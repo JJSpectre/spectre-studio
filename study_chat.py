@@ -57,6 +57,15 @@ MAX_SEARCHES = 3       # search_notes calls per answer
 MAX_SOURCES = 10       # passages the model can see and cite
 # Live progress of the answer being generated. /api/progress reads it.
 LIVE = {}
+# KaTeX files the page may load: exact URL -> (file, content type). Requests are only
+# looked up here and never turned into file paths.
+KATEX = ROOT / "vendor" / "katex"
+STATIC_TYPES = {".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8",
+                ".woff2": "font/woff2"}
+STATIC_FILES = {
+    "/vendor/katex/" + path.relative_to(KATEX).as_posix(): (path, STATIC_TYPES[path.suffix])
+    for path in KATEX.rglob("*") if path.suffix in STATIC_TYPES
+}
 
 EXPLAIN_PROMPT = (
     "You are a study tutor. Answer clearly using only the retrieved passages as evidence. "
@@ -1269,11 +1278,14 @@ class Handler(BaseHTTPRequestHandler):
 
     def reply(self, status, value, as_html=False):
         body = value.encode("utf-8") if as_html else json.dumps(value).encode("utf-8")
+        self.send(status, body, "text/html; charset=utf-8" if as_html else "application/json; charset=utf-8")
+
+    def send(self, status, body, content_type):
         self.send_response(status)
-        self.send_header("Content-Type", "text/html; charset=utf-8" if as_html else "application/json; charset=utf-8")
+        self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
-        self.send_header("Content-Security-Policy", "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'")
+        self.send_header("Content-Security-Policy", "default-src 'none'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'")
         self.send_header("X-Content-Type-Options", "nosniff")
         self.end_headers()
         try:
@@ -1288,6 +1300,13 @@ class Handler(BaseHTTPRequestHandler):
             return self.reply(200, (ROOT / "study_chat.html").read_text(encoding="utf-8").replace("__LOCAL_TOKEN__", TOKEN), as_html=True)
         if self.path == "/api/hello":
             return self.reply(200, {"app": "rag-study-chat"})
+        if self.path in STATIC_FILES:
+            path, content_type = STATIC_FILES[self.path]
+            try:
+                body = path.read_bytes()
+            except OSError:
+                return self.reply(404, {"error": "Not found."})
+            return self.send(200, body, content_type)
         return self.reply(404, {"error": "Not found."})
 
     def do_POST(self):

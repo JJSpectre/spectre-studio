@@ -1,0 +1,9 @@
+KaTeX 0.19.1 (MIT license, see LICENSE)
+https://katex.org
+
+Unmodified files from the npm package:
+https://registry.npmjs.org/katex/-/katex-0.19.1.tgz
+SHA-512 (base64): jG8uKntjSEcm2EpQOh0XturpPuuC9r3Sq5HLHdsFdWZT27E672SF19QEi+of0/YeOy15lDgRhKvr5614uRrEfA==
+
+Included: katex.min.js, katex.min.css, LICENSE, and the .woff2 fonts.
+Left out: the older .woff and .ttf copies of the same fonts, which Edge WebView2 never requests.

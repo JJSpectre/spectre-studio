@@ -1,0 +1,2 @@
+# Keep KaTeX's files exactly as published, with no line-ending changes.
+vendor/katex/** -text

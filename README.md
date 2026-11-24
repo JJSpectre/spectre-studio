@@ -16,6 +16,7 @@ I built it because hunting through a semester's worth of PDFs for one formula or
   - **Explain from my notes** (default): answers questions using only what's in your documents.
   - **Solve a problem**: walks through a worked solution step by step, using the methods and formulas from your notes, then shows how to check the answer on a TI-84 Plus CE. The math comes from built-in calculation tools rather than the language model, so the numbers are reliable.
 - **Fast updates.** Study Chat fingerprints each file and only processes notes that are new or changed, so updating the index after adding one PDF takes seconds instead of minutes.
+- **Formatted math.** LaTeX formulas in answers are drawn with [KaTeX](https://katex.org) 0.19.1 (MIT license), which is included in `vendor/katex`, so nothing loads from the internet.
 - **Model picker and comparison.** Choose which local model writes the answers, or run the same question through two models side by side to compare them.
 - **100% offline.** No API keys, no accounts, no cloud services.
 
@@ -86,7 +87,3 @@ Reopen Study Chat or click **Update index** to see your changes. Courses without
 ## How this was built
 
 I designed Study Chat, tested it on my own hardware, and directed every change, working with AI coding assistants to write and review much of the code. I'm studying Computer Science (AI-Assisted Software Engineering) at UNC Charlotte, and this project is how I learned RAG, embeddings, vector databases and local LLM tooling hands-on.
-
-## Roadmap
-
-- Render equations instead of showing raw LaTeX

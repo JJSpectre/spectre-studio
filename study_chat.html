@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="study-token" content="__LOCAL_TOKEN__">
 <title>Study Chat</title>
+<link rel="stylesheet" href="/vendor/katex/katex.min.css">
+<script defer src="/vendor/katex/katex.min.js"></script>
 <style>
 :root{color-scheme:light;--paper:#f8f8f2;--panel:#eeefe5;--line:#dbdfd1;--ink:#222820;--quiet:#515b50;--green:#214f3f;--green2:#e4efdf;--white:#fff;--shadow:0 6px 24px #1d3c2710}
 [hidden]{display:none!important}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
@@ -19,6 +21,7 @@ h1{font:500 clamp(36px,5vw,64px)/1.03 Georgia,serif;letter-spacing:-.05em;margin
 .turn{margin:0 0 26px}.you{display:flex;justify-content:flex-end;margin-bottom:18px}.bubble{max-width:88%;white-space:pre-wrap;overflow-wrap:anywhere;border-radius:15px 15px 3px 15px;background:var(--green2);padding:11px 15px}.reply-label{font-size:12px;font-weight:750;color:var(--green);margin-bottom:4px}.answer{white-space:pre-wrap;overflow-wrap:anywhere;font-size:16px}.error{color:#8e3528}.sources{margin-top:12px;color:var(--quiet);font-size:13px}.sources summary{cursor:pointer;color:var(--green);font-weight:670}.source{margin-top:8px;padding:9px 12px;background:#fff;border:1px solid var(--line);border-radius:8px;overflow-wrap:anywhere}.source strong{display:block;color:var(--ink)}.excerpt{white-space:pre-wrap;margin-top:4px}
 .bottom{padding:8px 24px 14px;background:var(--paper)}.composer{border:1px solid #c5cdbd;background:var(--white);border-radius:14px;box-shadow:var(--shadow);display:flex;gap:10px;align-items:flex-end;padding:8px;margin:auto;max-width:752px}.composer textarea{resize:vertical;min-height:44px;max-height:180px;flex:1;min-width:0;border:0;background:white;color:var(--ink);padding:9px}.send{padding:9px 17px;border-radius:10px;border:0}.foot{max-width:752px;margin:6px auto 0;color:var(--quiet);font-size:12px;min-height:18px}.foot.error{color:#8e3528}
 .answer.formatted{white-space:normal}.answer p,.answer blockquote{white-space:pre-wrap;margin:0 0 .68em}.answer h3,.answer h4{font-size:1.05em;margin:.75em 0 .3em}.answer ul,.answer ol{padding-left:1.5em;margin:0 0 .7em}.answer li{padding-left:.12em;margin:.18em 0}.answer blockquote{border-left:3px solid var(--line);padding-left:.75em;color:var(--quiet)}.answer code{background:#edf0e6;border-radius:4px;padding:.07em .25em}.answer pre{margin:0 0 .7em;background:#edf0e6;border-radius:8px;padding:10px 12px;white-space:pre-wrap;overflow-wrap:anywhere}.answer pre code{padding:0}.answer .citation{padding:0 .33em;border:1px solid #c2d6c8;border-radius:5px;background:var(--green2);color:var(--green);font-size:.8em;font-weight:680;vertical-align:.08em;margin:0 .1em}.source:focus{outline:2px solid #487b67;outline-offset:2px}
+.answer .katex{white-space:normal;font-size:1.1em}.answer .katex-display{margin:.5em 0;padding:.1em 0;overflow-x:auto;overflow-y:hidden}.answer .katex-display>.katex{white-space:nowrap}
 .reasoning .excerpt{max-height:340px;overflow:auto}.live{color:var(--quiet);font-style:italic}
 .compare{white-space:nowrap;border:1px solid #c5cdbd;border-radius:10px;padding:8px 11px;background:#f4f6ee;color:var(--green);font-weight:650}.compare:hover:not(:disabled){background:var(--green2)}.compare-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;white-space:normal}.model-card{min-width:0;border:1px solid var(--line);border-radius:11px;padding:13px;background:var(--white)}.model-name{font-size:14px;font-weight:760;color:var(--green);margin-bottom:2px}.model-time{font-size:12px;color:var(--quiet);margin-bottom:10px}.model-card .answer{font-size:14px}
 @media(max-width:680px){.compare-grid{grid-template-columns:1fr}.compare{white-space:normal;padding:7px;font-size:12px}.send{padding:8px 12px}}
@@ -172,7 +175,7 @@ function showLive(target,live){
     target.replaceChildren(make('span','live',who+(live.detail||'Using a tool')+'…'));
     notice(who+'Using tools · '+count);
   }else if(live.phase==='answering'&&live.answer){
-    showAnswer(target,live.answer,[]);
+    showAnswer(target,live.answer,[],false);
     notice(who+'Writing the answer… '+count);
   }else{
     target.replaceChildren(make('span','live',who+(live.phase==='thinking'?'Thinking… '+count:'Waiting for the model…')));
@@ -201,94 +204,77 @@ function addSources(turn,sources){
 }
 // Format study answers with a small, fixed set of DOM elements. Model and note
 // text never become HTML, links, or element attributes.
-function renderMath(value){
-  const display=value.startsWith('\\[')||value.startsWith('$$');
-  const width=value.startsWith('\\')||display?2:1;
-  const tokens=value.slice(width,-width).match(/\\[a-zA-Z]+|\\.|\d+(?:\.\d+)?|[^\s]/gu)||[];
-  if(!tokens.length||tokens.length>500) return document.createTextNode(value);
-  const symbols={pm:'±',mp:'∓',times:'×',cdot:'·',le:'≤',leq:'≤',ge:'≥',geq:'≥',
-    ne:'≠',neq:'≠',approx:'≈',alpha:'α',beta:'β',mu:'μ',sigma:'σ',pi:'π',infty:'∞',
-    sum:'∑',bar:'¯',hat:'^',overline:'¯',
-    // Arrows, dots, and operators models often use in worked steps.
-    Rightarrow:'⇒',rightarrow:'→',to:'→',Leftarrow:'⇐',leftarrow:'←',implies:'⟹',
-    ldots:'…',cdots:'⋯',dots:'…',div:'÷',lt:'<',gt:'>',sim:'∼',propto:'∝',
-    // Probability and set notation: P(A \mid B), A \cup B, A \cap B, x \in S.
-    mid:'∣',vert:'|',cup:'∪',cap:'∩',in:'∈',notin:'∉',emptyset:'∅',prime:'′',
-    // More Greek letters for statistics (chi-square, effect sizes, and so on).
-    chi:'χ',theta:'θ',lambda:'λ',delta:'δ',Delta:'Δ',rho:'ρ',epsilon:'ε',varepsilon:'ε',
-    phi:'φ',Sigma:'Σ',gamma:'γ',tau:'τ',omega:'ω',
-    // Spacing commands become plain spaces.
-    quad:' ',qquad:'  '};
-  // Escaped characters: \, \; \: and "\ " are spaces; \{ \} \% \$ \_ \& \# are literal.
-  const escaped={',':' ',';':' ',':':' ',' ':' ','!':'','{':'{','}':'}',
-    '%':'%','$':'$','_':'_','&':'&','#':'#','|':'‖','\\':' '};
-  let i=0;
-  function node(tag,...children){
-    const item=document.createElementNS('http://www.w3.org/1998/Math/MathML',tag);
-    item.append(...children);
-    return item;
-  }
-  function atom(){
-    const token=tokens[i++];
-    if(token==='{') return row(true);
-    if(!token||'}_^'.includes(token)) throw Error('Missing math operand');
-    if(token==='\\frac'||token==='\\dfrac'||token==='\\tfrac') return node('mfrac',atom(),atom());
-    if(token==='\\sqrt') return node('msqrt',atom());
-    if(['\\text','\\mathrm','\\mathbf','\\mathit','\\operatorname','\\textbf'].includes(token)) return atom();
-    if(token==='\\displaystyle'||token==='\\limits') return node('mrow');
-    if(token.startsWith('\\')){
-      const command=token.slice(1);
-      if(Object.hasOwn(escaped,command)) return node('mo',escaped[command]);
-      // \left( ... \right) just sizes the bracket; draw the bracket itself.
-      if(command==='left'||command==='right'){
-        const bracket=tokens[i++];
-        if(!bracket||bracket==='.') return node('mrow');
-        const shown=bracket.startsWith('\\')?(escaped[bracket.slice(1)]??symbols[bracket.slice(1)]??bracket.slice(1)):bracket;
-        return node('mo',shown);
-      }
-      if(['hat','bar','overline'].includes(command)){
-        const accent=node('mover',atom(),node('mo',symbols[command]));
-        accent.setAttribute('accent','true');
-        return accent;
-      }
-      if(!Object.hasOwn(symbols,command)) throw Error('Unsupported math command');
-      return node('mo',symbols[command]);
-    }
-    return node(/^\d/.test(token)?'mn':/^\p{L}$/u.test(token)?'mi':'mo',token==='-'?'−':token);
-  }
-  function row(group=false){
-    const result=node('mrow');
-    while(i<tokens.length&&tokens[i]!=='}'){
-      const base=atom();
-      let sub=null, sup=null;
-      while(tokens[i]==='_'||tokens[i]==='^'){
-        if(tokens[i++]==='_') sub=atom(); else sup=atom();
-      }
-      result.append(sub&&sup?node('msubsup',base,sub,sup):sub?node('msub',base,sub):sup?node('msup',base,sup):base);
-    }
-    if(group&&tokens[i++]!=='}') throw Error('Unclosed math group');
-    return result;
-  }
-  try{
-    const content=row();
-    if(i!==tokens.length) throw Error('Unmatched math group');
-    const math=node('math',content);
-    if(display) math.setAttribute('display','block');
-    return math;
-  }catch(_){return document.createTextNode(value)}
+// Dollar signs also mean money, so check that the text between them is a formula.
+function looksLikeMath(tex,display){
+  const command=/\\[a-zA-Z]/.test(tex);
+  // Inline math has no spaces just inside the dollars, or, with a command, one on each side.
+  const before=/^\s/.test(tex), after=/\s$/.test(tex);
+  if(!display&&(before||after)&&!(command&&before&&after)) return false;
+  if(command) return true;
+  // Markdown bold, two words in a row, or an amount followed by a word is prose.
+  if(tex.includes('**')||/\p{L}{2,}[\s,;:.]+\p{L}{2,}/u.test(tex)) return false;
+  return !(/^\s*\d/.test(tex)&&/[^\p{L}\d]\p{L}{3,}|\s\p{L}{2,}\s/u.test(tex));
 }
-function appendAnswerInline(target,text,citations,depth=0){
-  if(depth>=4){target.append(document.createTextNode(text));return}
-  const tokens=/\\\([\s\S]*?\\\)|\\\[[\s\S]*?\\\]|\$\$[\s\S]*?\$\$|\$[^$\n]+\$|\x60[^\x60\n]+\x60|\*\*[^*\n]+\*\*|__[^_\n]+__|\*[^*\n]+\*|\[\[\d{1,3}\]\]|\[\d{1,3}\]/g;
+// Swap each formula for a numbered placeholder before Markdown runs, so Markdown
+// can't split or restyle it. Code and escaped dollars are skipped.
+function takeMath(text){
+  const pattern=new RegExp([
+    /^[^\S\n]*(?<fence>\x60{3,}|~{3,})[\s\S]*?(?:\n[^\S\n]*\k<fence>[\x60~]*[^\S\n]*$|$(?![\s\S]))/,
+    /\x60[^\x60\n]+\x60/,
+    /\\\((?<paren>(?:\\(?![()])[\s\S]|[^\\\n]|\n(?![^\S\n]*\n))+?)\\\)/,
+    /\\\[(?<bracket>(?:\\(?![[\]])[\s\S]|[^\\])+?)\\\]/,
+    /\\[\\$]/,
+    /(?<![$\\])\$\$(?!\$)(?<block>(?:\\[\s\S]|[^$\\\n]|\$(?!\$)|\n(?![^\S\n]*\n))+?)\$\$(?!\$)/,
+    /(?<![A-Za-z0-9$\\])\$(?!\$)(?<inline>(?:\\[^()[\]\n]|[^$\\\n\x60])+?)\$(?![\d$])/
+  ].map(part=>part.source).join('|'),'gm');
+  const clean=text.replace(/[\x02\x03]/g,'');
+  const formulas=[];
+  let result='', cursor=0, match;
+  while((match=pattern.exec(clean))){
+    const {paren,bracket,block,inline}=match.groups;
+    let raw=match[0], tex=paren??bracket??block??inline;
+    if(tex===undefined) continue;
+    const display=bracket!==undefined||block!==undefined;
+    if(raw[0]==='$'&&!looksLikeMath(tex,display)){pattern.lastIndex=match.index+1;continue}
+    const line=clean.slice(clean.lastIndexOf('\n',match.index)+1,match.index);
+    if(/^\s*>/.test(line)) [raw,tex]=[raw,tex].map(part=>part.replace(/\n[^\S\n]*>[^\S\n]?/g,'\n'));
+    result+=clean.slice(cursor,match.index)+'\x02'+formulas.length+'\x03';
+    cursor=match.index+match[0].length;
+    formulas.push({raw,tex,display});
+  }
+  return {text:result+clean.slice(cursor),formulas};
+}
+function putMathBack(text,formulas){return text.replace(/\x02(\d+)\x03/g,(_,n)=>formulas[n].raw)}
+// Anything KaTeX can't draw, and every formula still being streamed, stays as original text.
+function renderMath({raw,tex,display},finished){
+  const original=document.createTextNode(raw);
+  if(!finished||typeof katex==='undefined'||tex.length>5000) return original;
+  // With trust off, KaTeX prints these commands in red instead of raising an error.
+  if(/\\(?:href|url|includegraphics|html[A-Za-z]+)(?![A-Za-z])/.test(tex)) return original;
+  const holder=document.createElement('span');
+  try{
+    // A bare % starts a LaTeX comment, which would silently hide the rest of the formula.
+    katex.render(tex.replace(/\\[\s\S]|%/g,part=>part==='%'?'\\%':part),holder,
+      {displayMode:display,throwOnError:true,trust:false,strict:'ignore',maxSize:20,maxExpand:500});
+    return holder;
+  }catch(_){return original}
+}
+function appendAnswerInline(target,text,citations,formulas,finished,depth=0){
+  if(depth>=4){target.append(document.createTextNode(putMathBack(text,formulas)));return}
+  const tokens=/\x02\d+\x03|\x60[^\x60\n]+\x60|\*\*[^*\n]+\*\*|__[^_\n]+__|\*[^*\n]+\*|\[\[\d{1,3}\]\]|\[\d{1,3}\]/g;
   let cursor=0;
   for(const match of text.matchAll(tokens)){
     const value=match[0];
     target.append(document.createTextNode(text.slice(cursor,match.index)));
     cursor=match.index+value.length;
-    if(value[0]==='\\'||value[0]==='$'){
-      target.append(renderMath(value));
+    if(value[0]==='\x02'){
+      const formula=formulas[Number(value.slice(1,-1))];
+      const node=renderMath(formula,finished);
+      target.append(node);
+      // Display math already ends its line, so drop the line break after it.
+      if(formula.display&&node.nodeType===Node.ELEMENT_NODE) cursor+=text.slice(cursor).match(/^[^\S\n]*\n|/)[0].length;
     }else if(value.charCodeAt(0)===96){
-      target.append(make('code','',value.slice(1,-1)));
+      target.append(make('code','',putMathBack(value.slice(1,-1),formulas)));
     }else if(value[0]==='['){
       const number=Number(value.replace(/\D/g,''));
       const openSource=citations[number-1];
@@ -301,22 +287,22 @@ function appendAnswerInline(target,text,citations,depth=0){
     }else{
       const width=value.startsWith('**')||value.startsWith('__')?2:1;
       const node=make(width===2?'strong':'em');
-      appendAnswerInline(node,value.slice(width,-width),citations,depth+1);
+      appendAnswerInline(node,value.slice(width,-width),citations,formulas,finished,depth+1);
       target.append(node);
     }
   }
   target.append(document.createTextNode(text.slice(cursor)));
 }
-function showAnswer(target,value,citations){
-  const text=String(value??'');
+function showAnswer(target,value,citations,finished=true){
+  const {text,formulas}=takeMath(String(value??'').replace(/\r\n?/g,'\n'));
   target.replaceChildren();
   target.classList.add('formatted');
-  const lines=text.replace(/\r\n?/g,'\n').split('\n');
+  const lines=text.split('\n');
   const listLine=/^\s*(?:(\d+)[.)]|[-*+])\s+(.+)$/;
   const fenceLine=/^\s*(\x60{3,}|~{3,})/;
   const quoteLine=/^\s*>\s?/;
   const headingLine=/^\s{0,3}(#{1,6})\s+(.+)$/;
-  const block=(tag,content)=>{const node=make(tag);appendAnswerInline(node,content,citations);target.append(node)};
+  const block=(tag,content)=>{const node=make(tag);appendAnswerInline(node,content,citations,formulas,finished);target.append(node)};
   let i=0;
   while(i<lines.length){
     const line=lines[i];
@@ -334,7 +320,7 @@ function showAnswer(target,value,citations){
         code.push(candidate);
       }
       const pre=make('pre');
-      pre.append(make('code','',code.join('\n')));
+      pre.append(make('code','',putMathBack(code.join('\n'),formulas)));
       target.append(pre);
     }else if(title){
       block(title[1].length<3?'h3':'h4',title[2]);
@@ -347,7 +333,7 @@ function showAnswer(target,value,citations){
         const item=lines[i].match(listLine);
         if(!item||Boolean(item[1])!==ordered) break;
         const row=make('li');
-        appendAnswerInline(row,item[2],citations);
+        appendAnswerInline(row,item[2],citations,formulas,finished);
         node.append(row);i++;
       }
       target.append(node);
