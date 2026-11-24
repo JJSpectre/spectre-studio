@@ -13,6 +13,7 @@ import threading
 import time
 import tomllib
 import traceback
+import unicodedata
 import webbrowser
 from collections import Counter
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -55,6 +56,25 @@ MAX_TOOL_ROUNDS = 20   # tool rounds before Study Chat asks for the final answer
 MAX_REPEATS = 3        # repeated identical calls before the same stop
 MAX_SEARCHES = 3       # search_notes calls per answer
 MAX_SOURCES = 10       # passages the model can see and cite
+FIRST_SOURCES = 4      # passages found before the model starts
+# Search. Three rankings are merged by reciprocal rank fusion: each passage scores
+# weight / (RRF_K + its rank) in each ranking.
+SEARCH_DEPTH = 50      # how far down each ranking to look
+RRF_K = 10
+WEIGHT_QUESTION = 0.5  # meaning of the whole question
+WEIGHT_ASK = 1.0       # meaning of only the part that asks for something
+WEIGHT_KEYWORDS = 0.5  # exact words (BM25)
+WEIGHT_RARE_TERM = 1.5 # exact words, when a short question names a rare term (1-PropZInt)
+SHORT_ASK = 3          # short: at most this many key words
+RARE_TERM = 3          # rare: in at most this many passages
+TYPED_TIE = 0.9        # a typed note this close to an OCR passage goes ahead of it
+HEADING_TERMS = 14     # opening words counted extra, since passages often start with a title
+HEADING_BOOST = 3
+STOP_WORDS = frozenset(
+    "a an and are as at be been by can did do does for from had has have how i if in into is it "
+    "its me my of on or said so than that the their them they this to up use was we were what "
+    "when which who will with would you your".split()
+)
 # Live progress of the answer being generated. /api/progress reads it.
 LIVE = {}
 # KaTeX files the page may load: exact URL -> (file, content type). Requests are only
@@ -402,12 +422,114 @@ def embedding_model():
     return EMBEDDER
 
 
-def search_phrases(text):
-    text = text.casefold()
+def keyword_words(text):
+    """The words of a passage or question that keyword search compares."""
+    # Every OCR passage starts with the same warning, so it says nothing about the topic.
+    text = re.sub(r"^\[Unverified OCR[^\]]*\]", "", text)
+    # PDFs often store "fi" as one character. NFKC splits it back into two letters.
+    text = unicodedata.normalize("NFKC", text).casefold()
     text = re.sub(r"\b(?:2\s*-?\s*prop\s*-?\s*ztest|two[\s-]+(?:(?:independent|population)\s+)*proportions?)\b",
                   "two proportions", text)
-    words = re.findall(r"[a-z0-9]+", text)
-    return set(zip(words, words[1:]))
+    words = [word for word in re.findall(r"\d+(?:\.\d+)?%|[^\W\d_]\w*", text)
+             if len(word) > 1 and word not in STOP_WORDS]
+    return [word[:-1] if len(word) > 3 and word.endswith("s")
+            and not word.endswith(("ss", "us", "is")) else word for word in words]
+
+
+def keyword_terms(words):
+    """Single words plus pairs of neighbors, so phrases count too."""
+    return words + [f"{first} {second}" for first, second in zip(words, words[1:])]
+
+
+ASK_SENTENCE = re.compile(
+    r"(?:\(\w\)\s*)?(?:[^,]{1,60},\s*)?"
+    r"(?:construct|find|test|estimate|compute|calculate|determine|explain|describe|give|state|define|"
+    r"interpret|compare|what|how|why|when|which|who|is|are|does|do|can)\b", re.I)
+
+
+def ask_part(question):
+    """The sentences that ask for something. The story in a word problem mostly
+    matches other stories, not the notes that teach the method."""
+    sentences = [part for part in re.split(r"(?<=[.?!])\s+(?=[A-Z(])", question) if part]
+    asking = [part for part in sentences if part.endswith("?") or ASK_SENTENCE.match(part)]
+    return " ".join(asking) or question
+
+
+def keyword_ranking(query, documents):
+    """Positions of the documents that share words with the query, best first (BM25)."""
+    wanted = set(keyword_terms(keyword_words(query)))
+    words = [keyword_words(text) for text in documents]
+    average = sum(map(len, words)) / len(words) if words else 0
+    counts = []
+    for passage in words:
+        found = Counter(keyword_terms(passage))
+        for term in keyword_terms(passage[:HEADING_TERMS]):
+            found[term] += HEADING_BOOST
+        counts.append(found)
+    rarity = {}
+    for term in wanted:
+        holders = sum(term in found for found in counts)
+        rarity[term] = math.log(1 + (len(counts) - holders + 0.5) / (holders + 0.5))
+    scores = []
+    for passage, found in zip(words, counts):
+        length = 1.2 * (0.25 + 0.75 * len(passage) / average) if average else 1.2
+        scores.append(sum(rarity[term] * found[term] * 2.2 / (found[term] + length)
+                          for term in wanted if term in found))
+    order = sorted(range(len(scores)), key=scores.__getitem__, reverse=True)
+    return [position for position in order if scores[position] > 0]
+
+
+def search_passages(query, where, limit, *, ask=None, skip=()):
+    """Return the best (metadata, text) passages by meaning and keywords combined.
+
+    ask is the part of the query that asks for something. Texts in skip are left out.
+    """
+    ask = ask or query
+    collection = index_collection()
+    # Keywords are read from the index itself, so they always match the current notes.
+    rows = collection.get(where=where, include=["documents", "metadatas"])
+    passages = {entry: (metadata, text) for entry, metadata, text
+                in zip(rows["ids"], rows["metadatas"], rows["documents"]) if text}
+    entries = list(passages)
+    documents = [passages[entry][1] for entry in entries]
+    keyword_weight = WEIGHT_KEYWORDS
+    asked = set(keyword_words(ask))
+    if len(asked) <= SHORT_ASK:
+        uses = Counter(word for text in documents for word in asked & set(keyword_words(text)))
+        if any(count <= RARE_TERM for count in uses.values()):
+            keyword_weight = WEIGHT_RARE_TERM
+    ranked = [(keyword_weight, [entries[position] for position in keyword_ranking(ask, documents)])]
+    for weight, text in ((WEIGHT_QUESTION, query), (WEIGHT_ASK, ask)):
+        vector = embedding_model().encode("search_query: " + text, show_progress_bar=False)
+        result = collection.query(query_embeddings=[vector.tolist()], where=where,
+                                  n_results=SEARCH_DEPTH, include=[])
+        ranked.append((weight, result["ids"][0]))
+    scores = Counter()
+    for weight, ranking in ranked:
+        for rank, entry in enumerate(ranking[:SEARCH_DEPTH], 1):
+            if entry in passages:
+                scores[entry] += weight / (RRF_K + rank)
+    order = [entry for entry, _ in scores.most_common()]
+
+    # A typed note has no misread symbols, so it wins a near tie with an OCR passage.
+    def kind(entry):
+        source = passages[entry][0]["source"].casefold()
+        return "typed" if source.endswith((".txt", ".md")) else "ocr" if source.endswith("ocr)") else "pdf"
+
+    for start in range(1, len(order)):
+        place = start
+        while (place and kind(order[place]) == "typed" and kind(order[place - 1]) == "ocr"
+               and scores[order[place]] >= TYPED_TIE * scores[order[place - 1]]):
+            order[place - 1], order[place] = order[place], order[place - 1]
+            place -= 1
+
+    seen, found = set(skip), []
+    for entry in order:
+        metadata, text = passages[entry]
+        if text not in seen and len(found) < limit:
+            seen.add(text)
+            found.append((metadata, text))
+    return found
 
 
 def prepare_question(data):
@@ -448,31 +570,13 @@ def prepare_question(data):
                 matched_sources.update(sources_by_filename[match.group()])
     if matched_sources:
         where = {"$and": [where, {"source": {"$in": sorted(matched_sources)}}]}
-    query = prior[-1] + "\nFollow-up: " + question if prior and follow_up and not matched_sources else question
-    vector = embedding_model().encode("search_query: " + query, show_progress_bar=False)
-    result = collection.query(
-        query_embeddings=[vector.tolist()], where=where, n_results=3,
-        include=["documents", "metadatas"],
-    )
-    candidates = list(zip(result["metadatas"][0], result["documents"][0]))
-    if not matched_sources:
-        phrases = search_phrases(question)
-        rows = collection.get(where=where, include=["documents", "metadatas"])
-        matches = [phrases & search_phrases(text or "") for text in rows["documents"]]
-        frequency = Counter(phrase for phrases_found in matches for phrase in phrases_found)
-        scores = [sum((12 if phrase == ("two", "proportions") else 1) / frequency[phrase]
-                      for phrase in found) for found in matches]
-        order = sorted(range(len(scores)), key=scores.__getitem__, reverse=True)
-        lexical = [(rows["metadatas"][i], rows["documents"][i]) for i in order[:2] if scores[i]]
-        candidates = candidates[:1] + lexical + candidates[1:]
-    sources = []
-    seen = set()
-    for metadata, document in candidates:
-        if document and document not in seen:
-            seen.add(document)
-            sources.append({"name": metadata["source"], "text": document})
-            if len(sources) == 4:
-                break
+    if prior and follow_up and not matched_sources:
+        # A short follow-up says too little by itself, so it isn't split up.
+        query = ask = prior[-1] + "\nFollow-up: " + question
+    else:
+        query, ask = question, ask_part(question)
+    sources = [{"name": metadata["source"], "text": text} for metadata, text
+               in search_passages(query, where, FIRST_SOURCES, ask=ask)]
     if not sources:
         return [], []
 
@@ -652,20 +756,13 @@ def search_notes(course, query, sources, limit=3):
     """Find more passages in the same course and number them after the existing ones."""
     if not isinstance(query, str) or not query.strip():
         return "Error: give a short search query, such as a method name."
-    vector = embedding_model().encode("search_query: " + query.strip()[:300], show_progress_bar=False)
-    result = index_collection().query(
-        query_embeddings=[vector.tolist()], where={"course": course},
-        n_results=limit + len(sources), include=["documents", "metadatas"],
-    )
-    seen = {source["text"] for source in sources}
+    found = search_passages(query.strip()[:300], {"course": course},
+                            min(limit, MAX_SOURCES - len(sources)),
+                            skip=[source["text"] for source in sources])
     added = []
-    for metadata, document in zip(result["metadatas"][0], result["documents"][0]):
-        if len(added) == limit or len(sources) >= MAX_SOURCES:
-            break
-        if document and document not in seen:
-            seen.add(document)
-            sources.append({"name": metadata["source"], "text": document})
-            added.append(len(sources))
+    for metadata, document in found:
+        sources.append({"name": metadata["source"], "text": document})
+        added.append(len(sources))
     if not added:
         return "No new passages found for that search."
     return "\n\n".join(f"[{n}] {sources[n - 1]['name']}\n{sources[n - 1]['text']}" for n in added)
