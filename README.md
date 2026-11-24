@@ -4,8 +4,7 @@
 
 I built it because hunting through a semester's worth of PDFs for one formula or definition was slow. Study Chat turns that into a few seconds.
 
-<!-- Screenshot: add one at docs/screenshot.png and remove the comment markers below -->
-<!-- ![Study Chat answering a question with cited sources](docs/screenshot.png) -->
+![Study Chat answering a question from the sample notes, with its source passages expanded](docs/screenshot.png)
 
 ## What it does
 
