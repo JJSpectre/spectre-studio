@@ -52,7 +52,7 @@ Python 3.12 · ChromaDB · sentence-transformers (Nomic Embed v1.5) · PyTorch w
    pip install torch==2.11.0 --index-url https://download.pytorch.org/whl/cu128
    pip install -r requirements.txt
    ```
-3. Add your documents, one folder per course. To try it first, copy the `AUTO-101` folder from `sample-notes` into a new `notes` folder. It has two short sample notes on brakes and check engine codes.
+3. Add your documents, one folder per course. To try it first, copy the `AUTO-101` folder from `sample-notes` into a new `notes` folder. It has two short sample notes on brakes and check engine codes, plus starter questions.
    ```
    notes\
        COURSE-1\
@@ -65,6 +65,19 @@ Python 3.12 · ChromaDB · sentence-transformers (Nomic Embed v1.5) · PyTorch w
 5. Double-click **Setup Study Chat.cmd** once. It creates a **Study Chat** shortcut on your desktop.
 6. Open Study Chat from the shortcut and click **Update index** to build the search database.
 
+## Starter questions
+
+Each course can have its own starter cards on the welcome screen. Put a file named `starters.toml` in the course folder, with one `[[card]]` section per card:
+
+```toml
+[[card]]
+title = "Review a concept"
+detail = "How disc brakes work"
+question = "How does a disc brake slow a wheel?"
+```
+
+Reopen Study Chat or click **Update index** to see your changes. Courses without this file show no cards. Everything under `notes` stays out of Git, so your own cards stay private.
+
 ## Notes on accuracy
 
 - OCR can misread math symbols. For formulas you rely on, keep a typed version in a `.txt` file in the course folder. Study Chat prefers typed text over OCR when both exist.
@@ -76,5 +89,4 @@ I designed Study Chat, tested it on my own hardware, and directed every change, 
 
 ## Roadmap
 
-- Make the default course and starter questions configurable instead of hard-coded
 - Render equations instead of showing raw LaTeX

@@ -11,6 +11,7 @@ import subprocess
 import sys
 import threading
 import time
+import tomllib
 import traceback
 import webbrowser
 from collections import Counter
@@ -22,6 +23,7 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parent
 DB = ROOT / "chroma_db"
 LOG = ROOT / "study-chat.log"
+LAST_COURSE = ROOT / "last_course.txt"
 EMBED_MODEL = "nomic-ai/nomic-embed-text-v1.5"
 DOC_PREFIX = "search_document: "
 # Saved with the index. If either value changes, Update index re-embeds everything.
@@ -115,7 +117,68 @@ def courses():
     if not (DB / "chroma.sqlite3").is_file():
         return []
     info = index_collection().get(include=["metadatas"])
-    return sorted({m["course"] for m in info["metadatas"] if m and m.get("course")})
+    return sorted({m["course"] for m in info["metadatas"] if m and m.get("course")},
+                  key=str.casefold)
+
+
+def save_last_course(course):
+    """Remember the course for next time. This uses a file because the desktop
+    window runs in private mode, so browser storage is lost when it closes."""
+    try:
+        LAST_COURSE.write_text(course, encoding="utf-8")
+    except OSError as error:
+        print(f"Couldn't save the last course: {error}", flush=True)
+
+
+def default_course(names):
+    """The course used last time, or the first one if that isn't available."""
+    try:
+        saved = LAST_COURSE.read_text(encoding="utf-8-sig").strip()
+    except (OSError, ValueError):
+        saved = ""
+    if saved in names:
+        return saved
+    return names[0] if names else ""
+
+
+def load_starters(course):
+    """Read the course's starter cards from notes/<course>/starters.toml, if it has any."""
+    path = ROOT / "notes" / course / "starters.toml"
+    if not path.is_file():
+        return []
+    try:
+        data = tomllib.loads(path.read_text(encoding="utf-8-sig"))
+        cards = data.pop("card", [])
+        if data or not isinstance(cards, list):
+            raise ValueError("start each card with a [[card]] line")
+        starters = []
+        for number, card in enumerate(cards, 1):
+            starter = {}
+            for key in ("title", "detail", "question"):
+                text = card.get(key) if isinstance(card, dict) else None
+                if not isinstance(text, str) or not text.strip():
+                    raise ValueError(f"card {number} needs a {key}, in quotes")
+                starter[key] = text.strip()
+            if len(starter["question"]) > 1800:
+                raise ValueError(f"the question in card {number} is over 1,800 characters")
+            starters.append(starter)
+    except (OSError, ValueError) as error:
+        raise AppError(f"Couldn't read notes/{course}/starters.toml: {error}") from error
+    return starters
+
+
+def course_info():
+    """What the page needs to show the courses and their starter cards."""
+    names = courses()
+    starters, problems = {}, []
+    for course in names:
+        try:
+            starters[course] = load_starters(course)
+        except AppError as error:
+            # A typo in one file only hides that course's cards.
+            problems.append(str(error))
+    return {"courses": names, "default_course": default_course(names),
+            "starters": starters, "starter_problems": problems}
 
 
 def lm_json(path, data=None, timeout=5):
@@ -292,7 +355,7 @@ def activate_model(target):
 def app_status():
     global ACTIVE_MODEL
     online = lm_online()
-    response = {"courses": courses(), "online": online, "model": ACTIVE_MODEL,
+    response = {**course_info(), "online": online, "model": ACTIVE_MODEL,
                 "loaded": None, "pending_load": PENDING_LOAD,
                 "models": [{"id": key, "name": name} for name, key in COMPARISON_MODELS]}
     if online:
@@ -337,6 +400,7 @@ def prepare_question(data):
         raise AppError("Choose Explain or Solve.")
     if not isinstance(selected, str) or selected not in courses():
         raise AppError("Select a course that has already been indexed.")
+    save_last_course(selected)
     prior = []
     if isinstance(history, list):
         for turn in history[-2:]:
@@ -1196,7 +1260,7 @@ def rebuild(progress_callback=None):
         detail = index_summary("indexed", skipped, len(new), len(changed))
     if stale_ids:
         detail += f" Removed {len(stale_ids)} old."
-    return {"message": f"{heading} · {COLLECTION.count()} chunks · {detail}", "courses": courses()}
+    return {"message": f"{heading} · {COLLECTION.count()} chunks · {detail}", **course_info()}
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -1242,6 +1306,12 @@ class Handler(BaseHTTPRequestHandler):
             return self.reply(400, {"error": "Invalid request."})
         if self.path == "/api/progress":
             return self.reply(200, {"message": INDEX_PROGRESS, "live": dict(LIVE)})
+        if self.path == "/api/course":
+            course = data.get("course")
+            if not isinstance(course, str) or not 1 <= len(course) <= 255 or not course.isprintable():
+                return self.reply(400, {"error": "Select a course."})
+            save_last_course(course)
+            return self.reply(200, {"message": "Course saved."})
         if not WORK.acquire(blocking=False):
             return self.reply(409, {"error": "Study Chat is busy. Wait for the current task to finish."})
         try:

@@ -1,0 +1,12 @@
+# Starter cards for this course. Each [[card]] section makes one card.
+# Delete this file if you don't want any cards.
+
+[[card]]
+title = "Review a concept"
+detail = "How disc brakes work"
+question = "How does a disc brake slow a wheel?"
+
+[[card]]
+title = "Look up a code"
+detail = "What P0301 means"
+question = "What does the trouble code P0301 mean?"
