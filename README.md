@@ -14,10 +14,10 @@ I built it because hunting through a semester's worth of PDFs for one formula or
 - **Organizes by course.** One folder per class. Search a single course or switch between them from a dropdown.
 - **Two modes:**
   - **Explain from my notes** (default): answers questions using only what's in your documents.
-  - **Solve a problem**: walks through a worked solution step by step, using the methods and formulas from your notes, then shows how to check the answer on a TI-84 Plus CE. The math comes from built-in calculation tools rather than the language model, so the numbers are reliable.
+  - **Solve a problem**: walks through a worked solution step by step, using the methods and formulas from your notes, then shows how to check the answer on a TI-84. The math comes from built-in calculation tools rather than the language model, so the numbers are reliable.
 - **Fast updates.** Study Chat fingerprints each file and only processes notes that are new or changed, so updating the index after adding one PDF takes seconds instead of minutes.
 - **Formatted math.** LaTeX formulas in answers are drawn with [KaTeX](https://katex.org) 0.19.1 (MIT license), which is included in `vendor/katex`, so nothing loads from the internet.
-- **Model picker and comparison.** Choose which local model writes the answers, or run the same question through two models side by side to compare them.
+- **Model picker.** Choose which local model writes the answers. Qwen 27B (`qwen/qwen3.8-27b`) is the default.
 - **100% offline.** No API keys, no accounts, no cloud services.
 
 ## How it works
@@ -35,11 +35,23 @@ Study Chat is a **retrieval-augmented generation (RAG)** app:
 
 Python 3.12 · ChromaDB · sentence-transformers (Nomic Embed v1.5) · PyTorch with CUDA · LM Studio local server · Tesseract OCR · pypdf · pywebview
 
-**Tested on:** Windows 11, RTX 3060 for embeddings, Radeon RX 7900 XT for the language model.
+**Tested on:** Windows 11 with a Radeon RX 7900 XT for the chat model and an RTX 3060, which runs the embedding model and also holds part of the chat model when LM Studio splits it across both GPUs.
+
+## Benchmarks
+
+User-measured on my PC (RTX 3060 + RX 7900 XT, LM Studio Vulkan), using a Solve-mode question asking for a 95% confidence interval for a proportion (n=120, x=54):
+
+| Model | Answer time | Notes |
+| --- | --- | --- |
+| Qwen3.8 27B | ~35-41 s | Correct; cited the typed formula note; numbers from tools |
+| GPT-OSS 20B | ~15-20 s | Correct interval; before the tool showed the standard error, it made one up |
+| Flint | ~490 s | Correct, but about 7,000 words of reasoning |
+
+With Qwen split across both GPUs, generation ran at about 42 tokens/s (about 35 s total answer time). On the 7900 XT alone, it ran at about 25 tokens/s (about 63 s). Answer time also depends on how long the model reasons.
 
 ## Setup
 
-**You'll need:** Windows, Python 3.12, an NVIDIA GPU (recommended for speed), [LM Studio](https://lmstudio.ai/) with at least one chat model downloaded, and optionally [Tesseract OCR](https://github.com/UB-Mannheim/tesseract/wiki) for reading text in PDF images.
+**You'll need:** Windows, Python 3.12, an NVIDIA GPU (recommended for speed), [LM Studio](https://lmstudio.ai/) with at least one chat model downloaded (the default is Qwen 27B, `qwen/qwen3.8-27b`), and optionally [Tesseract OCR](https://github.com/UB-Mannheim/tesseract/wiki) for reading text in PDF images.
 
 1. Clone the repo and open a terminal in its folder:
    ```

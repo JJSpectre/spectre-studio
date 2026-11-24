@@ -30,13 +30,15 @@ DOC_PREFIX = "search_document: "
 # Saved with the index. If either value changes, Update index re-embeds everything.
 INDEX_LABEL = {"embedding_model": EMBED_MODEL, "document_prefix": DOC_PREFIX}
 CHAT_MODEL = "qwen/qwen3.8-27b"
-COMPARISON_MODELS = (
+# Display names, the picker's choices while LM Studio is offline, and the models
+# this app manages (may unload) from the start.
+STUDY_MODELS = (
     ("Qwen 27B", CHAT_MODEL),
     ("Flint", "recursivesi/flint"),
 )
 ACTIVE_MODEL = CHAT_MODEL
 PENDING_LOAD = None
-MANAGED_MODELS = {model for _, model in COMPARISON_MODELS}
+MANAGED_MODELS = {model for _, model in STUDY_MODELS}
 INDEX_PROGRESS = ""
 BASE_URL = "http://127.0.0.1:1234"
 HOST = "127.0.0.1"
@@ -100,14 +102,14 @@ SOLVE_PROMPT = (
     "You are a study tutor solving a problem for a student. Use the retrieved passages as the "
     "source of methods, definitions, and formulas, and cite them as [1], [2], etc. Do the "
     "arithmetic yourself with the numbers given in the problem. Organize the answer under these "
-    "short Markdown headings: Problem type, Formula, Steps, Answer, Check on a TI-84 Plus CE. "
+    "short Markdown headings: Problem type, Formula, Steps, Answer, Check on a TI-84. "
     "Problem type: name the method and cite the note that covers it. "
     "Formula: write the formula from the notes with its citation. "
     "Steps: substitute the numbers and compute one step per line, keeping at least four decimal "
     "places until the end. "
     "Answer: give the final result; for a hypothesis test, also give the decision and a "
     "one-sentence conclusion in context. "
-    "Check on a TI-84 Plus CE: give the menu path and the values to enter, if the calculator "
+    "Check on a TI-84: give the menu path and the values to enter, if the calculator "
     "has a built-in function for it. "
     "If the notes do not cover the method, say so before solving and label any formula that is "
     "not from the notes as 'not from your notes'. If a formula only appears in garbled OCR, say "
@@ -294,7 +296,7 @@ def loaded_ids(model):
 
 
 def display_model(model, row=None):
-    return dict((key, name) for name, key in COMPARISON_MODELS).get(model) or (
+    return dict((key, name) for name, key in STUDY_MODELS).get(model) or (
         (row or {}).get("display_name") or model
     )
 
@@ -402,7 +404,7 @@ def app_status():
     online = lm_online()
     response = {**course_info(), "online": online, "model": ACTIVE_MODEL,
                 "loaded": None, "pending_load": PENDING_LOAD,
-                "models": [{"id": key, "name": name} for name, key in COMPARISON_MODELS]}
+                "models": [{"id": key, "name": name} for name, key in STUDY_MODELS]}
     if online:
         catalog = model_catalog()
         adopt_loaded_model(catalog)
@@ -849,11 +851,20 @@ def _two_sample_t(args):
     x2, s2, n2 = _num(args, "xbar2"), _num(args, "sx2", positive=True), _num(args, "n2", whole=True)
     if n1 < 2 or n2 < 2:
         raise ValueError("Each sample needs n of at least 2.")
+    difference = f"x̄1 − x̄2 = {x1 - x2:.10g}"
     if args.get("pooled") in (True, "true", "yes", 1):
         sp = _pooled_sd(s1, n1, s2, n2)
-        return x1, x2, n1, n2, sp * math.sqrt(1 / n1 + 1 / n2), n1 + n2 - 2, f"Pooled: yes, sp = {sp:.10g}"
+        se, df = sp * math.sqrt(1 / n1 + 1 / n2), n1 + n2 - 2
+        return x1, x2, n1, n2, se, df, (
+            f"Pooled: yes, df = n1 + n2 − 2\n{difference}\n"
+            f"sp = sqrt(((n1 − 1)s1² + (n2 − 1)s2²)/(n1 + n2 − 2)) = {sp:.10g}\n"
+            f"SE (pooled) = sp sqrt(1/n1 + 1/n2) = {se:.10g}")
     se, df = _welch(s1, n1, s2, n2)
-    return x1, x2, n1, n2, se, df, "Pooled: no (Welch degrees of freedom, as on the TI-84)"
+    return x1, x2, n1, n2, se, df, (
+        f"Pooled: no (Welch degrees of freedom, as on the TI-84)\n{difference}\n"
+        f"s1²/n1 = {s1 ** 2 / n1:.10g}\ns2²/n2 = {s2 ** 2 / n2:.10g}\n"
+        f"SE (unpooled) = sqrt(s1²/n1 + s2²/n2) = {se:.10g}\n"
+        "df formula: (s1²/n1 + s2²/n2)² / ((s1²/n1)²/(n1 − 1) + (s2²/n2)²/(n2 − 1))")
 
 
 def ti84_test(args):
@@ -868,7 +879,8 @@ def ti84_test(args):
         z = (p_hat - p0) / se
         return (f"1-PropZTest  H0: p = {g(p0)}  Ha: p {ALT_SIGN[alt]} {g(p0)}\n"
                 f"Formula: z = (p̂ − p0) / sqrt(p0(1 − p0)/n)\n"
-                f"p̂ = x/n = {x}/{n} = {g(p_hat)}\nSE = {g(se)}\nz = {g(z)}\np-value = {g(_z_p(z, alt))}")
+                f"p̂ = x/n = {x}/{n} = {g(p_hat)}\np̂ − p0 = {g(p_hat - p0)}\n"
+                f"SE (from p0) = sqrt(p0(1 − p0)/n) = {g(se)}\nz = {g(z)}\np-value = {g(_z_p(z, alt))}")
     if test == "2-propztest":
         x1, n1 = _counts(args, "x1", "n1")
         x2, n2 = _counts(args, "x2", "n2")
@@ -879,15 +891,18 @@ def ti84_test(args):
         return (f"2-PropZTest  H0: p1 = p2  Ha: p1 {ALT_SIGN[alt]} p2\n"
                 f"Formula: z = (p̂1 − p̂2) / sqrt(p̂(1 − p̂)(1/n1 + 1/n2)), p̂ = (x1 + x2)/(n1 + n2)\n"
                 f"p̂1 = {x1}/{n1} = {g(p1)}\np̂2 = {x2}/{n2} = {g(p2)}\n"
+                f"p̂1 − p̂2 = {g(p1 - p2)}\n"
                 f"p̂ (pooled) = ({x1} + {x2})/({n1} + {n2}) = {g(pooled)}\n"
-                f"SE = {g(se)}\nz = {g(z)}\np-value = {g(_z_p(z, alt))}")
+                f"SE (pooled) = sqrt(p̂(1 − p̂)(1/n1 + 1/n2)) = {g(se)}\n"
+                f"z = {g(z)}\np-value = {g(_z_p(z, alt))}")
     if test == "ztest":
         mu0, sigma = _num(args, "mu0"), _num(args, "sigma", positive=True)
         xbar, n, alt = _num(args, "xbar"), _num(args, "n", whole=True, positive=True), _alternative(args)
         se = sigma / math.sqrt(n)
         z = (xbar - mu0) / se
         return (f"ZTest  H0: μ = {g(mu0)}  Ha: μ {ALT_SIGN[alt]} {g(mu0)}\n"
-                f"Formula: z = (x̄ − μ0) / (σ/√n)\nSE = σ/√n = {g(se)}\nz = {g(z)}\np-value = {g(_z_p(z, alt))}")
+                f"Formula: z = (x̄ − μ0) / (σ/√n)\nx̄ − μ0 = {g(xbar - mu0)}\n"
+                f"SE = σ/√n = {g(se)}\nz = {g(z)}\np-value = {g(_z_p(z, alt))}")
     if test == "ttest":
         mu0, xbar, sx = _num(args, "mu0"), _num(args, "xbar"), _num(args, "sx", positive=True)
         n, alt = _num(args, "n", whole=True), _alternative(args)
@@ -896,7 +911,8 @@ def ti84_test(args):
         se = sx / math.sqrt(n)
         t = (xbar - mu0) / se
         return (f"TTest  H0: μ = {g(mu0)}  Ha: μ {ALT_SIGN[alt]} {g(mu0)}\n"
-                f"Formula: t = (x̄ − μ0) / (s/√n), df = n − 1\nSE = s/√n = {g(se)}\n"
+                f"Formula: t = (x̄ − μ0) / (s/√n), df = n − 1\nx̄ − μ0 = {g(xbar - mu0)}\n"
+                f"SE = s/√n = {g(se)}\n"
                 f"t = {g(t)}\ndf = {n - 1}\np-value = {g(_t_p(t, n - 1, alt))}")
     if test == "2-sampztest":
         s1, s2 = _num(args, "sigma1", positive=True), _num(args, "sigma2", positive=True)
@@ -906,23 +922,27 @@ def ti84_test(args):
         se = math.sqrt(s1 ** 2 / n1 + s2 ** 2 / n2)
         z = (x1 - x2) / se
         return (f"2-SampZTest  H0: μ1 = μ2  Ha: μ1 {ALT_SIGN[alt]} μ2\n"
-                f"Formula: z = (x̄1 − x̄2) / sqrt(σ1²/n1 + σ2²/n2)\nSE = {g(se)}\nz = {g(z)}\n"
+                f"Formula: z = (x̄1 − x̄2) / sqrt(σ1²/n1 + σ2²/n2)\nx̄1 − x̄2 = {g(x1 - x2)}\n"
+                f"σ1²/n1 = {g(s1 ** 2 / n1)}\nσ2²/n2 = {g(s2 ** 2 / n2)}\n"
+                f"SE (unpooled) = sqrt(σ1²/n1 + σ2²/n2) = {g(se)}\nz = {g(z)}\n"
                 f"p-value = {g(_z_p(z, alt))}")
     if test == "2-sampttest":
         alt = _alternative(args)
         x1, x2, n1, n2, se, df, note = _two_sample_t(args)
         t = (x1 - x2) / se
-        return (f"2-SampTTest  H0: μ1 = μ2  Ha: μ1 {ALT_SIGN[alt]} μ2\n{note}\n"
-                f"Formula: t = (x̄1 − x̄2) / SE\nSE = {g(se)}\nt = {g(t)}\ndf = {g(df)}\n"
+        return (f"2-SampTTest  H0: μ1 = μ2  Ha: μ1 {ALT_SIGN[alt]} μ2\n"
+                f"Formula: t = (x̄1 − x̄2) / SE\n{note}\nt = {g(t)}\ndf = {g(df)}\n"
                 f"p-value = {g(_t_p(t, df, alt))}")
     if test == "1-propzint":
         x, n = _counts(args, "x", "n")
         level = _c_level(args)
         p_hat = x / n
         z_star = statistics.NormalDist().inv_cdf((1 + level) / 2)
-        me = z_star * math.sqrt(p_hat * (1 - p_hat) / n)
+        se = math.sqrt(p_hat * (1 - p_hat) / n)
+        me = z_star * se
         return (f"1-PropZInt  C-Level {g(level)}\nFormula: p̂ ± z* sqrt(p̂(1 − p̂)/n)\n"
-                f"p̂ = {x}/{n} = {g(p_hat)}\nz* = {g(z_star)}\nmargin of error = {g(me)}\n"
+                f"p̂ = {x}/{n} = {g(p_hat)}\nSE (from p̂) = sqrt(p̂(1 − p̂)/n) = {g(se)}\n"
+                f"z* = {g(z_star)}\nmargin of error = {g(me)}\n"
                 f"interval = ({g(p_hat - me)}, {g(p_hat + me)})")
     if test == "2-propzint":
         x1, n1 = _counts(args, "x1", "n1")
@@ -930,17 +950,21 @@ def ti84_test(args):
         level = _c_level(args)
         p1, p2 = x1 / n1, x2 / n2
         z_star = statistics.NormalDist().inv_cdf((1 + level) / 2)
-        me = z_star * math.sqrt(p1 * (1 - p1) / n1 + p2 * (1 - p2) / n2)
+        se = math.sqrt(p1 * (1 - p1) / n1 + p2 * (1 - p2) / n2)
+        me = z_star * se
         return (f"2-PropZInt  C-Level {g(level)}\n"
                 f"Formula: (p̂1 − p̂2) ± z* sqrt(p̂1(1 − p̂1)/n1 + p̂2(1 − p̂2)/n2)\n"
-                f"p̂1 = {g(p1)}\np̂2 = {g(p2)}\nz* = {g(z_star)}\nmargin of error = {g(me)}\n"
+                f"p̂1 = {x1}/{n1} = {g(p1)}\np̂2 = {x2}/{n2} = {g(p2)}\np̂1 − p̂2 = {g(p1 - p2)}\n"
+                f"SE (unpooled) = sqrt(p̂1(1 − p̂1)/n1 + p̂2(1 − p̂2)/n2) = {g(se)}\n"
+                f"z* = {g(z_star)}\nmargin of error = {g(me)}\n"
                 f"interval = ({g(p1 - p2 - me)}, {g(p1 - p2 + me)})")
     if test == "zinterval":
         sigma, xbar = _num(args, "sigma", positive=True), _num(args, "xbar")
         n, level = _num(args, "n", whole=True, positive=True), _c_level(args)
         z_star = statistics.NormalDist().inv_cdf((1 + level) / 2)
         me = z_star * sigma / math.sqrt(n)
-        return (f"ZInterval  C-Level {g(level)}\nFormula: x̄ ± z* σ/√n\nz* = {g(z_star)}\n"
+        return (f"ZInterval  C-Level {g(level)}\nFormula: x̄ ± z* σ/√n\nx̄ = {g(xbar)}\n"
+                f"SE = σ/√n = {g(sigma / math.sqrt(n))}\nz* = {g(z_star)}\n"
                 f"margin of error = {g(me)}\ninterval = ({g(xbar - me)}, {g(xbar + me)})")
     if test == "tinterval":
         xbar, sx = _num(args, "xbar"), _num(args, "sx", positive=True)
@@ -949,7 +973,8 @@ def ti84_test(args):
             raise ValueError("n must be at least 2.")
         t_star = float(_scipy_stats().t.ppf((1 + level) / 2, n - 1))
         me = t_star * sx / math.sqrt(n)
-        return (f"TInterval  C-Level {g(level)}\nFormula: x̄ ± t* s/√n, df = n − 1\ndf = {n - 1}\n"
+        return (f"TInterval  C-Level {g(level)}\nFormula: x̄ ± t* s/√n, df = n − 1\nx̄ = {g(xbar)}\n"
+                f"SE = s/√n = {g(sx / math.sqrt(n))}\ndf = {n - 1}\n"
                 f"t* = {g(t_star)}\nmargin of error = {g(me)}\ninterval = ({g(xbar - me)}, {g(xbar + me)})")
     if test == "2-sampzint":
         s1, s2 = _num(args, "sigma1", positive=True), _num(args, "sigma2", positive=True)
@@ -957,17 +982,19 @@ def ti84_test(args):
         x2, n2 = _num(args, "xbar2"), _num(args, "n2", whole=True, positive=True)
         level = _c_level(args)
         z_star = statistics.NormalDist().inv_cdf((1 + level) / 2)
-        me = z_star * math.sqrt(s1 ** 2 / n1 + s2 ** 2 / n2)
+        se = math.sqrt(s1 ** 2 / n1 + s2 ** 2 / n2)
+        me = z_star * se
         return (f"2-SampZInt  C-Level {g(level)}\nFormula: (x̄1 − x̄2) ± z* sqrt(σ1²/n1 + σ2²/n2)\n"
-                f"z* = {g(z_star)}\nmargin of error = {g(me)}\n"
+                f"x̄1 − x̄2 = {g(x1 - x2)}\nσ1²/n1 = {g(s1 ** 2 / n1)}\nσ2²/n2 = {g(s2 ** 2 / n2)}\n"
+                f"SE (unpooled) = sqrt(σ1²/n1 + σ2²/n2) = {g(se)}\nz* = {g(z_star)}\nmargin of error = {g(me)}\n"
                 f"interval = ({g(x1 - x2 - me)}, {g(x1 - x2 + me)})")
     if test == "2-samptint":
         level = _c_level(args)
         x1, x2, n1, n2, se, df, note = _two_sample_t(args)
         t_star = float(_scipy_stats().t.ppf((1 + level) / 2, df))
         me = t_star * se
-        return (f"2-SampTInt  C-Level {g(level)}\n{note}\nFormula: (x̄1 − x̄2) ± t* SE\n"
-                f"SE = {g(se)}\ndf = {g(df)}\nt* = {g(t_star)}\nmargin of error = {g(me)}\n"
+        return (f"2-SampTInt  C-Level {g(level)}\nFormula: (x̄1 − x̄2) ± t* SE\n{note}\n"
+                f"df = {g(df)}\nt* = {g(t_star)}\nmargin of error = {g(me)}\n"
                 f"interval = ({g(x1 - x2 - me)}, {g(x1 - x2 + me)})")
     raise ValueError(
         "Unknown test. Use one of: 1-PropZTest, 2-PropZTest, ZTest, TTest, 2-SampZTest, "
@@ -979,8 +1006,8 @@ TI84_TOOL = {"type": "function", "function": {
     "name": "ti84_test",
     "description": (
         "Run a hypothesis test or confidence interval exactly as the TI-84 STAT > TESTS menu "
-        "does. Returns the formula, intermediate values, the statistic, and the p-value or "
-        "interval. Use it for every test or interval instead of computing by hand. "
+        "does. Returns the formula, the intermediate values (including the standard error), and "
+        "the statistic and p-value or the interval. Use it for every test or interval instead of computing by hand. "
         "Inputs by test: 1-PropZTest: x, n, p0, alternative. 2-PropZTest: x1, n1, x2, n2, "
         "alternative. ZTest: mu0, sigma, xbar, n, alternative. TTest: mu0, xbar, sx, n, "
         "alternative. 2-SampZTest: sigma1, sigma2, xbar1, n1, xbar2, n2, alternative. "
@@ -1053,7 +1080,7 @@ def run_tool(call, tools):
             return ti84_test(args)
         except (ValueError, ArithmeticError, TypeError) as error:
             return f"Error: {error}"
-    if call["name"] == "search_notes" and tools.get("search"):
+    if call["name"] == "search_notes":
         if tools["searches"] >= MAX_SEARCHES:
             return "Error: the search limit was reached. Answer with the passages you have."
         tools["searches"] += 1
@@ -1140,10 +1167,10 @@ def stream_completion(payload, started, tokens):
     return "".join(content_parts), "".join(reasoning_parts), tool_calls, finish_reason, tokens
 
 
-def generate_answer(model_id, messages, *, comparing=False, label="", tools=None):
+def generate_answer(model_id, messages, *, label="", tools=None):
     """Stream an answer, running any tools the model asks for.
 
-    tools is None (no tools) or a dict with course, sources, search, and searches.
+    tools is None (no tools) or a dict with course, sources, and searches.
     Returns (answer, reasoning, tool_log).
     """
     messages = list(messages)
@@ -1158,10 +1185,8 @@ def generate_answer(model_id, messages, *, comparing=False, label="", tools=None
     try:
         for round_number in range(MAX_TOOL_ROUNDS + 1):
             payload = {"model": model_id, "stream": True, "messages": messages}
-            if comparing:
-                payload["temperature"] = 0
             if offer_tools:
-                payload["tools"] = [TI84_TOOL, CALCULATE_TOOL] + ([SEARCH_TOOL] if tools.get("search") else [])
+                payload["tools"] = [TI84_TOOL, CALCULATE_TOOL, SEARCH_TOOL]
             content, thought, calls, finish_reason, tokens = stream_completion(payload, started, tokens)
             thought_in_text, answer = split_reasoning(content)
             reasoning_rounds.append((thought + thought_in_text).strip())
@@ -1236,7 +1261,7 @@ def ask(data):
     loaded = time.monotonic()
     # Solve mode gets the calculator and note search. search_notes adds
     # passages to this same sources list, so new citations line up.
-    tools = ({"course": data["course"], "sources": sources, "search": True, "searches": 0}
+    tools = ({"course": data["course"], "sources": sources, "searches": 0}
              if data.get("mode") == "solve" else None)
     answer, reasoning, tool_log = generate_answer(instance, messages, label=name, tools=tools)
     return {"answer": answer, "reasoning": reasoning, "tools": tool_log, "sources": sources,
@@ -1244,31 +1269,6 @@ def ask(data):
         "retrieval": round(retrieved - started, 2), "model_setup": round(loaded - retrieved, 2),
         "answer": round(time.monotonic() - loaded, 2),
     }}
-
-
-def compare(data):
-    sources, messages = prepare_question(data)
-    if not sources:
-        return {"results": [], "sources": []}
-    results = []
-    # Run the default (listed first) last, so a successful comparison leaves it ready.
-    for name, model_id in reversed(COMPARISON_MODELS):
-        started = time.monotonic()
-        try:
-            instance, _ = activate_model(model_id)
-            # Compare shares one set of passages between both models, so it gets
-            # the calculator but not search (search would renumber citations).
-            tools = ({"course": data["course"], "sources": sources, "search": False, "searches": 0}
-                     if data.get("mode") == "solve" else None)
-            answer, reasoning, tool_log = generate_answer(
-                instance, messages, comparing=True, label=name, tools=tools)
-            entry = {"name": name, "answer": answer, "reasoning": reasoning, "tools": tool_log}
-        except AppError as error:
-            entry = {"name": name, "error": str(error)}
-        entry["seconds"] = round(time.monotonic() - started, 1)
-        results.append(entry)
-    results.reverse()
-    return {"results": results, "sources": sources, "active_model": ACTIVE_MODEL}
 
 
 def chunk_metadata(chunk):
@@ -1452,8 +1452,6 @@ class Handler(BaseHTTPRequestHandler):
                 result = {"model": target, "name": name, "models": model_options(model_catalog())}
             elif self.path == "/api/ask":
                 result = ask(data)
-            elif self.path == "/api/compare":
-                result = compare(data)
             elif self.path == "/api/rebuild":
                 result = rebuild()
             elif self.path == "/api/notes":

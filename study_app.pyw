@@ -12,6 +12,43 @@ LOG = ROOT / "study-chat-desktop.log"
 ICON = ROOT / "study-chat.ico"
 
 
+def enable_right_click(window):
+    """Turn on WebView2's right-click menu, which pywebview only enables in debug mode.
+
+    It opens on the question box and on selected text. Elsewhere it would offer
+    Refresh, which clears the chat.
+    """
+    view = window.native.webview
+
+    def on_menu(_, args):
+        try:
+            target = args.ContextMenuTarget
+            if not (target.IsEditable or target.HasSelection):
+                args.Handled = True  # Handled without a choice: no menu opens.
+                return
+            for item in list(args.MenuItems):
+                if item.Name == "reload":
+                    args.MenuItems.Remove(item)
+        except Exception:
+            logging.exception("Could not prepare the right-click menu")
+            args.Handled = True
+
+    def turn_on(*_):
+        try:
+            if view.CoreWebView2 is not None:
+                view.CoreWebView2.Settings.AreDefaultContextMenusEnabled = True
+                view.CoreWebView2.ContextMenuRequested += on_menu
+        except Exception:
+            logging.exception("Could not enable the right-click menu")
+
+    # WebView2 starts in the background. pywebview's own handler sets its defaults
+    # first, then this one runs, before the page loads.
+    if view.CoreWebView2 is None:
+        view.CoreWebView2InitializationCompleted += turn_on
+    else:
+        turn_on()
+
+
 def open_window():
     import study_chat as backend
     import webview
@@ -28,8 +65,9 @@ def open_window():
 
         window = webview.create_window(
             "Study Chat", backend.ORIGIN, width=1140, height=810,
-            min_size=(690, 510), background_color="#f8f8f2",
+            min_size=(690, 510), background_color="#f8f8f2", text_select=True,
         )
+        window.events.before_show += lambda: enable_right_click(window)
         closing = Event()
 
         def mark_closed():
