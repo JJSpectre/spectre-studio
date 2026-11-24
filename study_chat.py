@@ -28,10 +28,10 @@ EMBED_MODEL = "nomic-ai/nomic-embed-text-v1.5"
 DOC_PREFIX = "search_document: "
 # Saved with the index. If either value changes, Update index re-embeds everything.
 INDEX_LABEL = {"embedding_model": EMBED_MODEL, "document_prefix": DOC_PREFIX}
-CHAT_MODEL = "recursivesi/flint"
+CHAT_MODEL = "qwen/qwen3.8-27b"
 COMPARISON_MODELS = (
-    ("Flint", CHAT_MODEL),
-    ("Qwen 27B", "qwen/qwen3.8-27b"),
+    ("Qwen 27B", CHAT_MODEL),
+    ("Flint", "recursivesi/flint"),
 )
 ACTIVE_MODEL = CHAT_MODEL
 PENDING_LOAD = None
@@ -361,18 +361,31 @@ def activate_model(target):
     return instance, display_model(target, catalog[target])
 
 
-def app_status():
+def adopt_loaded_model(catalog):
+    """If the selected model isn't loaded but one other managed model is, select that one."""
     global ACTIVE_MODEL
+    if ACTIVE_MODEL not in catalog or not loaded_ids(catalog[ACTIVE_MODEL]):
+        active = [key for key in catalog if key in MANAGED_MODELS and loaded_ids(catalog[key])]
+        if len(active) == 1:
+            ACTIVE_MODEL = active[0]
+
+
+def activate_selected_model():
+    """For ask_notes.py, which has no model picker: use the study model LM Studio
+    already has loaded, or load the default."""
+    ensure_lm()
+    adopt_loaded_model(model_catalog())
+    return activate_model(ACTIVE_MODEL)
+
+
+def app_status():
     online = lm_online()
     response = {**course_info(), "online": online, "model": ACTIVE_MODEL,
                 "loaded": None, "pending_load": PENDING_LOAD,
                 "models": [{"id": key, "name": name} for name, key in COMPARISON_MODELS]}
     if online:
         catalog = model_catalog()
-        if ACTIVE_MODEL not in catalog or not loaded_ids(catalog[ACTIVE_MODEL]):
-            active = [key for key in catalog if key in MANAGED_MODELS and loaded_ids(catalog[key])]
-            if len(active) == 1:
-                ACTIVE_MODEL = active[0]
+        adopt_loaded_model(catalog)
         response.update(model=ACTIVE_MODEL, models=model_options(catalog),
                         loaded=bool(loaded_ids(catalog.get(ACTIVE_MODEL, {}))))
     return response
@@ -1141,7 +1154,7 @@ def compare(data):
     if not sources:
         return {"results": [], "sources": []}
     results = []
-    # Run Flint last so a successful comparison leaves the default ready.
+    # Run the default (listed first) last, so a successful comparison leaves it ready.
     for name, model_id in reversed(COMPARISON_MODELS):
         started = time.monotonic()
         try:
