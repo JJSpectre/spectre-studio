@@ -2,19 +2,24 @@
 
 import os
 import hashlib
+import json
 import shutil
 import subprocess
 import tempfile
 from io import BytesIO
 from pathlib import Path
 
-from PIL import Image, ImageOps
-from pypdf import PdfReader
+from PIL import Image, ImageOps, __version__ as PILLOW_VERSION
+from pypdf import PdfReader, __version__ as PYPDF_VERSION
 
 NOTES_DIR = Path(__file__).resolve().parent / "notes"
 CHUNK_SIZE = 500
 OVERLAP = 50
 OCR_CACHE = NOTES_DIR.parent / ".ocr_cache"
+# Change this when extract_image_text() changes, so old OCR results aren't reused.
+OCR_SETTINGS = "ocr-v1-eng-psm3"
+# Change this when parse_pdf() changes, so old saved PDFs aren't reused.
+PDF_CACHE_VERSION = "pdf-v1"
 NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 
 
@@ -68,21 +73,12 @@ def extract_image_text(image, tesseract):
     return result.stdout.decode("utf-8", errors="replace").strip()
 
 
-def cached_image_text(image_file, tesseract, cache):
-    executable = Path(tesseract).stat()
-    key = hashlib.sha256()
-    key.update(f"ocr-v1-eng-psm3:{executable.st_size}:{executable.st_mtime_ns}:".encode())
-    key.update(image_file.data)
-    target = cache / (key.hexdigest() + ".txt")
-    try:
-        return target.read_text(encoding="utf-8")
-    except OSError:
-        pass
-    text = extract_image_text(image_file.image, tesseract)
+def write_cache(target, text):
+    """Save a cache file in one step. If it can't be saved, it is just redone next time."""
     tmp = None
     try:
-        cache.mkdir(parents=True, exist_ok=True)
-        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=cache, delete=False) as stream:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=target.parent, delete=False) as stream:
             tmp = Path(stream.name)
             stream.write(text)
         tmp.replace(target)
@@ -92,12 +88,67 @@ def cached_image_text(image_file, tesseract, cache):
                 tmp.unlink()
             except OSError:
                 pass
+
+
+def cached_image_text(image_file, tesseract, cache):
+    executable = Path(tesseract).stat()
+    key = hashlib.sha256()
+    key.update(f"{OCR_SETTINGS}:{executable.st_size}:{executable.st_mtime_ns}:".encode())
+    key.update(image_file.data)
+    target = cache / (key.hexdigest() + ".txt")
+    try:
+        return target.read_text(encoding="utf-8")
+    except OSError:
+        pass
+    text = extract_image_text(image_file.image, tesseract)
+    write_cache(target, text)
     return text
 
 
+def pdf_cache_file(data, cache):
+    """Name the cache file after the PDF's bytes and every tool that affects the result."""
+    try:
+        executable = Path(find_tesseract()).stat()
+        tesseract = f"{executable.st_size}:{executable.st_mtime_ns}"
+    except (SystemExit, OSError):
+        # Text-only PDFs don't need Tesseract. parse_pdf() reports it if a PDF does.
+        tesseract = "none"
+    key = hashlib.sha256()
+    key.update(f"{PDF_CACHE_VERSION}:{OCR_SETTINGS}:pypdf-{PYPDF_VERSION}:"
+               f"pillow-{PILLOW_VERSION}:{tesseract}:".encode())
+    key.update(data)
+    return cache / f"pdf-{key.hexdigest()}.json"
+
+
+def load_pdf_cache(target):
+    """Return (pages, image_texts) saved earlier, or None if missing or damaged."""
+    try:
+        saved = json.loads(target.read_text(encoding="utf-8"))
+        pages = [(page, text) for page, text in saved["pages"]]
+        image_texts = [(page, image, text) for page, image, text in saved["image_texts"]]
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
+    for *numbers, text in pages + image_texts:
+        if not isinstance(text, str) or not all(type(number) is int for number in numbers):
+            return None
+    return pages, image_texts
+
+
 def read_pdf(path, *, cache=OCR_CACHE, progress=None):
+    """Read a PDF, or reuse the saved result if this exact file was read before."""
+    data = Path(path).read_bytes()
+    target = pdf_cache_file(data, cache)
+    saved = load_pdf_cache(target)
+    if saved is not None:
+        return saved
+    pages, image_texts = parse_pdf(path, data, cache=cache, progress=progress)
+    write_cache(target, json.dumps({"pages": pages, "image_texts": image_texts}))
+    return pages, image_texts
+
+
+def parse_pdf(path, data, *, cache=OCR_CACHE, progress=None):
     """Keep original PDF text separate from OCR, with page numbers on OCR."""
-    reader = PdfReader(path)
+    reader = PdfReader(BytesIO(data))
     pages = []
     image_texts = []
     tesseract = None

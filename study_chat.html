@@ -457,7 +457,7 @@ for(const button of el.starters.querySelectorAll('button'))button.onclick=()=>{e
 $('new').onclick=reset;
 $('notes').onclick=async()=>{try{const out=await api('notes');notice(out.message)}catch(error){notice(error.message,true)}};
 $('update').onclick=async()=>{
-  busy=true;controls();notice('Updating notes and reading any PDF images. This can take a few minutes.');
+  busy=true;controls();notice('Checking your notes for changes…');
   let updating=true;
   const poll=setInterval(async()=>{
     try{const out=await api('progress');if(updating&&out.message) notice(out.message)}

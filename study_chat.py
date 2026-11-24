@@ -22,6 +22,10 @@ from urllib.request import Request, urlopen
 ROOT = Path(__file__).resolve().parent
 DB = ROOT / "chroma_db"
 LOG = ROOT / "study-chat.log"
+EMBED_MODEL = "nomic-ai/nomic-embed-text-v1.5"
+DOC_PREFIX = "search_document: "
+# Saved with the index. If either value changes, Update index re-embeds everything.
+INDEX_LABEL = {"embedding_model": EMBED_MODEL, "document_prefix": DOC_PREFIX}
 CHAT_MODEL = "recursivesi/flint"
 COMPARISON_MODELS = (
     ("Flint", CHAT_MODEL),
@@ -308,7 +312,7 @@ def embedding_model():
         os.environ["HF_HUB_OFFLINE"] = "1"
         from sentence_transformers import SentenceTransformer
         EMBEDDER = SentenceTransformer(
-            "nomic-ai/nomic-embed-text-v1.5", device="cuda:0", local_files_only=True,
+            EMBED_MODEL, device="cuda:0", local_files_only=True,
         )
     return EMBEDDER
 
@@ -1084,6 +1088,21 @@ def compare(data):
     return {"results": results, "sources": sources, "active_model": ACTIVE_MODEL}
 
 
+def chunk_metadata(chunk):
+    return {key: chunk[key] for key in ("course", "source", "page_start", "page_end")
+            if key in chunk}
+
+
+def index_summary(verb, skipped, new, changed):
+    """For example: Skipped 300 unchanged passages, indexing 9 new and 3 changed."""
+    counts = " and ".join(f"{count} {kind}" for count, kind in ((new, "new"), (changed, "changed"))
+                          if count)
+    if not skipped and counts:
+        return f"{verb.capitalize()} {counts} passage{'' if new + changed == 1 else 's'}."
+    text = f"Skipped {skipped} unchanged passage{'' if skipped == 1 else 's'}"
+    return f"{text}, {verb} {counts}." if counts else text + "."
+
+
 def rebuild(progress_callback=None):
     global CLIENT, COLLECTION, INDEX_PROGRESS
     from ingest import OCRError, load_chunks
@@ -1104,24 +1123,65 @@ def rebuild(progress_callback=None):
     if CLIENT is None:
         import chromadb
         CLIENT = chromadb.PersistentClient(path=str(DB))
-    if COLLECTION is None:
-        COLLECTION = CLIENT.get_or_create_collection(
+
+    def open_collection():
+        # An existing collection keeps the label it was created with.
+        return CLIENT.get_or_create_collection(
             "study_notes", embedding_function=None,
-            configuration={"hnsw": {"space": "cosine"}},
+            configuration={"hnsw": {"space": "cosine"}}, metadata=INDEX_LABEL,
         )
-    model = embedding_model() if chunks else None
-    for start in range(0, len(chunks), 16):
-        batch = chunks[start:start + 16]
-        progress(f"Indexing chunks {start + 1}–{start + len(batch)} of {len(chunks)}…")
-        docs = [chunk["text"] for chunk in batch]
-        vectors = model.encode(["search_document: " + text for text in docs], batch_size=8,
-                               show_progress_bar=False)
-        COLLECTION.upsert(
-            ids=[chunk["id"] for chunk in batch], documents=docs,
-            embeddings=vectors.tolist(),
-            metadatas=[{key: chunk[key] for key in ("course", "source", "page_start", "page_end")
-                        if key in chunk} for chunk in batch],
-        )
+
+    if COLLECTION is None:
+        COLLECTION = open_collection()
+    label = COLLECTION.metadata or {}
+    reembed = bool(chunks) and any(label.get(key) != value for key, value in INDEX_LABEL.items())
+    if reembed:
+        # Vectors from different embedding setups can't be mixed, so start over.
+        # Load the model first: if that fails, the old index is still there.
+        progress(f"The embedding setup changed or wasn't recorded. "
+                 f"Re-embedding all {len(chunks)} passages.")
+        embedding_model()
+        COLLECTION = None
+        CLIENT.delete_collection("study_notes")
+        COLLECTION = open_collection()
+
+    # Compare the notes with what is already indexed.
+    rows = COLLECTION.get(include=["documents", "metadatas"])
+    stored = {entry: (text, metadata or {}) for entry, text, metadata
+              in zip(rows["ids"], rows["documents"], rows["metadatas"])}
+    new, changed, relabel = [], [], []
+    for chunk in chunks:
+        if chunk["id"] not in stored:
+            new.append(chunk)
+            continue
+        text, metadata = stored[chunk["id"]]
+        if text != chunk["text"]:
+            changed.append(chunk)
+        elif metadata != chunk_metadata(chunk):
+            # Same words, so the vector is still right. Only the page or course moved.
+            relabel.append(chunk)
+    to_embed = new + changed
+    skipped = len(chunks) - len(to_embed)
+
+    if to_embed:
+        summary = index_summary("indexing", skipped, len(new), len(changed))
+        progress(summary)
+        model = embedding_model()
+        for start in range(0, len(to_embed), 16):
+            batch = to_embed[start:start + 16]
+            progress(f"{summary} ({start + 1}–{start + len(batch)} of {len(to_embed)})")
+            docs = [chunk["text"] for chunk in batch]
+            vectors = model.encode([DOC_PREFIX + text for text in docs], batch_size=8,
+                                   show_progress_bar=False)
+            COLLECTION.upsert(
+                ids=[chunk["id"] for chunk in batch], documents=docs,
+                embeddings=vectors.tolist(),
+                metadatas=[chunk_metadata(chunk) for chunk in batch],
+            )
+    for start in range(0, len(relabel), 1000):
+        batch = relabel[start:start + 1000]
+        COLLECTION.update(ids=[chunk["id"] for chunk in batch],
+                          metadatas=[chunk_metadata(chunk) for chunk in batch])
     current_ids = {chunk["id"] for chunk in chunks}
     stale_ids = [entry for entry in COLLECTION.get(include=[])["ids"]
                  if entry not in current_ids]
@@ -1129,7 +1189,14 @@ def rebuild(progress_callback=None):
         progress("Removing passages that are no longer in the notes.")
         for start in range(0, len(stale_ids), 1000):
             COLLECTION.delete(ids=stale_ids[start:start + 1000])
-    return {"message": f"Index updated · {COLLECTION.count()} chunks", "courses": courses()}
+    heading = "Index updated" if to_embed or relabel or stale_ids else "Index is up to date"
+    if reembed:
+        detail = f"Re-embedded all {len(to_embed)} passages."
+    else:
+        detail = index_summary("indexed", skipped, len(new), len(changed))
+    if stale_ids:
+        detail += f" Removed {len(stale_ids)} old."
+    return {"message": f"{heading} · {COLLECTION.count()} chunks · {detail}", "courses": courses()}
 
 
 class Handler(BaseHTTPRequestHandler):
