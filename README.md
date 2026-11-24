@@ -15,6 +15,7 @@ I built it because hunting through a semester's worth of PDFs for one formula or
 - **Two modes:**
   - **Explain from my notes** (default): answers questions using only what's in your documents.
   - **Solve a problem**: walks through a worked solution step by step, using the methods and formulas from your notes, then shows how to check the answer on a TI-84 Plus CE. The math comes from built-in calculation tools rather than the language model, so the numbers are reliable.
+- **Fast updates.** Study Chat fingerprints each file and only processes notes that are new or changed, so updating the index after adding one PDF takes seconds instead of minutes.
 - **Model picker and comparison.** Choose which local model writes the answers, or run the same question through two models side by side to compare them.
 - **100% offline.** No API keys, no accounts, no cloud services.
 
@@ -24,9 +25,10 @@ Study Chat is a **retrieval-augmented generation (RAG)** app:
 
 1. **Ingest** (`ingest.py`): reads every file in `notes/<course>/`, extracts the text (plus OCR text from PDF images via Tesseract), and splits it into passages tagged with course, file and page.
 2. **Embed and store:** each passage is turned into a vector with the Nomic Embed v1.5 model, running on an NVIDIA GPU through PyTorch CUDA, and saved in a local ChromaDB database.
-3. **Retrieve:** your question is embedded the same way, and ChromaDB returns the closest passages from the selected course.
-4. **Answer:** the passages go to a language model running in LM Studio, which writes an answer that cites them as [1], [2] and so on.
-5. **Interface** (`study_chat.py`, `study_chat.html`, `study_app.pyw`): a small local web server and HTML interface, opened in its own desktop window with pywebview.
+3. **Update incrementally:** each PDF is fingerprinted (SHA-256), so unchanged files reuse their cached text and OCR. Only new or changed passages are embedded, and passages from deleted files are removed. The database is labeled with the embedding model that built it, so switching models triggers a full rebuild instead of mixing incompatible vectors. An update with no changes takes seconds.
+4. **Retrieve:** your question is embedded the same way, and ChromaDB returns the closest passages from the selected course.
+5. **Answer:** the passages go to a language model running in LM Studio, which writes an answer that cites them as [1], [2] and so on.
+6. **Interface** (`study_chat.py`, `study_chat.html`, `study_app.pyw`): a small local web server and HTML interface, opened in its own desktop window with pywebview.
 
 ## Tech stack
 
