@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="study-token" content="__LOCAL_TOKEN__">
+<title>Study Chat</title>
+<style>
+:root{color-scheme:light;--paper:#f8f8f2;--panel:#eeefe5;--line:#dbdfd1;--ink:#222820;--quiet:#515b50;--green:#214f3f;--green2:#e4efdf;--white:#fff;--shadow:0 6px 24px #1d3c2710}
+[hidden]{display:none!important}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
+button,textarea,select{font:inherit}button{cursor:pointer}button:disabled,select:disabled{opacity:.55;cursor:default}button:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid #487b67;outline-offset:3px}
+.layout{display:grid;grid-template-columns:246px minmax(0,1fr);height:100dvh}.side{background:var(--panel);border-right:1px solid var(--line);padding:28px 20px 20px;display:flex;flex-direction:column;gap:22px}
+.brand{display:flex;align-items:center;gap:11px;font-weight:760;font-size:19px;letter-spacing:-.035em}.mark{display:grid;place-items:center;width:35px;height:35px;border-radius:10px;color:white;background:var(--green);font:600 21px Georgia}.sub{font-size:12px;color:var(--quiet);font-weight:500;letter-spacing:0}
+.course-wrap label,.section-label{font-size:11px;letter-spacing:.13em;font-weight:740;text-transform:uppercase;color:var(--quiet);display:block;margin-bottom:7px}
+select,.tool{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#f9f9f4;color:var(--ink);text-align:left}.tool+.tool{margin-top:8px}.tool:hover:not(:disabled){background:#fff}.primary{background:var(--green);color:white;border-color:var(--green);font-weight:680}.primary:hover:not(:disabled){background:#316551}.quit{margin-top:auto}.quit button{background:none;border:0;padding:0;color:var(--quiet);font-size:13px}.local{color:var(--quiet);font-size:12px}
+.main{display:grid;grid-template-rows:auto minmax(0,1fr) auto;min-height:0}.top{border-bottom:1px solid var(--line);padding:16px 28px;display:flex;justify-content:space-between;align-items:center;gap:12px}.top strong{font-size:14px}.status{font-size:12px;color:var(--quiet);display:flex;gap:6px;align-items:center}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#967035}.dot.on{background:#397a51}
+.scroll{overflow:auto;min-height:0}.thread{max-width:800px;margin:auto;padding:32px 24px 24px;min-height:100%}.welcome{padding:clamp(28px,9vh,125px) 0 28px}.kicker{font-size:11px;letter-spacing:.19em;font-weight:750;color:var(--green);text-transform:uppercase}
+h1{font:500 clamp(36px,5vw,64px)/1.03 Georgia,serif;letter-spacing:-.05em;margin:14px 0}.welcome p{max-width:470px;color:var(--quiet);font-size:16px;margin:0 0 26px}.starters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.starter{background:#fff;border:1px solid var(--line);text-align:left;color:var(--ink);padding:14px;border-radius:12px}.starter strong{display:block;color:var(--green);margin-bottom:3px}.starter span{color:var(--quiet);font-size:13px}.starter:hover{border-color:#749683}
+.turn{margin:0 0 26px}.you{display:flex;justify-content:flex-end;margin-bottom:18px}.bubble{max-width:88%;white-space:pre-wrap;overflow-wrap:anywhere;border-radius:15px 15px 3px 15px;background:var(--green2);padding:11px 15px}.reply-label{font-size:12px;font-weight:750;color:var(--green);margin-bottom:4px}.answer{white-space:pre-wrap;overflow-wrap:anywhere;font-size:16px}.error{color:#8e3528}.sources{margin-top:12px;color:var(--quiet);font-size:13px}.sources summary{cursor:pointer;color:var(--green);font-weight:670}.source{margin-top:8px;padding:9px 12px;background:#fff;border:1px solid var(--line);border-radius:8px;overflow-wrap:anywhere}.source strong{display:block;color:var(--ink)}.excerpt{white-space:pre-wrap;margin-top:4px}
+.bottom{padding:8px 24px 14px;background:var(--paper)}.composer{border:1px solid #c5cdbd;background:var(--white);border-radius:14px;box-shadow:var(--shadow);display:flex;gap:10px;align-items:flex-end;padding:8px;margin:auto;max-width:752px}.composer textarea{resize:vertical;min-height:44px;max-height:180px;flex:1;min-width:0;border:0;background:white;color:var(--ink);padding:9px}.send{padding:9px 17px;border-radius:10px;border:0}.foot{max-width:752px;margin:6px auto 0;color:var(--quiet);font-size:12px;min-height:18px}.foot.error{color:#8e3528}
+.answer.formatted{white-space:normal}.answer p,.answer blockquote{white-space:pre-wrap;margin:0 0 .68em}.answer h3,.answer h4{font-size:1.05em;margin:.75em 0 .3em}.answer ul,.answer ol{padding-left:1.5em;margin:0 0 .7em}.answer li{padding-left:.12em;margin:.18em 0}.answer blockquote{border-left:3px solid var(--line);padding-left:.75em;color:var(--quiet)}.answer code{background:#edf0e6;border-radius:4px;padding:.07em .25em}.answer pre{margin:0 0 .7em;background:#edf0e6;border-radius:8px;padding:10px 12px;white-space:pre-wrap;overflow-wrap:anywhere}.answer pre code{padding:0}.answer .citation{padding:0 .33em;border:1px solid #c2d6c8;border-radius:5px;background:var(--green2);color:var(--green);font-size:.8em;font-weight:680;vertical-align:.08em;margin:0 .1em}.source:focus{outline:2px solid #487b67;outline-offset:2px}
+.reasoning .excerpt{max-height:340px;overflow:auto}.live{color:var(--quiet);font-style:italic}
+.compare{white-space:nowrap;border:1px solid #c5cdbd;border-radius:10px;padding:8px 11px;background:#f4f6ee;color:var(--green);font-weight:650}.compare:hover:not(:disabled){background:var(--green2)}.compare-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;white-space:normal}.model-card{min-width:0;border:1px solid var(--line);border-radius:11px;padding:13px;background:var(--white)}.model-name{font-size:14px;font-weight:760;color:var(--green);margin-bottom:2px}.model-time{font-size:12px;color:var(--quiet);margin-bottom:10px}.model-card .answer{font-size:14px}
+@media(max-width:680px){.compare-grid{grid-template-columns:1fr}.compare{white-space:normal;padding:7px;font-size:12px}.send{padding:8px 12px}}
+@media(max-width:720px){.layout{display:flex;flex-direction:column}.side{padding:9px 12px;gap:8px;display:grid;grid-template-columns:1fr 1fr auto;border-right:0;border-bottom:1px solid var(--line);align-items:center}.brand{font-size:16px}.brand .sub,.section-label,.course-wrap label,.local{display:none}.mark{width:28px;height:28px}.tools{grid-column:1/3;display:flex;gap:5px}.tool{width:auto;padding:6px 8px;font-size:11px}.tool+.tool{margin-top:0}.quit{margin:0;grid-column:3;grid-row:2}.main{flex:1}.top{padding:7px 12px}.thread{padding:18px 12px}.welcome{padding-top:19px}.bottom{padding:6px 12px}.starters{grid-template-columns:1fr}.course-wrap select{padding:5px 8px}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="side" aria-label="Study controls">
+  <div class="brand"><span class="mark" aria-hidden="true">S</span><div>Study Chat<div class="sub">Your local study assistant</div></div></div>
+  <div class="course-wrap"><label for="course">Course</label><select id="course" aria-label="Course" disabled><option>Checking index…</option></select></div>
+  <div class="course-wrap model-wrap"><label for="model">Study model</label><select id="model" aria-label="Study model" disabled><option>Checking models…</option></select></div>
+  <div class="course-wrap"><label for="mode">Mode</label><select id="mode" aria-label="Mode"><option value="explain">Explain from my notes</option><option value="solve">Solve a problem</option></select></div>
+  <div class="tools"><span class="section-label">Workspace</span><button class="tool primary" id="new">New chat</button><button class="tool" id="notes">Open notes folder</button><button class="tool" id="update">Update index</button></div>
+  <div class="quit"><button id="quit">Quit app</button><div class="local">RAG · On this PC</div></div>
+</aside>
+<main class="main">
+  <header class="top"><strong id="title">Study session</strong><span class="status" id="status"><span id="dot" class="dot"></span><span id="statusText">Checking LM Studio…</span></span></header>
+  <div class="scroll" id="scroll"><div class="thread" id="thread">
+    <section class="welcome" id="welcome">
+      <div class="kicker">Notes in, answers out</div>
+      <h1>What are you<br>studying today?</h1>
+      <p>Ask a question and see which passages from your own notes informed the answer.</p>
+      <div class="starters" id="starters">
+        <button class="starter" data-q="What is the difference between an explanatory variable and a response variable?"><strong>Review a concept</strong><span>Explanatory vs. response variables</span></button>
+        <button class="starter" data-q="What is the formula for a 95% confidence interval for a population proportion?"><strong>Find a formula</strong><span>95% confidence interval for a proportion</span></button>
+      </div>
+    </section>
+  </div></div>
+  <div class="bottom">
+    <form class="composer" id="form"><textarea id="question" rows="1" maxlength="1800" aria-label="Your question" placeholder="Ask a question about your notes…" required></textarea><button type="submit" class="send primary" id="send" disabled>Ask</button><button type="submit" class="compare" id="compare" disabled>Compare models</button></form>
+    <div class="foot" id="message" role="status">Enter to ask · Shift+Enter for a new line · Check original pages for exact OCR formulas.</div>
+  </div>
+</main>
+</div>
+<script>
+'use strict';
+const $=id=>document.getElementById(id), token=document.querySelector('meta[name=study-token]').content;
+const el={course:$('course'), model:$('model'), mode:$('mode'), form:$('form'), question:$('question'), send:$('send'), compare:$('compare'), thread:$('thread'), scroll:$('scroll'), welcome:$('welcome'), starters:$('starters'), message:$('message')};
+let busy=false, stopped=false, indexed=[], history=[], modelOptions=[], activeModel='';
+const hint='Enter to ask · Shift+Enter for a new line · Check original pages for exact OCR formulas.';
+async function api(path,data={}) {
+  const r=await fetch('/api/'+path,{method:'POST',headers:{'Content-Type':'application/json','X-Study-Token':token},body:JSON.stringify(data)});
+  const out=await r.json();
+  if(!r.ok) throw new Error(out.error||'Request failed.');
+  return out;
+}
+function notice(text,error=false){el.message.textContent=text;el.message.classList.toggle('error',error)}
+function online(on){$('dot').classList.toggle('on',on);$('statusText').textContent=on?'LM Studio connected':'LM Studio · connects when you ask'}
+function controls(){
+  el.send.disabled=busy||stopped||!indexed.length||!el.question.value.trim();
+  el.compare.disabled=el.send.disabled;
+  el.question.disabled=busy||stopped;
+  el.course.disabled=busy||stopped||!indexed.length;
+  el.model.disabled=busy||stopped||!modelOptions.length;
+  el.mode.disabled=busy||stopped;
+  for(const id of ['new','notes','update','quit']) $(id).disabled=busy||stopped;
+}
+function showModels(models,active){
+  modelOptions=models;
+  activeModel=active;
+  el.model.replaceChildren();
+  for(const model of models){
+    const option=document.createElement('option');
+    option.value=model.id;
+    option.textContent=model.name;
+    el.model.append(option);
+  }
+  if(!models.some(model=>model.id===active)){
+    const option=document.createElement('option');
+    option.value='';
+    option.textContent=models.length?'Select a model…':'No models available';
+    el.model.append(option);
+    el.model.value='';
+  }else el.model.value=active;
+  controls();
+}
+function showCourses(list){
+  const previous=el.course.value;
+  indexed=list;
+  el.course.replaceChildren();
+  for(const course of list){const item=document.createElement('option');item.value=course;item.textContent=course;el.course.append(item)}
+  if(!list.length){const none=document.createElement('option');none.textContent='No indexed courses';el.course.append(none)}
+  else if(list.includes(previous)) el.course.value=previous;
+  else if(list.includes('STAT-1220')) el.course.value='STAT-1220';
+  $('title').textContent=list.length?el.course.value+' study session':'Study session';
+  el.starters.hidden=el.course.value!=='STAT-1220';
+  controls();
+}
+function reset(){
+  history=[];
+  for(const turn of el.thread.querySelectorAll('.turn')) turn.remove();
+  el.welcome.hidden=false;
+  el.question.value='';
+  notice(hint);
+  controls();
+  el.question.focus();
+}
+function make(tag,cls,text){const node=document.createElement(tag);if(cls) node.className=cls;if(text) node.textContent=text;return node}
+function bottom(){el.scroll.scrollTop=el.scroll.scrollHeight}
+function addTurn(question,comparing=false){
+  el.welcome.hidden=true;
+  const turn=make('article','turn');
+  const you=make('div','you');
+  you.append(make('div','bubble',question));
+  const reply=make('div','answer',comparing?'Searching your notes once, then asking Flint and Qwen in turn…':'Searching your notes and asking the study model…');
+  const label=make('div','reply-label',comparing?'Model comparison · shared notes':'Study Chat');
+  turn.append(you,label,reply);
+  el.thread.append(turn);bottom();
+  return {turn,reply,label};
+}
+// Collapsible reasoning. Plain text only, so nothing in it can become HTML.
+function addReasoning(parent,text){
+  if(!text) return;
+  const details=make('details','sources reasoning');
+  const words=text.split(/\s+/).filter(Boolean).length;
+  details.append(make('summary','', 'Show reasoning (~'+words.toLocaleString()+' words)'),make('div','excerpt',text));
+  parent.append(details);
+}
+// Every calculation and search the model ran, so the student can check them.
+function addToolLog(parent,tools){
+  if(!tools||!tools.length) return;
+  const details=make('details','sources reasoning');
+  details.append(make('summary','', 'TI-84, calculator & searches ('+tools.length+')'));
+  for(const step of tools){
+    const entry=make('div','source');
+    const title=step.tool==='calculate'?'Calculated':step.tool==='ti84_test'?'TI-84 · '+step.input:step.tool==='search_notes'?'Searched notes for “'+step.input+'”':step.tool;
+    entry.append(make('strong','',title),make('div','excerpt',step.tool==='search_notes'?step.output.split('\n').filter(l=>/^\[\d+\]/.test(l)).join('\n')||step.output:step.output));
+    details.append(entry);
+  }
+  parent.append(details);
+}
+// While the model works, show what /api/progress reports.
+function showLive(target,live){
+  if(!live||!live.phase) return;
+  const who=live.model?live.model+' · ':'';
+  const count=Number(live.tokens||0).toLocaleString()+' tokens';
+  if(live.phase==='tool'){
+    target.replaceChildren(make('span','live',who+(live.detail||'Using a tool')+'…'));
+    notice(who+'Using tools · '+count);
+  }else if(live.phase==='answering'&&live.answer){
+    showAnswer(target,live.answer,[]);
+    notice(who+'Writing the answer… '+count);
+  }else{
+    target.replaceChildren(make('span','live',who+(live.phase==='thinking'?'Thinking… '+count:'Waiting for the model…')));
+    notice(who+(live.phase==='thinking'?'Reasoning through the problem. Long problems can take a few minutes.':'Starting…'));
+  }
+  bottom();
+}
+function addSources(turn,sources){
+  if(!sources.length) return [];
+  const details=make('details','sources');
+  details.append(make('summary','', 'Retrieved passages ('+sources.length+')'));
+  const cards=[];
+  sources.forEach((source,i)=>{
+    const entry=make('div','source');
+    entry.tabIndex=-1;
+    entry.append(make('strong','', '['+(i+1)+'] '+source.name),make('div','excerpt',source.text));
+    details.append(entry);
+    cards.push(()=>{
+      details.open=true;
+      entry.focus({preventScroll:true});
+      entry.scrollIntoView({block:'nearest'});
+    });
+  });
+  turn.append(details);
+  return cards;
+}
+// Format study answers with a small, fixed set of DOM elements. Model and note
+// text never become HTML, links, or element attributes.
+function renderMath(value){
+  const display=value.startsWith('\\[')||value.startsWith('$$');
+  const width=value.startsWith('\\')||display?2:1;
+  const tokens=value.slice(width,-width).match(/\\[a-zA-Z]+|\\.|\d+(?:\.\d+)?|[^\s]/gu)||[];
+  if(!tokens.length||tokens.length>500) return document.createTextNode(value);
+  const symbols={pm:'±',mp:'∓',times:'×',cdot:'·',le:'≤',leq:'≤',ge:'≥',geq:'≥',
+    ne:'≠',neq:'≠',approx:'≈',alpha:'α',beta:'β',mu:'μ',sigma:'σ',pi:'π',infty:'∞',
+    sum:'∑',bar:'¯',hat:'^',overline:'¯',
+    // Arrows, dots, and operators models often use in worked steps.
+    Rightarrow:'⇒',rightarrow:'→',to:'→',Leftarrow:'⇐',leftarrow:'←',implies:'⟹',
+    ldots:'…',cdots:'⋯',dots:'…',div:'÷',lt:'<',gt:'>',sim:'∼',propto:'∝',
+    // Probability and set notation: P(A \mid B), A \cup B, A \cap B, x \in S.
+    mid:'∣',vert:'|',cup:'∪',cap:'∩',in:'∈',notin:'∉',emptyset:'∅',prime:'′',
+    // More Greek letters for statistics (chi-square, effect sizes, and so on).
+    chi:'χ',theta:'θ',lambda:'λ',delta:'δ',Delta:'Δ',rho:'ρ',epsilon:'ε',varepsilon:'ε',
+    phi:'φ',Sigma:'Σ',gamma:'γ',tau:'τ',omega:'ω',
+    // Spacing commands become plain spaces.
+    quad:' ',qquad:'  '};
+  // Escaped characters: \, \; \: and "\ " are spaces; \{ \} \% \$ \_ \& \# are literal.
+  const escaped={',':' ',';':' ',':':' ',' ':' ','!':'','{':'{','}':'}',
+    '%':'%','$':'$','_':'_','&':'&','#':'#','|':'‖','\\':' '};
+  let i=0;
+  function node(tag,...children){
+    const item=document.createElementNS('http://www.w3.org/1998/Math/MathML',tag);
+    item.append(...children);
+    return item;
+  }
+  function atom(){
+    const token=tokens[i++];
+    if(token==='{') return row(true);
+    if(!token||'}_^'.includes(token)) throw Error('Missing math operand');
+    if(token==='\\frac'||token==='\\dfrac'||token==='\\tfrac') return node('mfrac',atom(),atom());
+    if(token==='\\sqrt') return node('msqrt',atom());
+    if(['\\text','\\mathrm','\\mathbf','\\mathit','\\operatorname','\\textbf'].includes(token)) return atom();
+    if(token==='\\displaystyle'||token==='\\limits') return node('mrow');
+    if(token.startsWith('\\')){
+      const command=token.slice(1);
+      if(Object.hasOwn(escaped,command)) return node('mo',escaped[command]);
+      // \left( ... \right) just sizes the bracket; draw the bracket itself.
+      if(command==='left'||command==='right'){
+        const bracket=tokens[i++];
+        if(!bracket||bracket==='.') return node('mrow');
+        const shown=bracket.startsWith('\\')?(escaped[bracket.slice(1)]??symbols[bracket.slice(1)]??bracket.slice(1)):bracket;
+        return node('mo',shown);
+      }
+      if(['hat','bar','overline'].includes(command)){
+        const accent=node('mover',atom(),node('mo',symbols[command]));
+        accent.setAttribute('accent','true');
+        return accent;
+      }
+      if(!Object.hasOwn(symbols,command)) throw Error('Unsupported math command');
+      return node('mo',symbols[command]);
+    }
+    return node(/^\d/.test(token)?'mn':/^\p{L}$/u.test(token)?'mi':'mo',token==='-'?'−':token);
+  }
+  function row(group=false){
+    const result=node('mrow');
+    while(i<tokens.length&&tokens[i]!=='}'){
+      const base=atom();
+      let sub=null, sup=null;
+      while(tokens[i]==='_'||tokens[i]==='^'){
+        if(tokens[i++]==='_') sub=atom(); else sup=atom();
+      }
+      result.append(sub&&sup?node('msubsup',base,sub,sup):sub?node('msub',base,sub):sup?node('msup',base,sup):base);
+    }
+    if(group&&tokens[i++]!=='}') throw Error('Unclosed math group');
+    return result;
+  }
+  try{
+    const content=row();
+    if(i!==tokens.length) throw Error('Unmatched math group');
+    const math=node('math',content);
+    if(display) math.setAttribute('display','block');
+    return math;
+  }catch(_){return document.createTextNode(value)}
+}
+function appendAnswerInline(target,text,citations,depth=0){
+  if(depth>=4){target.append(document.createTextNode(text));return}
+  const tokens=/\\\([\s\S]*?\\\)|\\\[[\s\S]*?\\\]|\$\$[\s\S]*?\$\$|\$[^$\n]+\$|\x60[^\x60\n]+\x60|\*\*[^*\n]+\*\*|__[^_\n]+__|\*[^*\n]+\*|\[\[\d{1,3}\]\]|\[\d{1,3}\]/g;
+  let cursor=0;
+  for(const match of text.matchAll(tokens)){
+    const value=match[0];
+    target.append(document.createTextNode(text.slice(cursor,match.index)));
+    cursor=match.index+value.length;
+    if(value[0]==='\\'||value[0]==='$'){
+      target.append(renderMath(value));
+    }else if(value.charCodeAt(0)===96){
+      target.append(make('code','',value.slice(1,-1)));
+    }else if(value[0]==='['){
+      const number=Number(value.replace(/\D/g,''));
+      const openSource=citations[number-1];
+      if(!openSource){target.append(document.createTextNode(value));continue}
+      const button=make('button','citation','['+number+']');
+      button.type='button';
+      button.setAttribute('aria-label','Show retrieved passage '+number);
+      button.addEventListener('click',openSource);
+      target.append(button);
+    }else{
+      const width=value.startsWith('**')||value.startsWith('__')?2:1;
+      const node=make(width===2?'strong':'em');
+      appendAnswerInline(node,value.slice(width,-width),citations,depth+1);
+      target.append(node);
+    }
+  }
+  target.append(document.createTextNode(text.slice(cursor)));
+}
+function showAnswer(target,value,citations){
+  const text=String(value??'');
+  target.replaceChildren();
+  target.classList.add('formatted');
+  const lines=text.replace(/\r\n?/g,'\n').split('\n');
+  const listLine=/^\s*(?:(\d+)[.)]|[-*+])\s+(.+)$/;
+  const fenceLine=/^\s*(\x60{3,}|~{3,})/;
+  const quoteLine=/^\s*>\s?/;
+  const headingLine=/^\s{0,3}(#{1,6})\s+(.+)$/;
+  const block=(tag,content)=>{const node=make(tag);appendAnswerInline(node,content,citations);target.append(node)};
+  let i=0;
+  while(i<lines.length){
+    const line=lines[i];
+    if(!line.trim()){i++;continue}
+    const fence=line.match(fenceLine);
+    const title=line.match(headingLine);
+    const list=line.match(listLine);
+    if(fence){
+      const code=[];
+      const marker=fence[1];
+      i++;
+      while(i<lines.length){
+        const candidate=lines[i++], trimmed=candidate.trim();
+        if(trimmed.length>=marker.length&&[...trimmed].every(c=>c===marker[0])) break;
+        code.push(candidate);
+      }
+      const pre=make('pre');
+      pre.append(make('code','',code.join('\n')));
+      target.append(pre);
+    }else if(title){
+      block(title[1].length<3?'h3':'h4',title[2]);
+      i++;
+    }else if(list){
+      const ordered=Boolean(list[1]);
+      const node=make(ordered?'ol':'ul');
+      if(ordered&&Number(list[1])!==1) node.start=Number(list[1]);
+      while(i<lines.length){
+        const item=lines[i].match(listLine);
+        if(!item||Boolean(item[1])!==ordered) break;
+        const row=make('li');
+        appendAnswerInline(row,item[2],citations);
+        node.append(row);i++;
+      }
+      target.append(node);
+    }else if(quoteLine.test(line)){
+      const quote=[];
+      while(i<lines.length&&quoteLine.test(lines[i])) quote.push(lines[i++].replace(quoteLine,''));
+      block('blockquote',quote.join('\n'));
+    }else{
+      const paragraph=[lines[i++]];
+      while(i<lines.length&&lines[i].trim()&&![fenceLine,headingLine,listLine,quoteLine].some(re=>re.test(lines[i]))) paragraph.push(lines[i++]);
+      block('p',paragraph.join('\n'));
+    }
+  }
+}
+function showComparison(target,results,citations){
+  if(!results.length){
+    target.textContent="I couldn't find any notes for this course.";
+    return false;
+  }
+  const grid=make('div','compare-grid');
+  let answered=false;
+  for(const result of results){
+    const card=make('section','model-card');
+    const answer=make('div','answer');
+    if(result.error){
+      answer.classList.add('error');
+      answer.textContent=result.error;
+    }else{
+      showAnswer(answer,result.answer,citations);
+      answered=true;
+    }
+    card.append(make('div','model-name',result.name),make('div','model-time',result.seconds+' s · may include model loading'),answer);
+    addReasoning(card,result.reasoning);
+    addToolLog(card,result.tools);
+    grid.append(card);
+  }
+  target.replaceChildren(grid);
+  return answered;
+}
+el.form.addEventListener('submit',async e=>{
+  e.preventDefault();
+  const question=el.question.value.trim();
+  if(busy||stopped||!question||!indexed.length) return;
+  const course=el.course.value;
+  const comparing=e.submitter===el.compare;
+  el.question.value='';
+  const {turn,reply,label}=addTurn(question,comparing);
+  const mode=el.mode.value;
+  busy=true;notice(comparing?'Comparing one loaded study model at a time. This can take a few minutes.':'Working locally…');controls();
+  // Poll for live progress. "waiting" stops a late poll from
+  // overwriting the final answer after it arrives.
+  let waiting=true;
+  const poll=setInterval(async()=>{
+    try{const p=await api('progress');if(waiting) showLive(reply,p.live)}catch(_){}
+  },600);
+  try {
+    const request=api(comparing?'compare':'ask',{question,course,mode,history:history.slice(-2)});
+    const result=await request.finally(()=>{waiting=false;clearInterval(poll)});
+    if(!comparing){addReasoning(turn,result.reasoning);addToolLog(turn,result.tools)}
+    const citations=addSources(turn,result.sources);
+    let answered=true;
+    if(comparing){
+      answered=showComparison(reply,result.results,citations);
+      if(result.active_model) showModels(modelOptions,result.active_model);
+    }
+    else{
+      if(result.model) label.textContent='Study Chat · '+result.model;
+      showAnswer(reply,result.answer,citations);
+    }
+    if(answered) history.push({question});
+    online(true);
+    const timing=result.timing;
+    notice(comparing?'Comparison finished. The most recently loaded model is selected.':
+      timing?'Retrieval '+timing.retrieval+' s · Model setup '+timing.model_setup+' s · Answer '+timing.answer+' s':hint);
+  }catch(error){
+    reply.textContent=error.message;reply.classList.add('error');
+    el.question.value=question;
+    notice('You can retry the same question.',true);
+  }finally{busy=false;controls();el.question.focus();bottom()}
+});
+el.question.addEventListener('input',controls);
+el.mode.addEventListener('change',()=>{
+  el.question.placeholder=el.mode.value==='solve'?'Type or paste a problem to solve…':'Ask a question about your notes…';
+  el.question.focus();
+});
+el.question.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();if(!el.send.disabled)el.form.requestSubmit(el.send)}});
+el.course.addEventListener('change',()=>{reset();$('title').textContent=el.course.value+' study session';el.starters.hidden=el.course.value!=='STAT-1220'});
+el.model.addEventListener('change',async()=>{
+  const wanted=el.model.value;
+  if(!wanted||busy||stopped) return;
+  const name=el.model.selectedOptions[0].textContent;
+  busy=true;controls();
+  notice('Switching to '+name+'… The previous study model is unloaded before the new one loads.');
+  try{
+    const out=await api('model',{model:wanted});
+    showModels(out.models,out.model);
+    online(true);notice(out.name+' is ready.');
+  }catch(error){
+    showModels(modelOptions,activeModel);
+    let state=' Could not verify which model is loaded.';
+    try{
+      const status=await api('status');
+      online(status.online);
+      if(status.online){
+        showModels(status.models,status.model);
+        const selected=el.model.selectedOptions[0];
+        if(status.pending_load){
+          state=' LM Studio may still be processing the load.';
+        }else if(selected&&selected.value){
+          state=status.loaded?' '+selected.textContent+' is loaded.':
+            ' '+selected.textContent+' is selected but unloaded. Ask will try to load it, or pick another model to retry.';
+        }
+      }
+    }catch(_){ /* Keep the original switch error visible. */ }
+    notice(error.message+state,true);
+  }finally{busy=false;controls()}
+});
+for(const button of el.starters.querySelectorAll('button'))button.onclick=()=>{el.question.value=button.dataset.q;controls();el.question.focus()};
+$('new').onclick=reset;
+$('notes').onclick=async()=>{try{const out=await api('notes');notice(out.message)}catch(error){notice(error.message,true)}};
+$('update').onclick=async()=>{
+  busy=true;controls();notice('Updating notes and reading any PDF images. This can take a few minutes.');
+  let updating=true;
+  const poll=setInterval(async()=>{
+    try{const out=await api('progress');if(updating&&out.message) notice(out.message)}
+    catch(_){}
+  },1000);
+  try{const out=await api('rebuild');showCourses(out.courses);notice(out.message)}
+  catch(error){notice(error.message,true)}finally{updating=false;clearInterval(poll);busy=false;controls()}
+};
+$('quit').onclick=async()=>{
+  try{await api('quit');stopped=true;controls();$('statusText').textContent='Study Chat closed';$('dot').classList.remove('on');notice('You can close this tab. Double-click Start Study Chat to reopen.')}
+  catch(error){notice(error.message,true)}
+};
+busy=true;controls();
+api('status').then(out=>{online(out.online);showCourses(out.courses);showModels(out.models,out.model);if(!out.courses.length)notice('Add your notes to a course folder, then click Update index.')})
+.catch(error=>notice(error.message,true)).finally(()=>{busy=false;controls()});
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# Python environment and temporary files
+.venv/
+__pycache__/
+*.pyc
+
+# Private data: course notes, search database, OCR cache
+notes/
+chroma_db/
+.ocr_cache/
+
+# Logs (can contain your questions)
+*.log
+
+# Backup copies from earlier updates
+*.before-*
+
+# Private working notes
+README-CLAUDE.txt
+Study-Chat-Project-Handoff.md
