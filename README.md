@@ -51,7 +51,7 @@ Python 3.12 · ChromaDB · sentence-transformers (Nomic Embed v1.5) · PyTorch w
    pip install torch==2.11.0 --index-url https://download.pytorch.org/whl/cu128
    pip install -r requirements.txt
    ```
-3. Add your documents, one folder per course:
+3. Add your documents, one folder per course. To try it first, copy the `AUTO-101` folder from `sample-notes` into a new `notes` folder. It has two short sample notes on brakes and check engine codes.
    ```
    notes\
        COURSE-1\
@@ -77,4 +77,3 @@ I designed Study Chat, tested it on my own hardware, and directed every change, 
 
 - Make the default course and starter questions configurable instead of hard-coded
 - Render equations instead of showing raw LaTeX
-- Add sample documents so the app can be tried without your own notes

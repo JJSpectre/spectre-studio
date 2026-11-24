@@ -1,0 +1,26 @@
+Check Engine Light and OBD-II Codes - Sample Notes
+
+What OBD-II is
+Since the 1996 model year, cars and light trucks sold in the United States use OBD-II (On-Board Diagnostics, second generation). The engine computer watches its sensors, and when a reading stays outside its expected range it stores a diagnostic trouble code (DTC) and may turn on the check engine light.
+
+Reading codes
+A scan tool plugs into the 16-pin OBD-II port, usually under the dashboard on the driver's side. It reads stored codes and live sensor data.
+
+How a code is built
+A code has one letter and four digits, for example P0301.
+- First letter: P = powertrain, B = body, C = chassis, U = network.
+- First digit: 0 = generic code used by all makers, 1 = manufacturer-specific.
+- The remaining digits narrow down the system and the fault.
+
+Common examples
+- P0300: random or multiple cylinder misfire detected.
+- P0301 to P0308: misfire detected in cylinder 1 through 8. The last digit is the cylinder number.
+- P0420: catalyst system efficiency below threshold (bank 1).
+- P0171: system too lean (bank 1).
+- P0455: evaporative emission system leak detected (large leak). A loose gas cap is a common cause.
+
+Solid vs. flashing light
+A solid check engine light means a fault was stored and should be checked soon. A flashing light means an active misfire bad enough to damage the catalytic converter. Reduce load and have the vehicle checked right away.
+
+A code is a starting point, not a diagnosis
+A code says which system failed a test, not which part is bad. A P0171 lean code could come from a vacuum leak, a weak fuel pump or a dirty mass airflow sensor. Confirm the cause with testing before replacing parts.
