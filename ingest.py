@@ -18,13 +18,22 @@ OVERLAP = 50
 OCR_CACHE = NOTES_DIR.parent / ".ocr_cache"
 # Change this when extract_image_text() changes, so old OCR results aren't reused.
 OCR_SETTINGS = "ocr-v1-eng-psm3"
-# Change this when parse_pdf() changes, so old saved PDFs aren't reused.
+# Change this when the text parse_pdf() returns changes, so old saved PDFs aren't reused.
 PDF_CACHE_VERSION = "pdf-v1"
 NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 
 
 class OCRError(RuntimeError):
     pass
+
+
+class UnreadablePDF(Exception):
+    """A whole PDF that can't be opened, or whose page text can't be read."""
+
+
+def short_reason(error):
+    text = " ".join(str(getattr(error, "strerror", None) or error).split())
+    return f"{type(error).__name__}: {text}"[:200] if text else type(error).__name__
 
 
 def find_tesseract():
@@ -138,53 +147,91 @@ def pdf_cache_file(data, cache):
 
 
 def load_pdf_cache(target):
-    """Return (pages, image_texts) saved earlier, or None if missing or damaged."""
+    """Return (pages, image_texts, skipped) saved earlier, or None if missing or damaged."""
     try:
         saved = json.loads(target.read_text(encoding="utf-8"))
         pages = [(page, text) for page, text in saved["pages"]]
         image_texts = [(page, image, text) for page, image, text in saved["image_texts"]]
+        # Files saved before images could be skipped have no list.
+        skipped = [(page, image, reason) for page, image, reason in saved.get("skipped", [])]
     except (OSError, ValueError, KeyError, TypeError):
         return None
-    for *numbers, text in pages + image_texts:
+    for *numbers, text in pages + image_texts + skipped:
         if not isinstance(text, str) or not all(type(number) is int for number in numbers):
             return None
-    return pages, image_texts
+    return pages, image_texts, skipped
 
 
 def read_pdf(path, *, cache=OCR_CACHE, progress=None, track=None):
     """Read a PDF, or reuse the saved result if this exact file was read before."""
-    data = Path(path).read_bytes()
+    try:
+        data = Path(path).read_bytes()
+    except OSError as exc:
+        raise UnreadablePDF(f"couldn't be opened ({short_reason(exc)})") from exc
     target = pdf_cache_file(data, cache)
     saved = load_pdf_cache(target)
     if saved is not None:
         return saved
-    pages, image_texts = parse_pdf(path, data, cache=cache, progress=progress, track=track)
-    write_cache(target, json.dumps({"pages": pages, "image_texts": image_texts}))
-    return pages, image_texts
+    pages, image_texts, skipped = parse_pdf(path, data, cache=cache, progress=progress, track=track)
+    write_cache(target, json.dumps({"pages": pages, "image_texts": image_texts, "skipped": skipped}))
+    return pages, image_texts, skipped
 
 
 def parse_pdf(path, data, *, cache=OCR_CACHE, progress=None, track=None):
-    """Keep original PDF text separate from OCR, with page numbers on OCR."""
-    reader = PdfReader(BytesIO(data))
+    """Keep original PDF text separate from OCR, with page numbers on OCR.
+
+    An image that can't be decoded is listed in skipped as (page, image, reason) and keeps
+    its number, so the other images' numbers don't move. Image 0 means all of the page's images.
+    """
+    try:
+        reader = PdfReader(BytesIO(data))
+        page_count = len(reader.pages)
+    except MemoryError:
+        raise
+    except Exception as exc:
+        raise UnreadablePDF(f"couldn't be opened ({short_reason(exc)})") from exc
     pages = []
     image_texts = []
+    skipped = []
     tesseract = None
 
-    for page_number, page in enumerate(reader.pages, 1):
+    for page_number in range(1, page_count + 1):
         if track is not None:
-            track(page_number, len(reader.pages))
-        pages.append((page_number, page.extract_text() or ""))
-        images = page.images
-        for image_number, key in enumerate(images.keys(), 1):
+            track(page_number, page_count)
+        try:
+            page = reader.pages[page_number - 1]
+            pages.append((page_number, page.extract_text() or ""))
+        except MemoryError:
+            raise
+        except Exception as exc:
+            raise UnreadablePDF(f"page {page_number}'s text couldn't be read ({short_reason(exc)})") from exc
+        # pypdf and Pillow raise many kinds of errors for a bad image.
+        try:
+            images = page.images
+            keys = images.keys()
+        except MemoryError:
+            raise
+        except Exception as exc:
+            skipped.append((page_number, 0, short_reason(exc)))
+            continue
+        for image_number, key in enumerate(keys, 1):
             try:
                 image_file = images[key]
                 image = image_file.image
-                if image is None or min(image.size) < 24:
+                if image is None:
+                    raise ValueError("pypdf couldn't decode the image")
+            except MemoryError:
+                raise
+            except Exception as exc:
+                skipped.append((page_number, image_number, short_reason(exc)))
+                continue
+            try:
+                if min(image.size) < 24:
                     continue
                 if tesseract is None:
                     tesseract = find_tesseract()
                 if progress is not None:
-                    progress(f"Reading {path.name} · page {page_number} of {len(reader.pages)}")
+                    progress(f"Reading {path.name} · page {page_number} of {page_count}")
                 text = cached_image_text(image_file, tesseract, cache)
             except (OSError, RuntimeError, subprocess.TimeoutExpired) as exc:
                 raise OCRError(
@@ -194,7 +241,7 @@ def parse_pdf(path, data, *, cache=OCR_CACHE, progress=None, track=None):
             if text:
                 image_texts.append((page_number, image_number, text))
 
-    return pages, image_texts
+    return pages, image_texts, skipped
 
 
 def word_spans(count, size=CHUNK_SIZE, overlap=OVERLAP):
@@ -247,8 +294,11 @@ def check_pdfs(notes_dir, cache):
     return saved, unread
 
 
-def load_chunks(notes_dir=NOTES_DIR, *, progress=None, track=None):
-    """Read every course's notes. track gets each step and how far it is, for a progress bar."""
+def load_chunks(notes_dir=NOTES_DIR, *, progress=None, track=None, on_skip=None):
+    """Read every course's notes. track gets each step and how far it is, for a progress bar.
+
+    on_skip gets (source, page, image, reason) for each skipped image. Page 0 is a whole file.
+    """
     all_chunks = []
     cache = notes_dir.parent / ".ocr_cache"
     saved, unread, done = {}, {}, 0
@@ -265,6 +315,7 @@ def load_chunks(notes_dir=NOTES_DIR, *, progress=None, track=None):
             if not path.is_file():
                 continue
             ext = path.suffix.lower()
+            source = path.relative_to(notes_dir).as_posix()
             if ext == ".pdf":
                 found = saved.pop(path, None)
                 if found is None:
@@ -272,9 +323,18 @@ def load_chunks(notes_dir=NOTES_DIR, *, progress=None, track=None):
                         if track is not None and path in unread:
                             track("reading", file=order.index(path) + 1, files=len(order), name=path.name,
                                   page=page, pages=pages, done=min(done + page - 1, total), total=total)
-                    found = read_pdf(path, cache=cache, progress=progress, track=on_page)
-                    done += unread.get(path, 0)
-                pages, image_texts = found
+                    try:
+                        found = read_pdf(path, cache=cache, progress=progress, track=on_page)
+                    except UnreadablePDF as exc:
+                        if on_skip is not None:
+                            on_skip(source, 0, 0, str(exc))
+                        continue
+                    finally:
+                        done += unread.get(path, 0)
+                pages, image_texts, skipped = found
+                if on_skip is not None:
+                    for page_number, image_number, reason in skipped:
+                        on_skip(source, page_number, image_number, reason)
                 text_chunks = chunk_pages(pages)
             elif ext in (".txt", ".md"):
                 text = path.read_text(encoding="utf-8", errors="ignore")
@@ -283,7 +343,6 @@ def load_chunks(notes_dir=NOTES_DIR, *, progress=None, track=None):
             else:
                 continue
 
-            source = path.relative_to(notes_dir).as_posix()
             for i, (chunk, first, last) in enumerate(text_chunks):
                 entry = {
                     "id": f"{source}#{i}",

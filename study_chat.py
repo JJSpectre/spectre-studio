@@ -1709,6 +1709,28 @@ def index_summary(verb, skipped, new, changed):
     return f"{text}, {verb} {counts}." if counts else text + "."
 
 
+def skipped_summary(skips):
+    """For example: 2 images skipped (too large or unreadable): a.pdf (pages 6, 97)."""
+    files, pages, parts = [], {}, []
+    for source, page, image, reason in skips:
+        if page:
+            pages.setdefault(source, {})[f"{page}" if image else f"{page} (all images)"] = None
+        else:
+            files.append(f"{source.rsplit('/', 1)[-1]} ({reason})")
+    if pages:
+        listed = []
+        for source, found in pages.items():
+            shown = list(found)
+            text = ", ".join(shown[:12]) + (f", and {len(shown) - 12} more" if len(shown) > 12 else "")
+            listed.append(f"{source.rsplit('/', 1)[-1]} (page{'' if len(shown) == 1 else 's'} {text})")
+        images = [image for _, page, image, _ in skips if page]
+        count = f"{len(images)} image{'' if len(images) == 1 else 's'}" if all(images) else "Images"
+        parts.append(f"{count} skipped (too large or unreadable): " + "; ".join(listed))
+    if files:
+        parts.append(f"{len(files)} file{'' if len(files) == 1 else 's'} skipped: " + "; ".join(files))
+    return " · ".join(parts)
+
+
 def rebuild(progress_callback=None):
     global CLIENT, COLLECTION, INDEX_PROGRESS
     from ingest import OCRError, load_chunks
@@ -1736,9 +1758,17 @@ def rebuild(progress_callback=None):
     def embedded(done, total):
         show("embedding", share + (100 - share) * done // total, done=done, total=total)
 
+    skips = []
+
+    def on_skip(source, page, image, reason):
+        skips.append((source, page, image, reason))
+        where = f", page {page}, {f'image {image}' if image else 'all images'}" if page else ""
+        # Goes to the log, so what was skipped can be looked up later.
+        print(f"[skipped] {source}{where}: {reason}", flush=True)
+
     progress("Reading course notes and checking the OCR cache…")
     try:
-        chunks = load_chunks(progress=progress, track=track)
+        chunks = load_chunks(progress=progress, track=track, on_skip=on_skip)
     except OCRError as error:
         raise AppError(str(error)) from error
     if not chunks and not (DB / "chroma.sqlite3").is_file():
@@ -1810,8 +1840,10 @@ def rebuild(progress_callback=None):
         COLLECTION.update(ids=[chunk["id"] for chunk in batch],
                           metadatas=[chunk_metadata(chunk) for chunk in batch])
     current_ids = {chunk["id"] for chunk in chunks}
+    # A file that couldn't be read is still in the notes, so keep what was indexed from it.
+    unread_files = tuple(f"{source}#" for source, page, _, _ in skips if not page)
     stale_ids = [entry for entry in COLLECTION.get(include=[])["ids"]
-                 if entry not in current_ids]
+                 if entry not in current_ids and not entry.startswith(unread_files)]
     if stale_ids:
         progress("Removing passages that are no longer in the notes.")
         for start in range(0, len(stale_ids), 1000):
@@ -1823,6 +1855,8 @@ def rebuild(progress_callback=None):
         detail = index_summary("indexed", skipped, len(new), len(changed))
     if stale_ids:
         detail += f" Removed {len(stale_ids)} old."
+    if skips:
+        detail += f" · {skipped_summary(skips)}"
     result = {"message": f"{heading} · {COLLECTION.count()} chunks · {detail}", **course_info()}
     # Last, so a run that fails anywhere above keeps the previous time.
     result["index_checked"] = save_index_checked()
