@@ -71,7 +71,7 @@ button:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-vis
 select{appearance:none;width:100%;min-width:130px;max-width:184px;padding:8px 34px 8px 38px;border:1px solid var(--control);border-radius:8px;background:var(--panel);color:var(--ink);text-align:left;text-overflow:ellipsis}
 .bar select{min-width:0;max-width:none;padding:7px 23px 7px 9px;font-size:14px}select:hover:not(:disabled){background:var(--raised)}option{background:var(--panel);color:var(--ink)}
 input:not([type=checkbox]){width:100%;min-width:0;padding:8px 12px;border:1px solid var(--control);border-radius:8px;background:var(--panel);color:var(--ink);caret-color:var(--accent)}input::placeholder{color:var(--quiet);opacity:1}input::-webkit-search-cancel-button{filter:invert(.8)}
-.dot{flex:none;display:inline-block;width:9px;height:9px;border-radius:50%;border:2px solid var(--warn)}.dot.on{border-color:var(--good);background:var(--good)}
+.dot{flex:none;display:inline-block;width:9px;height:9px;border-radius:50%;border:2px solid var(--warn)}.dot.on{border-color:var(--good);background:var(--good)}.dot.load{border-color:var(--accent)}
 .scroll{overflow:auto;min-height:0}.thread{max-width:1080px;margin:0 auto;padding:22px 24px;min-height:100%}
 .welcome h2{font-size:22px;font-weight:650;line-height:1.25;margin:0 0 4px}.welcome p{color:var(--quiet);margin:0 0 16px}
 .starters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
@@ -159,6 +159,12 @@ input:not([type=checkbox]){width:100%;min-width:0;padding:8px 12px;border:1px so
 .empty{flex:1;display:grid;place-content:center;justify-items:center;gap:8px;min-height:120px;padding:8px 12px;color:var(--quiet);font-size:14px;line-height:1.45;text-align:center}.empty .icon{width:30px;height:30px;stroke-width:1.5;color:var(--control)}.empty p{max-width:300px;margin:0}
 .fact{display:flex;flex:1;align-items:center;gap:9px;min-height:37px;font-size:14px;line-height:1.35}.fact+.fact{border-top:1px solid var(--line)}.fact .icon{width:17px;height:17px;stroke-width:2.5;color:var(--quiet)}.fact.ok .icon{color:var(--good)}.fact span{flex:1;min-width:0}.fact b{padding:1px 10px;border:1px solid var(--line);border-radius:999px;font-size:13px;font-weight:400;line-height:1.5;text-align:center}
 .gpu-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:12px;margin-top:4px}.gpu-card{padding:10px 13px;border:1px solid var(--line);border-radius:10px;background:var(--raised);font-size:13px}.gpu-card>strong{display:block;font-size:15px;line-height:1.35}.gpu-card>div{margin-top:5px}.gpu-card .used{font-size:13px}.gpu-role{margin:0;color:var(--quiet);font-size:12px;line-height:1.5}p.gpu-role{margin-top:7px}.gpu-cards .gpu-state{color:var(--quiet);font-size:14px}
+.index-card{padding:13px 18px 15px;border:1px solid var(--accent);border-radius:12px;background:var(--panel)}.index-wrap{max-width:1270px;margin:0 auto;padding:0 24px}.index-wrap .index-card{margin-top:16px}
+.index-head{display:flex;align-items:center;gap:10px;font-size:16px;line-height:1.3}.index-head .icon{color:var(--accent)}.index-head strong{flex:1;font-weight:600}.index-head b{font-size:20px;font-weight:650}.index-head b,.index-now span,.index-slim b{font-variant-numeric:tabular-nums}
+.index-card progress,.index-slim progress{appearance:none;display:block;width:100%;height:5px;border:0;border-radius:5px;overflow:hidden;background:var(--line)}.index-card progress::-webkit-progress-bar,.index-slim progress::-webkit-progress-bar{background:var(--line)}.index-card progress::-webkit-progress-value,.index-slim progress::-webkit-progress-value{border-radius:5px;background:var(--accent)}.index-card .index-all{height:9px;margin:9px 0 11px}
+.index-steps{display:flex;flex-wrap:wrap;gap:6px 22px;margin:0 0 10px;padding:0;list-style:none;color:var(--quiet);font-size:13px}.index-steps li{display:flex;align-items:center;gap:8px}.index-steps .icon{width:16px;height:16px;stroke-width:2.5;color:var(--good)}.index-steps .dot{border-color:var(--control)}.index-steps li:not(.done) .icon,.index-steps .done .dot{display:none}.index-steps .now{color:var(--ink);font-weight:600}.index-steps .now .dot{border-color:var(--accent);background:var(--accent)}
+.index-now{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px 18px;padding-top:10px;border-top:1px solid var(--line);color:var(--quiet);font-size:13px}.index-now span:first-child{color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.index-now progress{grid-column:1/-1}
+.index-slim{display:flex;align-items:center;gap:12px;max-width:1032px;margin:7px auto 0;color:var(--quiet);font-size:12px}.index-slim span,.index-slim b{flex:none}.index-slim progress{flex:1;min-width:60px}.index-slim b{color:var(--ink);font-weight:600}
 dialog{width:min(560px,calc(100vw - 32px));max-height:calc(100dvh - 32px);padding:0;border:1px solid var(--control);border-radius:12px;background:var(--panel);color:var(--ink);box-shadow:var(--shadow);scrollbar-width:thin}dialog::backdrop{background:#000a}
 dialog form{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;padding:20px 22px}dialog h2{font-size:20px;font-weight:650;line-height:1.25;margin:0;overflow-wrap:anywhere}
 dialog p{margin:0;color:var(--quiet);font-size:14px;overflow-wrap:anywhere}dialog p.error{color:var(--bad)}dialog p.comments-note{padding:9px 12px;border:1px solid var(--warn);border-radius:8px;color:var(--warn)}dialog p.comments-note:focus{outline:2px solid var(--warn)}dialog p:empty{display:none}
@@ -174,7 +180,7 @@ dialog fieldset{min-width:0;margin:0;padding:0;border:0}
 @media(max-width:1119px){.home-banner{justify-items:end;min-height:140px}.art{width:calc(100% - 440px)}.art.right{display:none}.panels{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:900px){.tile:not(.off) span{display:none}}
 @media(max-width:720px){
-  .home-banner{min-height:104px;padding:10px 12px}.art{width:calc(100% - 400px)}.home-pick{width:min(370px,100%)}.home{gap:10px;padding:10px 12px 12px}.panels{grid-template-columns:minmax(0,1fr);gap:10px}.libs{grid-row:auto}.libs ul{max-height:none}.empty{min-height:90px}
+  .home-banner{min-height:104px;padding:10px 12px}.art{width:calc(100% - 400px)}.home-pick{width:min(370px,100%)}.home{gap:10px;padding:10px 12px 12px}.panels{grid-template-columns:minmax(0,1fr);gap:10px}.libs{grid-row:auto}.libs ul{max-height:none}.empty{min-height:90px}.index-card{padding:10px 13px 12px}.index-wrap{padding:0 12px}.index-wrap .index-card{margin-top:10px}
   .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.tile{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:0 10px;padding:9px}.tile .icon{width:22px;height:22px;margin:0}.tile strong{font-size:14px}.tile:last-child:nth-child(odd){grid-column:1/-1}
   .layout{display:flex;flex-direction:column}.shell{flex:1}
   .side{position:relative;z-index:3;flex:none;flex-flow:row wrap;align-items:center;gap:3px 8px;padding:7px 12px;border-right:0;border-bottom:1px solid var(--line);overflow:visible}
@@ -194,7 +200,7 @@ dialog fieldset{min-width:0;margin:0;padding:0;border:0}
   .thread{padding:14px 12px}.bottom{padding:4px 12px 6px}.composer{padding:8px}
   .turn{grid-template-columns:minmax(0,1fr)}.turn>*{grid-column:1}.avatar{display:none}.starters{grid-template-columns:1fr}
 }
-@media(forced-colors:active){.nav[aria-current=page],.lib[aria-pressed=true],.composer textarea:focus{outline:2px solid Highlight}.dot.on{background:Highlight;forced-color-adjust:none}.answer ol>li::before,.source-number{border:1px solid}.gpu progress{appearance:auto}.views button[aria-pressed=true]{outline:2px solid Highlight;outline-offset:-2px}}
+@media(forced-colors:active){.nav[aria-current=page],.lib[aria-pressed=true],.composer textarea:focus{outline:2px solid Highlight}.dot.on{background:Highlight;forced-color-adjust:none}.answer ol>li::before,.source-number{border:1px solid}.gpu progress,.index-card progress,.index-slim progress{appearance:auto}.views button[aria-pressed=true]{outline:2px solid Highlight;outline-offset:-2px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style>
 </head>
@@ -287,6 +293,7 @@ dialog fieldset{min-width:0;margin:0;padding:0;border:0}
       <div class="home-pick"><div class="pick-box"><svg class="icon" aria-hidden="true"><use id="homeIcon" href="#i-layers"/></svg><select id="homeLibrary" aria-label="Library" disabled></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div><p id="homeLine"></p></div>
     </div>
     <div class="home">
+      <section class="index-card" aria-label="Updating the index" hidden></section>
       <div class="tiles">
         <button type="button" class="tile" id="homeAsk" disabled><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg><strong>Ask anything</strong><span>Chat in Explain mode</span></button>
         <button type="button" class="tile" id="homeSolve" disabled><svg class="icon" aria-hidden="true"><use href="#i-mode"/></svg><strong>Solve a problem</strong><span>Chat in Solve mode</span></button>
@@ -319,6 +326,7 @@ dialog fieldset{min-width:0;margin:0;padding:0;border:0}
   </div></div>
   <div class="bottom">
     <form class="composer" id="form"><button type="button" class="button" id="new" title="New chat"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg><span>New chat</span></button><textarea id="question" rows="1" maxlength="1800" aria-label="Your question" placeholder="Ask a question about your notes…" required></textarea><button type="submit" class="send primary" id="send" aria-label="Ask" title="Ask" disabled><svg class="icon" aria-hidden="true"><use href="#i-send"/></svg></button></form>
+    <div class="index-slim" id="chatIndex" hidden><span></span><progress max="100" value="0" aria-label="Updating the index"></progress><b></b></div>
     <div class="under"><div class="foot" id="message" role="status">Enter to ask · Shift+Enter for a new line · Check original pages for exact OCR formulas.</div><div class="scope-line"><span id="title">Checking index…</span> · <span id="courseStats">Counting files and passages…</span></div></div>
   </div>
 </section>
@@ -339,6 +347,7 @@ dialog fieldset{min-width:0;margin:0;padding:0;border:0}
         <div class="views" role="group" aria-label="View"><button type="button" id="viewGrid" aria-label="Grid" title="Grid" aria-pressed="true"><svg class="icon" aria-hidden="true"><use href="#i-grid"/></svg></button><button type="button" id="viewList" aria-label="List" title="List" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-list"/></svg></button></div>
       </div>
     </header>
+    <div class="index-wrap"><section class="index-card" aria-label="Updating the index" hidden></section></div>
     <div class="library-list" id="libraryList"><p>Reading your libraries…</p></div>
   </div>
   <div class="bottom"><div class="foot" id="libraryMessage" role="status"></div></div>
@@ -346,6 +355,12 @@ dialog fieldset{min-width:0;margin:0;padding:0;border:0}
 </main>
 </div>
 </div>
+<template id="indexCard">
+  <div class="index-head"><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg><strong>Updating the index</strong><b></b></div>
+  <progress class="index-all" max="100" value="0" aria-label="Whole update"></progress>
+  <ol class="index-steps"><li><span class="dot"></span><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Reading pages</li><li><span class="dot"></span><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Embedding passages</li></ol>
+  <div class="index-now"><span></span><span></span><progress value="0" aria-label="This step"></progress></div>
+</template>
 <dialog id="libraryDialog" aria-labelledby="libraryFormTitle">
   <form id="libraryForm" autocomplete="off">
     <h2 id="libraryFormTitle">New library</h2>
@@ -396,14 +411,16 @@ function online(on){
   statusLine($('lmLine'),on,on?'LM Studio connected':'LM Studio · connects when you ask');
   statusLine($('homeLm'),on,on?'Connected':'Connects when you ask');
 }
-// The selected model's state as last confirmed by LM Studio. Unknown hides the pill.
+// The selected model's state as last confirmed by LM Studio. Unknown hides the line.
+// stateTurn counts the changes, so an answer to an older question can't replace a newer state.
+let stateTurn=0;
 function showModelState(state){
-  const text={loaded:'Model loaded',idle:'Model not loaded',pending:'Load not confirmed'}[state]||'';
+  const text={loaded:'Model loaded',loading:'Loading model…',idle:'Model not loaded',pending:'Load not confirmed'}[state]||'';
+  stateTurn++;
   $('modelState').hidden=!text;
   $('modelStateText').textContent=text;
-  $('modelState').firstElementChild.classList.toggle('on',state==='loaded');
+  $('modelState').firstElementChild.className='dot'+(state==='loaded'?' on':state==='loading'?' load':'');
 }
-function statusState(status){return !status.online?'':status.pending_load?'pending':status.loaded?'loaded':'idle'}
 function controls(){
   el.send.disabled=busy||stopped||!indexed.length||!el.scope.value||!el.question.value.trim();
   el.question.disabled=busy||stopped;
@@ -530,7 +547,7 @@ function lookOf(group){
 // The Dashboard. homeId is the library picked there, which changes nothing in Chat until Ask
 // or Solve is clicked. With no pick, the Dashboard shows Chat's library.
 let homeId='';
-function homeGroups(){return library==='ready'?libraries.filter(group=>group.id!=='unsorted'):[]}
+function homeGroups(){return library==='unavailable'?[]:libraries.filter(group=>group.id!=='unsorted')}
 function homeGroup(){
   const groups=homeGroups(), find=id=>groups.find(group=>group.id===id);
   return find(homeId)??find(el.library.value)??groups[0];
@@ -1328,7 +1345,7 @@ async function ask(question,mode,files=[]){
     reply.textContent=error.message;reply.classList.add('error');
     if(!el.question.value) el.question.value=question;
     notice('You can retry the same question.',true);
-  }finally{busy=false;controls();(turn.querySelector('.choice')||el.question).focus();land(turn)}
+  }finally{busy=false;controls();(turn.querySelector('.choice')||el.question).focus();land(turn);pollModel()}
 }
 el.question.addEventListener('input',controls);
 el.mode.addEventListener('change',()=>{
@@ -1343,7 +1360,7 @@ el.model.addEventListener('change',async()=>{
   const wanted=el.model.value;
   if(!wanted||busy||stopped) return;
   const name=el.model.selectedOptions[0].textContent;
-  busy=true;controls();showModelState('');
+  busy=true;controls();showModelState('');pollModel();
   notice('Switching to '+name+'… The previous study model is unloaded before the new one loads.');
   try{
     const out=await api('model',{model:wanted});
@@ -1357,18 +1374,17 @@ el.model.addEventListener('change',async()=>{
       online(status.online);
       if(status.online){
         showModels(status.models,status.model);
-        showModelState(statusState(status));
-        const selected=el.model.selectedOptions[0];
-        if(status.pending_load){
+        const selected=el.model.selectedOptions[0], now=(await api('model-state',{model:el.model.value})).state;
+        if(status.pending_load||now==='loading'){
           state=' LM Studio may still be processing the load.';
-        }else if(selected&&selected.value){
-          state=status.loaded?' '+selected.textContent+' is loaded.':
+        }else if(selected&&selected.value&&now){
+          state=now==='loaded'?' '+selected.textContent+' is loaded.':
             ' '+selected.textContent+' is selected but unloaded. Ask will try to load it, or pick another model to retry.';
         }
       }
     }catch(_){ /* Keep the original switch error visible. */ }
     notice(error.message+state,true);
-  }finally{busy=false;controls()}
+  }finally{busy=false;controls();pollModel()}
 });
 // GPU memory. A reading that failed or is over 10 seconds old says unavailable, never 0.
 function gpuName(gpu){return gpu.name.replace(/^(NVIDIA GeForce|AMD Radeon) /,'')}
@@ -1424,6 +1440,26 @@ async function pollGpus(){
   if(gpuWanted()) gpuTimer=setTimeout(pollGpus,3000);
 }
 document.addEventListener('visibilitychange',pollGpus);
+// The model's state, read the same way. It also says whether LM Studio answers.
+let modelAsking=false, modelTimer=0;
+function modelWanted(){return gpuReady&&!stopped&&!document.hidden}
+async function pollModel(){
+  clearTimeout(modelTimer);
+  if(modelAsking||!modelWanted()) return;
+  modelAsking=true;
+  const turn=stateTurn, model=el.model.value;
+  let out={online:null,state:''};
+  try{out=await api('model-state',{model},AbortSignal.timeout(5000))}catch(_){}
+  modelAsking=false;
+  const late=turn!==stateTurn||model!==el.model.value;
+  if(!late&&!stopped){
+    if(out.online!==null) online(out.online);
+    showModelState(out.state);
+  }
+  if(modelWanted()) modelTimer=setTimeout(pollModel,late?0:5000);
+}
+document.addEventListener('visibilitychange',pollModel);
+window.addEventListener('focus',pollModel);
 function fitGpus(){$('hardware').open=!compact.matches}
 fitGpus();
 compact.addEventListener('change',fitGpus);
@@ -1443,24 +1479,54 @@ $('librarySearch').addEventListener('input',()=>showLibraries());
 for(const id of ['libraryFilter','librarySort']) $(id).addEventListener('change',()=>showLibraries());
 $('new').onclick=()=>{showPage('chatPage');reset()};
 $('notes').onclick=async()=>{try{const out=await api('notes');notice(out.message)}catch(error){notice(error.message,true)}};
+// The progress cards and Chat's bar, while the index updates. With no step they're hidden.
+const indexCards=[...document.querySelectorAll('.index-card')];
+for(const card of indexCards) card.append($('indexCard').content.cloneNode(true));
+function showIndex({step='',percent=0,file,files,name,page,pages,done,total}={}){
+  const label={counting:'Counting pages',reading:'Reading pages',embedding:'Embedding passages',finishing:'Finishing'}[step]??'';
+  const at=['counting','reading','embedding','finishing'].indexOf(step), count=n=>n.toLocaleString();
+  const [left,right,value,max]=step==='reading'?['File '+file+' of '+files+' · '+name,'Page '+count(page)+' of '+count(pages),page,pages]:
+    step==='embedding'?['Passages '+count(done)+' of '+count(total),'',done,total]:[label+'…','',0,0];
+  for(const card of indexCards){
+    card.hidden=!step;
+    card.querySelector('.index-head b').textContent=percent+'%';
+    card.querySelector('.index-all').value=percent;
+    card.querySelectorAll('li').forEach((item,number)=>{
+      item.className=at>number+1?'done':at===number+1?'now':'todo';
+      if(at===number+1) item.setAttribute('aria-current','step');
+      else item.removeAttribute('aria-current');
+    });
+    const [first,second]=card.querySelectorAll('.index-now span'), bar=card.querySelector('.index-now progress');
+    first.textContent=first.title=left;
+    second.textContent=right;
+    bar.hidden=!max;
+    bar.max=max||1;
+    bar.value=value;
+  }
+  const [text,bar,number]=$('chatIndex').children;
+  $('chatIndex').hidden=!step;
+  text.textContent='Updating the index · '+label;
+  bar.value=percent;
+  number.textContent=percent+'%';
+}
 $('update').onclick=async()=>{
-  busy=true;controls();notice('Checking your notes for changes…');
+  busy=true;controls();notice('');showIndex({step:'counting'});
   library='loading';showStats();
   let updating=true;
   const poll=setInterval(async()=>{
-    try{const out=await api('progress');if(updating&&out.message) notice(out.message)}
+    try{const out=await api('progress');if(updating&&out.index.step) showIndex(out.index)}
     catch(_){}
-  },1000);
+  },500);
   try{const out=await api('rebuild');showCourses(out);notice([out.message,...problems(out)].join(' · '),problems(out).length>0)}
-  catch(error){updating=false;notice(error.message,true);await refreshLibrary()}finally{updating=false;clearInterval(poll);busy=false;controls();checkOcr()}
+  catch(error){updating=false;notice(error.message,true);await refreshLibrary()}finally{updating=false;clearInterval(poll);showIndex();busy=false;controls();checkOcr()}
 };
 $('quit').onclick=async()=>{
-  try{await api('quit');stopped=true;controls();statusLine($('lmLine'),false,'Spectre Studio closed');statusLine($('homeLm'),false,'App closed');for(const id of ['appLine','indexLine']) $(id).hidden=true;notice('You can close this tab. Open Spectre Studio again to continue.')}
+  try{await api('quit');stopped=true;controls();statusLine($('lmLine'),false,'Spectre Studio closed');statusLine($('homeLm'),false,'App closed');showModelState('');for(const id of ['appLine','indexLine']) $(id).hidden=true;notice('You can close this tab. Open Spectre Studio again to continue.')}
   catch(error){notice(error.message,true)}
 };
 busy=true;showHome();checkOcr();
-api('status').then(out=>{online(out.online);showCourses(out);showModels(out.models,out.model);showModelState(statusState(out));if(!out.courses.length)notice('Add your notes to a course folder, then click Update index on the Knowledge Libraries page.');else if(problems(out).length)notice(problems(out).join(' · '),true)})
-.catch(error=>{notice(error.message,true);statusLine($('lmLine'),false,'LM Studio · unavailable');statusLine($('homeLm'),false,'Unavailable');return refreshLibrary()}).finally(()=>{busy=false;controls();gpuReady=true;pollGpus()});
+api('status').then(out=>{online(out.online);showCourses(out);showModels(out.models,out.model);if(!out.courses.length)notice('Add your notes to a course folder, then click Update index on the Knowledge Libraries page.');else if(problems(out).length)notice(problems(out).join(' · '),true)})
+.catch(error=>{notice(error.message,true);statusLine($('lmLine'),false,'LM Studio · unavailable');statusLine($('homeLm'),false,'Unavailable');return refreshLibrary()}).finally(()=>{busy=false;controls();gpuReady=true;pollGpus();pollModel()});
 </script>
 </body>
 </html>

@@ -50,7 +50,8 @@ STUDY_MODELS = (
 ACTIVE_MODEL = CHAT_MODEL
 PENDING_LOAD = None
 MANAGED_MODELS = {model for _, model in STUDY_MODELS}
-INDEX_PROGRESS = ""
+INDEX_PROGRESS = {}
+READING_SHARE = 80     # percent of the progress bar for reading PDFs, if any need it
 BASE_URL = "http://127.0.0.1:1234"
 HOST = "127.0.0.1"
 PORT = 8765
@@ -729,6 +730,27 @@ def app_status():
         response.update(model=ACTIVE_MODEL, models=model_options(catalog),
                         loaded=bool(loaded_ids(catalog.get(ACTIVE_MODEL, {}))))
     return response
+
+
+def model_state(model):
+    """What LM Studio says about one model right now. This only reads, and changes no selection.
+
+    /api/v1/models already lists a model as loaded while it's loading. This older list doesn't.
+    online is None if LM Studio was too slow or its answer can't be used.
+    """
+    try:
+        rows = lm_json("/api/v0/models", timeout=3)["data"]
+        states = {row["id"]: row["state"] for row in rows}
+        state = {"loaded": "loaded", "loading": "loading", "not-loaded": "idle"}.get(states.get(model), "")
+    except OSError as error:
+        reason = error.reason if isinstance(error, URLError) else error
+        return {"online": False if isinstance(reason, ConnectionRefusedError) else None, "state": ""}
+    except (ValueError, KeyError, TypeError):
+        return {"online": None, "state": ""}
+    # After an unconfirmed load, the card may be showing the model from before it.
+    if state == "idle" and PENDING_LOAD is not None and states.get(PENDING_LOAD) != "loaded":
+        state = "pending"
+    return {"online": True, "state": state}
 
 
 def embedding_model():
@@ -1691,15 +1713,32 @@ def rebuild(progress_callback=None):
     global CLIENT, COLLECTION, INDEX_PROGRESS
     from ingest import OCRError, load_chunks
 
+    INDEX_PROGRESS = {}
+    share = 0
+
     def progress(message):
-        global INDEX_PROGRESS
-        INDEX_PROGRESS = message
         if progress_callback is not None:
             progress_callback(message)
 
+    def show(step, percent, **details):
+        # For the page's progress bar. It's replaced whole, so a reader never sees half of it.
+        global INDEX_PROGRESS
+        percent = max(min(percent, 99), INDEX_PROGRESS.get("percent", 0))
+        INDEX_PROGRESS = {"step": step, "percent": percent, **details}
+
+    def track(step, **details):
+        nonlocal share
+        if step == "reading":
+            share = READING_SHARE
+        total = details.get("total")
+        show(step, share * details["done"] // total if total else 0, **details)
+
+    def embedded(done, total):
+        show("embedding", share + (100 - share) * done // total, done=done, total=total)
+
     progress("Reading course notes and checking the OCR cache…")
     try:
-        chunks = load_chunks(progress=progress)
+        chunks = load_chunks(progress=progress, track=track)
     except OCRError as error:
         raise AppError(str(error)) from error
     if not chunks and not (DB / "chroma.sqlite3").is_file():
@@ -1724,6 +1763,7 @@ def rebuild(progress_callback=None):
         # Load the model first: if that fails, the old index is still there.
         progress(f"The embedding setup changed or wasn't recorded. "
                  f"Re-embedding all {len(chunks)} passages.")
+        embedded(0, len(chunks))
         embedding_model()
         COLLECTION = None
         CLIENT.delete_collection("study_notes")
@@ -1750,6 +1790,7 @@ def rebuild(progress_callback=None):
     if to_embed:
         summary = index_summary("indexing", skipped, len(new), len(changed))
         progress(summary)
+        embedded(0, len(to_embed))
         model = embedding_model()
         for start in range(0, len(to_embed), 16):
             batch = to_embed[start:start + 16]
@@ -1762,6 +1803,8 @@ def rebuild(progress_callback=None):
                 embeddings=vectors.tolist(),
                 metadatas=[chunk_metadata(chunk) for chunk in batch],
             )
+            embedded(start + len(batch), len(to_embed))
+    show("finishing", 99)
     for start in range(0, len(relabel), 1000):
         batch = relabel[start:start + 1000]
         COLLECTION.update(ids=[chunk["id"] for chunk in batch],
@@ -1838,11 +1881,17 @@ class Handler(BaseHTTPRequestHandler):
         except (ValueError, UnicodeError):
             return self.reply(400, {"error": "Invalid request."})
         if self.path == "/api/progress":
-            return self.reply(200, {"message": INDEX_PROGRESS, "live": dict(LIVE)})
+            return self.reply(200, {"index": INDEX_PROGRESS, "live": dict(LIVE)})
         if self.path == "/api/gpu":
             # Never takes WORK, so the meters don't wait for answers or model switching.
             from gpu_meter import snapshot
             return self.reply(200, snapshot())
+        if self.path == "/api/model-state":
+            # Doesn't take WORK, so the model card stays right during answers and indexing.
+            model = data.get("model")
+            if not isinstance(model, str) or len(model) > 300:
+                return self.reply(400, {"error": "Choose a model."})
+            return self.reply(200, model_state(model))
         if self.path == "/api/ocr":
             # Doesn't take WORK either. It only looks for Tesseract and its English data.
             from ingest import ocr_state
@@ -1900,7 +1949,7 @@ class Handler(BaseHTTPRequestHandler):
     @staticmethod
     def clear_index_progress():
         global INDEX_PROGRESS
-        INDEX_PROGRESS = ""
+        INDEX_PROGRESS = {}
 
 
 def start():

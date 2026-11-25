@@ -151,19 +151,19 @@ def load_pdf_cache(target):
     return pages, image_texts
 
 
-def read_pdf(path, *, cache=OCR_CACHE, progress=None):
+def read_pdf(path, *, cache=OCR_CACHE, progress=None, track=None):
     """Read a PDF, or reuse the saved result if this exact file was read before."""
     data = Path(path).read_bytes()
     target = pdf_cache_file(data, cache)
     saved = load_pdf_cache(target)
     if saved is not None:
         return saved
-    pages, image_texts = parse_pdf(path, data, cache=cache, progress=progress)
+    pages, image_texts = parse_pdf(path, data, cache=cache, progress=progress, track=track)
     write_cache(target, json.dumps({"pages": pages, "image_texts": image_texts}))
     return pages, image_texts
 
 
-def parse_pdf(path, data, *, cache=OCR_CACHE, progress=None):
+def parse_pdf(path, data, *, cache=OCR_CACHE, progress=None, track=None):
     """Keep original PDF text separate from OCR, with page numbers on OCR."""
     reader = PdfReader(BytesIO(data))
     pages = []
@@ -171,6 +171,8 @@ def parse_pdf(path, data, *, cache=OCR_CACHE, progress=None):
     tesseract = None
 
     for page_number, page in enumerate(reader.pages, 1):
+        if track is not None:
+            track(page_number, len(reader.pages))
         pages.append((page_number, page.extract_text() or ""))
         images = page.images
         for image_number, key in enumerate(images.keys(), 1):
@@ -222,8 +224,38 @@ def chunk_pages(pages, size=CHUNK_SIZE, overlap=OVERLAP):
             for start, end in word_spans(len(words), size, overlap)]
 
 
-def load_chunks(notes_dir=NOTES_DIR, *, progress=None):
+def count_pages(data):
+    """How many pages a PDF has, or 0 if it can't be opened. parse_pdf() reports that."""
+    try:
+        return len(PdfReader(BytesIO(data)).pages)
+    except Exception:
+        return 0
+
+
+def check_pdfs(notes_dir, cache):
+    """Each PDF's saved result, and the page count of each one that still has to be read."""
+    saved, unread = {}, {}
+    for path in sorted(notes_dir.glob("*/**/*")):
+        if path.suffix.lower() == ".pdf" and path.is_file():
+            try:
+                data = path.read_bytes()
+                saved[path] = load_pdf_cache(pdf_cache_file(data, cache))
+            except OSError:
+                data, saved[path] = b"", None
+            if saved[path] is None:
+                unread[path] = count_pages(data)
+    return saved, unread
+
+
+def load_chunks(notes_dir=NOTES_DIR, *, progress=None, track=None):
+    """Read every course's notes. track gets each step and how far it is, for a progress bar."""
     all_chunks = []
+    cache = notes_dir.parent / ".ocr_cache"
+    saved, unread, done = {}, {}, 0
+    if track is not None:
+        track("counting")
+        saved, unread = check_pdfs(notes_dir, cache)
+    order, total = list(unread), sum(unread.values())
     for course_dir in sorted(notes_dir.iterdir()):
         if not course_dir.is_dir():
             continue
@@ -234,7 +266,15 @@ def load_chunks(notes_dir=NOTES_DIR, *, progress=None):
                 continue
             ext = path.suffix.lower()
             if ext == ".pdf":
-                pages, image_texts = read_pdf(path, cache=notes_dir.parent / ".ocr_cache", progress=progress)
+                found = saved.pop(path, None)
+                if found is None:
+                    def on_page(page, pages, path=path, done=done):
+                        if track is not None and path in unread:
+                            track("reading", file=order.index(path) + 1, files=len(order), name=path.name,
+                                  page=page, pages=pages, done=min(done + page - 1, total), total=total)
+                    found = read_pdf(path, cache=cache, progress=progress, track=on_page)
+                    done += unread.get(path, 0)
+                pages, image_texts = found
                 text_chunks = chunk_pages(pages)
             elif ext in (".txt", ".md"):
                 text = path.read_text(encoding="utf-8", errors="ignore")
