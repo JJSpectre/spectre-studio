@@ -1495,6 +1495,10 @@ class Handler(BaseHTTPRequestHandler):
             return self.reply(400, {"error": "Invalid request."})
         if self.path == "/api/progress":
             return self.reply(200, {"message": INDEX_PROGRESS, "live": dict(LIVE)})
+        if self.path == "/api/gpu":
+            # Never takes WORK, so the meters don't wait for answers or model switching.
+            from gpu_meter import snapshot
+            return self.reply(200, snapshot())
         if self.path == "/api/course":
             course = data.get("course")
             if not isinstance(course, str) or not 1 <= len(course) <= 255 or not course.isprintable():

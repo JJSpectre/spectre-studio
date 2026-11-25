@@ -34,6 +34,14 @@ button:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-v
 .primary:hover:not(:disabled){background:var(--primary-hover)}
 .status-card{margin-top:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:12px 14px;font-size:13px;color:var(--quiet);display:grid;gap:8px}
 .status-card>div{display:flex;align-items:center;gap:10px}.status-card .icon{width:16px;height:16px;color:var(--accent)}
+.side{scrollbar-width:thin}
+.hardware{margin-top:-10px;border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:0 14px;color:var(--quiet);font-size:12px;line-height:1.4}
+.hardware summary{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-radius:6px;cursor:pointer;list-style:none}.hardware summary::-webkit-details-marker{display:none}
+.hardware .section-label{margin:0}.hardware .icon{width:16px;height:16px}.hardware[open] .icon{transform:rotate(180deg)}
+.gpu,.gpu-state{margin-bottom:10px}.gpu strong,.gpu .used{display:block;color:var(--ink);font-weight:400}.gpu strong{font-size:13px}
+.gpu progress{appearance:none;display:block;width:100%;height:7px;margin:4px 0 3px;border:0;border-radius:4px;overflow:hidden;background:var(--line)}
+.gpu progress::-webkit-progress-bar{background:var(--line)}.gpu progress::-webkit-progress-value{border-radius:4px;background:var(--accent)}
+.gpu-note{margin:0 0 10px;font-size:11px}
 .quit button{color:var(--quiet);font-size:14px;padding:8px 14px}.quit .icon{width:17px;height:17px}
 .main{display:grid;grid-template-rows:auto minmax(0,1fr) auto;min-height:0;min-width:0}
 .top{border-bottom:1px solid var(--line);padding:12px 24px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 20px}
@@ -101,7 +109,7 @@ select:hover:not(:disabled){background:var(--raised)}option{background:var(--pan
 @media(max-width:720px){
   .layout{display:flex;flex-direction:column}.main{flex:1}
   .side{flex:none;flex-flow:row wrap;align-items:center;gap:6px 10px;padding:7px 12px;border-right:0;border-bottom:1px solid var(--line);overflow:visible}
-  .brand{font-size:16px;gap:8px}.mark{width:28px;height:28px}.sub,.section-label,.status-card .extra,nav,.page>.icon,.page h1{display:none}
+  .brand{font-size:16px;gap:8px}.mark{width:28px;height:28px}.sub,.section-label,.status-card .extra,nav,.page>.icon,.page h1,.hardware{display:none}
   .tools{display:flex;gap:4px}.tool,.quit button{width:auto;gap:6px;padding:5px 8px;font-size:13px}.tool+.tool{margin-top:0}.tool .icon{width:16px;height:16px}
   .checked{margin:0 0 0 4px;align-self:center;font-size:11px;line-height:1.3;white-space:nowrap}
   .status-card{margin:0 0 0 auto;padding:5px 9px;font-size:12px}
@@ -109,7 +117,7 @@ select:hover:not(:disabled){background:var(--raised)}option{background:var(--pan
   .thread{padding:14px 12px}.bottom{padding:4px 12px 6px}.composer{padding:8px}
   .turn{grid-template-columns:minmax(0,1fr)}.turn>*{grid-column:1}.avatar{display:none}.starters{grid-template-columns:1fr}
 }
-@media(forced-colors:active){.nav[aria-current=page],.composer textarea:focus{outline:2px solid Highlight}.dot.on{background:Highlight;forced-color-adjust:none}.answer ol>li::before,.source-number{border:1px solid}}
+@media(forced-colors:active){.nav[aria-current=page],.composer textarea:focus{outline:2px solid Highlight}.dot.on{background:Highlight;forced-color-adjust:none}.answer ol>li::before,.source-number{border:1px solid}.gpu progress{appearance:auto}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style>
 </head>
@@ -147,6 +155,11 @@ select:hover:not(:disabled){background:var(--raised)}option{background:var(--pan
     <div class="extra"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg><span id="indexText">Checking notes index…</span></div>
     <div class="extra"><svg class="icon" aria-hidden="true"><use href="#i-model"/></svg>RAG · On this PC</div>
   </section>
+  <details class="hardware" id="hardware" open>
+    <summary><span class="section-label">Hardware</span><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></summary>
+    <div id="gpus"><div class="gpu-state">Reading GPU memory…</div></div>
+    <p class="gpu-note">Adapter-wide usage, all apps</p>
+  </details>
   <div class="quit"><button type="button" id="quit"><svg class="icon" aria-hidden="true"><use href="#i-power"/></svg>Quit app</button></div>
 </aside>
 <main class="main">
@@ -178,8 +191,8 @@ const $=id=>document.getElementById(id), token=document.querySelector('meta[name
 const el={course:$('course'), model:$('model'), mode:$('mode'), form:$('form'), question:$('question'), send:$('send'), thread:$('thread'), scroll:$('scroll'), welcome:$('welcome'), starters:$('starters'), message:$('message')};
 let busy=false, stopped=false, indexed=[], history=[], modelOptions=[], activeModel='';
 const hint='Enter to ask · Shift+Enter for a new line · Check original pages for exact OCR formulas.';
-async function api(path,data={}) {
-  const r=await fetch('/api/'+path,{method:'POST',headers:{'Content-Type':'application/json','X-Study-Token':token},body:JSON.stringify(data)});
+async function api(path,data={},signal) {
+  const r=await fetch('/api/'+path,{signal,method:'POST',headers:{'Content-Type':'application/json','X-Study-Token':token},body:JSON.stringify(data)});
   const out=await r.json();
   if(!r.ok) throw new Error(out.error||'Request failed.');
   return out;
@@ -678,6 +691,46 @@ el.model.addEventListener('change',async()=>{
     notice(error.message+state,true);
   }finally{busy=false;controls()}
 });
+// GPU memory. A reading that failed or is over 10 seconds old says unavailable, never 0.
+function showGpus(out){
+  if(out.waiting) return;
+  const say=text=>$('gpus').replaceChildren(make('div','gpu-state',text));
+  if(out.error) return say('GPU readings unavailable');
+  if(!out.adapters.length) return say('No GPU readings on this PC');
+  const known=n=>typeof n==='number'&&out.age<=10, gb=n=>(n/2**30).toFixed(1);
+  $('gpus').replaceChildren(...out.adapters.map(gpu=>{
+    const row=make('div','gpu'), used=known(gpu.dedicated)&&known(gpu.total);
+    row.append(make('strong','',gpu.name));
+    if(used){
+      const bar=make('progress');
+      bar.max=gpu.total;
+      bar.value=gpu.dedicated;
+      bar.setAttribute('aria-label',gpu.name+' dedicated memory');
+      row.append(bar);
+    }
+    row.append(make('span','used','Dedicated '+(used?gb(gpu.dedicated)+' / '+gb(gpu.total)+' GB':'unavailable')));
+    row.append(make('span','','Shared '+(known(gpu.shared)?gb(gpu.shared)+' GB':'unavailable')));
+    return row;
+  }));
+}
+// Read only while the meters can be seen. The next request is set after the last one
+// ends, so a slow reading never causes overlapping requests.
+const narrow=matchMedia('(max-width:720px)');
+let gpuReady=false, gpuAsking=false, gpuTimer=0;
+function gpuWanted(){return gpuReady&&!stopped&&!document.hidden&&!narrow.matches&&$('hardware').open}
+async function pollGpus(){
+  clearTimeout(gpuTimer);
+  if(stopped) return showGpus({error:true});
+  if(gpuAsking||!gpuWanted()) return;
+  gpuAsking=true;
+  try{showGpus(await api('gpu',{},AbortSignal.timeout(4000)))}
+  catch(_){showGpus({error:true})}
+  gpuAsking=false;
+  if(gpuWanted()) gpuTimer=setTimeout(pollGpus,3000);
+}
+document.addEventListener('visibilitychange',pollGpus);
+narrow.addEventListener('change',pollGpus);
+$('hardware').addEventListener('toggle',pollGpus);
 $('navChat').onclick=()=>el.question.focus();
 $('new').onclick=reset;
 $('notes').onclick=async()=>{try{const out=await api('notes');notice(out.message)}catch(error){notice(error.message,true)}};
@@ -698,7 +751,7 @@ $('quit').onclick=async()=>{
 };
 busy=true;controls();
 api('status').then(out=>{online(out.online);showCourses(out);showModels(out.models,out.model);showModelState(statusState(out));if(!out.courses.length)notice('Add your notes to a course folder, then click Update index.');else if(out.starter_problems.length)notice(out.starter_problems.join(' · '),true)})
-.catch(error=>{notice(error.message,true);return refreshLibrary()}).finally(()=>{busy=false;controls()});
+.catch(error=>{notice(error.message,true);return refreshLibrary()}).finally(()=>{busy=false;controls();gpuReady=true;pollGpus()});
 </script>
 </body>
 </html>
