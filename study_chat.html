@@ -4,52 +4,166 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="study-token" content="__LOCAL_TOKEN__">
-<title>Study Chat</title>
+<title>Spectre Studio</title>
 <link rel="stylesheet" href="/vendor/katex/katex.min.css">
 <script defer src="/vendor/katex/katex.min.js"></script>
 <style>
-:root{color-scheme:light;--paper:#f8f8f2;--panel:#eeefe5;--line:#dbdfd1;--ink:#222820;--quiet:#515b50;--green:#214f3f;--green2:#e4efdf;--white:#fff;--shadow:0 6px 24px #1d3c2710}
-[hidden]{display:none!important}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
-button,textarea,select{font:inherit}button{cursor:pointer}button:disabled,select:disabled{opacity:.55;cursor:default}button:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid #487b67;outline-offset:3px}
-.layout{display:grid;grid-template-columns:246px minmax(0,1fr);height:100dvh}.side{background:var(--panel);border-right:1px solid var(--line);padding:28px 20px 20px;display:flex;flex-direction:column;gap:22px}
-.brand{display:flex;align-items:center;gap:11px;font-weight:760;font-size:19px;letter-spacing:-.035em}.mark{display:grid;place-items:center;width:35px;height:35px;border-radius:10px;color:white;background:var(--green);font:600 21px Georgia}.sub{font-size:12px;color:var(--quiet);font-weight:500;letter-spacing:0}
-.course-wrap label,.section-label{font-size:11px;letter-spacing:.13em;font-weight:740;text-transform:uppercase;color:var(--quiet);display:block;margin-bottom:7px}
-select,.tool{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#f9f9f4;color:var(--ink);text-align:left}.tool+.tool{margin-top:8px}.tool:hover:not(:disabled){background:#fff}.primary{background:var(--green);color:white;border-color:var(--green);font-weight:680}.primary:hover:not(:disabled){background:#316551}.quit{margin-top:auto}.quit button{background:none;border:0;padding:0;color:var(--quiet);font-size:13px}.local{color:var(--quiet);font-size:12px}
-.main{display:grid;grid-template-rows:auto minmax(0,1fr) auto;min-height:0}.top{border-bottom:1px solid var(--line);padding:16px 28px;display:flex;justify-content:space-between;align-items:center;gap:12px}.top strong{font-size:14px}.status{font-size:12px;color:var(--quiet);display:flex;gap:6px;align-items:center}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#967035}.dot.on{background:#397a51}
-.scroll{overflow:auto;min-height:0}.thread{max-width:800px;margin:auto;padding:32px 24px 24px;min-height:100%}.welcome{padding:clamp(28px,9vh,125px) 0 28px}.kicker{font-size:11px;letter-spacing:.19em;font-weight:750;color:var(--green);text-transform:uppercase}
-h1{font:500 clamp(36px,5vw,64px)/1.03 Georgia,serif;letter-spacing:-.05em;margin:14px 0}.welcome p{max-width:470px;color:var(--quiet);font-size:16px;margin:0 0 26px}.starters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.starter{background:#fff;border:1px solid var(--line);text-align:left;color:var(--ink);padding:14px;border-radius:12px}.starter strong{display:block;color:var(--green);margin-bottom:3px}.starter span{color:var(--quiet);font-size:13px}.starter:hover{border-color:#749683}
-.turn{margin:0 0 26px}.you{display:flex;justify-content:flex-end;margin-bottom:18px}.bubble{max-width:88%;white-space:pre-wrap;overflow-wrap:anywhere;border-radius:15px 15px 3px 15px;background:var(--green2);padding:11px 15px}.reply-label{font-size:12px;font-weight:750;color:var(--green);margin-bottom:4px}.answer{white-space:pre-wrap;overflow-wrap:anywhere;font-size:16px}.error{color:#8e3528}.sources{margin-top:12px;color:var(--quiet);font-size:13px}.sources summary{cursor:pointer;color:var(--green);font-weight:670}.source{margin-top:8px;padding:9px 12px;background:#fff;border:1px solid var(--line);border-radius:8px;overflow-wrap:anywhere}.source strong{display:block;color:var(--ink)}.excerpt{white-space:pre-wrap;margin-top:4px}
-.bottom{padding:8px 24px 14px;background:var(--paper)}.composer{border:1px solid #c5cdbd;background:var(--white);border-radius:14px;box-shadow:var(--shadow);display:flex;gap:10px;align-items:flex-end;padding:8px;margin:auto;max-width:752px}.composer textarea{resize:vertical;min-height:44px;max-height:180px;flex:1;min-width:0;border:0;background:white;color:var(--ink);padding:9px}.send{padding:9px 17px;border-radius:10px;border:0}.foot{max-width:752px;margin:6px auto 0;color:var(--quiet);font-size:12px;min-height:18px}.foot.error{color:#8e3528}
-.answer.formatted{white-space:normal}.answer p,.answer blockquote{white-space:pre-wrap;margin:0 0 .68em}.answer h3,.answer h4{font-size:1.05em;margin:.75em 0 .3em}.answer ul,.answer ol{padding-left:1.5em;margin:0 0 .7em}.answer li{padding-left:.12em;margin:.18em 0}.answer blockquote{border-left:3px solid var(--line);padding-left:.75em;color:var(--quiet)}.answer code{background:#edf0e6;border-radius:4px;padding:.07em .25em}.answer pre{margin:0 0 .7em;background:#edf0e6;border-radius:8px;padding:10px 12px;white-space:pre-wrap;overflow-wrap:anywhere}.answer pre code{padding:0}.answer .citation{padding:0 .33em;border:1px solid #c2d6c8;border-radius:5px;background:var(--green2);color:var(--green);font-size:.8em;font-weight:680;vertical-align:.08em;margin:0 .1em}.source:focus{outline:2px solid #487b67;outline-offset:2px}
+:root{color-scheme:dark;
+  --bg:#0b1118;--side:#0f151c;--panel:#131c28;--raised:#1b2736;--line:#2b3a4d;--control:#62788f;
+  --ink:#eaf2fb;--quiet:#a9bacd;--accent:#5cb3ff;--primary:#1765d1;--primary-hover:#1d70e0;
+  --active:#15407a;--bubble:#0b3a7c;--good:#4fdd6a;--warn:#f2b84b;--bad:#ff8f85;
+  --shadow:0 6px 24px #0006}
+[hidden]{display:none!important}*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 "Segoe UI Variable Text","Segoe UI",system-ui,sans-serif}
+button,textarea,select{font:inherit}button{cursor:pointer}button:disabled,select:disabled{opacity:.55;cursor:default}
+button:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.icon{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.layout{display:grid;grid-template-columns:258px minmax(0,1fr);height:100dvh}
+.side{background:var(--side);border-right:1px solid var(--line);padding:22px 14px 14px;display:flex;flex-direction:column;gap:20px;min-height:0;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:12px;padding:0 4px;font-weight:650;font-size:20px;line-height:1.2}
+.mark{width:42px;height:42px;stroke-width:1.5;color:var(--accent)}
+.sub{font-size:12px;color:var(--quiet);font-weight:400;margin-top:2px}
+.section-label{font-size:11px;letter-spacing:.1em;font-weight:650;text-transform:uppercase;color:var(--quiet);display:block;margin:0 0 8px 6px}
+.nav,.tool,.quit button{display:flex;align-items:center;gap:14px;width:100%;padding:10px 14px;border:1px solid transparent;border-radius:8px;background:none;color:var(--ink);text-align:left}
+.nav{font-size:16px}
+.nav[aria-current=page]{background:linear-gradient(90deg,var(--active),#1f4a82);border-color:#3f78bd;border-left:3px solid var(--accent)}
+.nav[aria-current=page] .icon{color:var(--accent)}
+.tool+.tool{margin-top:6px}
+.tool:hover:not(:disabled),.quit button:hover:not(:disabled){background:var(--raised)}
+.primary{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:600}
+.primary:hover:not(:disabled){background:var(--primary-hover)}
+.status-card{margin-top:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:12px 14px;font-size:13px;color:var(--quiet);display:grid;gap:8px}
+.status-card>div{display:flex;align-items:center;gap:10px}.status-card .icon{width:16px;height:16px;color:var(--accent)}
+.quit button{color:var(--quiet);font-size:14px;padding:8px 14px}.quit .icon{width:17px;height:17px}
+.main{display:grid;grid-template-rows:auto minmax(0,1fr) auto;min-height:0;min-width:0}
+.top{border-bottom:1px solid var(--line);padding:12px 24px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 20px}
+.page{display:flex;align-items:center;gap:14px}.page>.icon{width:34px;height:34px;stroke-width:1.5;color:var(--accent)}
+.page h1{font-family:inherit;font-size:24px;font-weight:650;line-height:1.2;letter-spacing:0;margin:0}.page strong{font-weight:400;color:var(--quiet);font-size:14px}
+.picks{display:flex;flex-wrap:wrap;align-items:end;gap:10px}
+.pick label{display:block;font-size:12px;color:var(--quiet);margin:0 0 3px 2px}
+.pick-box{position:relative}.pick-box .icon{position:absolute;top:50%;left:11px;width:18px;height:18px;transform:translateY(-50%);color:var(--accent);pointer-events:none}
+.pick-box .chevron{left:auto;right:10px;color:var(--quiet)}
+select{appearance:none;width:100%;min-width:150px;max-width:230px;padding:8px 34px 8px 38px;border:1px solid var(--control);border-radius:8px;background:var(--panel);color:var(--ink);text-align:left;text-overflow:ellipsis}
+select:hover:not(:disabled){background:var(--raised)}option{background:var(--panel);color:var(--ink)}
+.model-state{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:8px 12px;font-size:13px;white-space:nowrap}
+.dot{flex:none;display:inline-block;width:9px;height:9px;border-radius:50%;border:2px solid var(--warn)}.dot.on{border-color:var(--good);background:var(--good)}
+.scroll{overflow:auto;min-height:0}.thread{max-width:1080px;margin:0 auto;padding:22px 24px;min-height:100%}
+.welcome h2{font-size:22px;font-weight:650;line-height:1.25;margin:0 0 4px}.welcome p{color:var(--quiet);margin:0 0 16px}
+.starters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.starter{background:linear-gradient(180deg,var(--raised),var(--panel));border:1px solid var(--control);text-align:left;color:var(--ink);padding:14px 16px;border-radius:10px}
+.starter strong{display:block;color:var(--accent);font-weight:600;margin-bottom:2px}.starter span{color:var(--quiet);font-size:14px}.starter:hover{border-color:var(--accent);background:var(--raised)}
+.turn{display:grid;grid-template-columns:44px minmax(0,1fr);column-gap:14px;margin:0 0 30px}.turn>*{grid-column:2}
+.you{grid-column:1/-1;display:flex;justify-content:flex-end;align-items:flex-start;gap:12px;margin-bottom:14px}
+.bubble{max-width:80%;white-space:pre-wrap;overflow-wrap:anywhere;border:1px solid #2a66b5;border-radius:10px;background:var(--bubble);padding:9px 16px}
+.avatar{display:grid;place-items:center;width:42px;height:42px;border-radius:50%;background:var(--raised);border:1px solid var(--line);color:var(--ink);flex:none}
+.avatar.ai{grid-column:1;grid-row:2/span 2;color:var(--accent)}.avatar .icon{width:24px;height:24px}
+.reply-label{font-size:13px;font-weight:600;color:var(--accent);margin-bottom:5px}
+.answer{white-space:pre-wrap;overflow-wrap:anywhere;font-size:15.5px;border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:16px 20px}
+.sources{margin-top:10px;color:var(--quiet);font-size:14px}.sources>summary{cursor:pointer;color:var(--accent);font-weight:600}
+.source{margin-top:8px;border:1px solid var(--control);border-radius:8px;background:var(--raised);overflow-wrap:anywhere}
+.source strong{display:block;color:var(--ink);font-weight:600}.excerpt{white-space:pre-wrap}
+.reasoning .excerpt{color:var(--quiet);margin-top:6px}.reasoning>.source{padding:10px 14px}
+.sources-panel{grid-column:1/-1;margin-top:14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:14px 18px 0}
+.sources-panel h2{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:600;line-height:1.3;margin:0 0 10px}.sources-panel h2 .icon{color:var(--accent)}
+.sources-panel summary{display:flex;align-items:center;gap:14px;padding:8px 14px;border-radius:8px;cursor:pointer;list-style:none}.sources-panel summary::-webkit-details-marker{display:none}
+.sources-panel summary:hover{background:#22324a}
+.sources-panel summary>.icon{width:24px;height:24px;stroke-width:1.75;color:var(--accent)}.sources-panel summary>.turns{width:20px;height:20px;color:var(--ink)}.source[open]>summary>.turns{transform:rotate(180deg)}
+.source-name{flex:1;min-width:0;line-height:1.35}.source-name span{color:var(--quiet);font-size:13px}
+.source-number{flex:none;min-width:30px;border-radius:5px;background:var(--active);color:#fff;font-size:13px;font-weight:600;text-align:center;padding:1px 6px}
+.source-pages{flex:none;color:var(--ink);font-size:14px}
+.source-body{border-top:1px solid var(--line);padding:12px 16px 14px}
+.source-body .excerpt{max-width:800px;font-size:14px;line-height:1.6;color:#d3dfec}
+.preview{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:5;overflow:hidden}
+.more{margin-top:10px;padding:4px 12px;border:1px solid var(--control);border-radius:6px;background:var(--panel);color:var(--accent);font-size:13px;font-weight:600}.more:hover{border-color:var(--accent)}
+.turn{scroll-margin-top:16px}
+.source-facts{display:flex;flex-wrap:wrap;gap:4px 22px;margin:12px -18px 0;padding:10px 18px;border-top:1px solid var(--line);color:var(--quiet);font-size:13px}.source-facts span{display:flex;align-items:center;gap:8px}.source-facts .icon{width:16px;height:16px;color:var(--accent)}
+.scroll,.bottom{scrollbar-gutter:stable}.bottom{overflow:hidden;padding:6px 24px 12px;background:var(--bg)}
+.composer{border:1px solid var(--line);background:var(--panel);border-radius:12px;box-shadow:var(--shadow);display:flex;gap:10px;align-items:flex-end;padding:12px;margin:auto;max-width:1032px}
+.composer textarea{resize:vertical;min-height:48px;max-height:180px;flex:1;min-width:0;border:1px solid var(--control);border-radius:10px;background:var(--raised);color:var(--ink);caret-color:var(--accent);padding:11px 14px}
+.composer textarea::placeholder{color:var(--quiet);opacity:1}
+.composer textarea:focus{border-color:var(--accent);outline:2px solid var(--accent);outline-offset:0}
+.send{display:grid;place-items:center;width:58px;height:48px;border:0;border-radius:10px}
+.foot{max-width:1032px;margin:6px auto 0;color:var(--quiet);font-size:12px;min-height:18px}.foot.error,.error{color:var(--bad)}
+.answer.formatted{white-space:normal}.answer.formatted>:last-child{margin-bottom:0}.answer p,.answer blockquote{white-space:pre-wrap;margin:0 0 .68em}
+.answer h3,.answer h4{font-size:1.1em;font-weight:650;line-height:1.35;margin:1em 0 .45em;padding-top:.6em;border-top:1px solid var(--line)}.answer.formatted>:first-child{margin-top:0;padding-top:0;border-top:0}
+.answer ul{padding-left:1.5em;margin:0 0 .8em}.answer li{margin:.28em 0}.answer ul li::marker{color:var(--accent)}
+.answer ol{list-style:none;padding:0;margin:0 0 .8em}.answer ol>li{position:relative;padding-left:42px;margin:.42em 0}
+.answer ol>li::before{content:counter(list-item);box-sizing:border-box;position:absolute;left:0;top:.12em;min-width:28px;padding:0 5px;border-radius:5px;background:var(--primary);color:#fff;font-size:.85em;font-weight:600;line-height:1.5;text-align:center}
+.answer blockquote{border-left:3px solid var(--control);padding-left:.75em;color:var(--quiet)}
+.answer code{background:var(--raised);border-radius:4px;padding:.07em .3em;font-family:Consolas,monospace}.answer pre{margin:0 0 .7em;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;white-space:pre-wrap;overflow-wrap:anywhere}.answer pre code{background:none;padding:0}
+.answer .citation{padding:0 .4em;border:1px solid #3f78bd;border-radius:5px;background:var(--active);color:#fff;font-size:.8em;font-weight:600;vertical-align:.08em;margin:0 .1em}.answer .citation:hover{background:var(--primary)}
 .answer .katex{white-space:normal;font-size:1.1em}.answer .katex-display{margin:.5em 0;padding:.1em 0;overflow-x:auto;overflow-y:hidden}.answer .katex-display>.katex{white-space:nowrap}
-.answer .table-scroll{overflow-x:auto;margin:0 0 .7em}.answer table{border-collapse:collapse;font-size:.95em}.answer th,.answer td{border:1px solid var(--line);padding:5px 10px;text-align:left;vertical-align:top;overflow-wrap:normal}.answer th{background:var(--panel);font-weight:680}
+.answer .table-scroll{overflow-x:auto;margin:0 0 .7em}.answer table{border-collapse:collapse;font-size:.95em}.answer th,.answer td{border:1px solid var(--control);padding:5px 10px;text-align:left;vertical-align:top;overflow-wrap:normal}.answer th{background:#22324a;font-weight:600}
 .reasoning .excerpt{max-height:340px;overflow:auto}.live{color:var(--quiet);font-style:italic}
-@media(max-width:680px){.send{padding:8px 12px}}
-@media(max-width:720px){.layout{display:flex;flex-direction:column}.side{padding:9px 12px;gap:8px;display:grid;grid-template-columns:1fr 1fr auto;border-right:0;border-bottom:1px solid var(--line);align-items:center}.brand{font-size:16px}.brand .sub,.section-label,.course-wrap label,.local{display:none}.mark{width:28px;height:28px}.tools{grid-column:1/3;display:flex;gap:5px}.tool{width:auto;padding:6px 8px;font-size:11px}.tool+.tool{margin-top:0}.quit{margin:0;grid-column:3;grid-row:2}.main{flex:1}.top{padding:7px 12px}.thread{padding:18px 12px}.welcome{padding-top:19px}.bottom{padding:6px 12px}.starters{grid-template-columns:1fr}.course-wrap select{padding:5px 8px}}
+@media(max-width:1180px){.layout{grid-template-columns:220px minmax(0,1fr)}.brand{font-size:18px}.sub{font-size:11px}}
+@media(max-width:720px){
+  .layout{display:flex;flex-direction:column}.main{flex:1}
+  .side{flex:none;flex-flow:row wrap;align-items:center;gap:6px 10px;padding:7px 12px;border-right:0;border-bottom:1px solid var(--line);overflow:visible}
+  .brand{font-size:16px;gap:8px}.mark{width:28px;height:28px}.sub,.section-label,.status-card .extra,nav,.page>.icon,.page h1{display:none}
+  .tools{display:flex;gap:4px}.tool,.quit button{width:auto;gap:6px;padding:5px 8px;font-size:13px}.tool+.tool{margin-top:0}.tool .icon{width:16px;height:16px}
+  .status-card{margin:0 0 0 auto;padding:5px 9px;font-size:12px}
+  .top{padding:6px 12px}.pick label{margin-bottom:0}select{min-width:0;max-width:170px;padding:5px 28px 5px 34px}.model-state{padding:5px 8px}
+  .thread{padding:14px 12px}.bottom{padding:4px 12px 6px}.composer{padding:8px}
+  .turn{grid-template-columns:minmax(0,1fr)}.turn>*{grid-column:1}.avatar{display:none}.starters{grid-template-columns:1fr}
+}
+@media(forced-colors:active){.nav[aria-current=page],.composer textarea:focus{outline:2px solid Highlight}.dot.on{background:Highlight;forced-color-adjust:none}.answer ol>li::before,.source-number{border:1px solid}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style>
 </head>
 <body>
+<!-- Icons from Lucide 1.79.0 (ISC license), see vendor/lucide. -->
+<svg hidden aria-hidden="true">
+<symbol id="i-brain" viewBox="0 0 24 24"><path d="M12 18V5"/><path d="M15 13a4.17 4.17 0 01-3-4 4.17 4.17 0 01-3 4"/><path d="M17.707 6.294A3 3 0 1012 5a3 3 0 10-5.707 1.294"/><path d="M17.996 5.125a4 4 0 012.526 5.77"/><path d="M18 18a4 4 0 002-7.465"/><path d="M19.967 17.482a4 4 0 11-7.967.517 4 4 0 11-7.967-.517"/><path d="M6 18a4 4 0 01-2-7.465"/><path d="M6.004 5.125a4 4 0 00-2.526 5.77"/></symbol>
+<symbol id="i-chat" viewBox="0 0 24 24"><path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"/><path d="M12 11h.01"/><path d="M16 11h.01"/><path d="M8 11h.01"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+<symbol id="i-folder" viewBox="0 0 24 24"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
+<symbol id="i-power" viewBox="0 0 24 24"><path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.77.04"/></symbol>
+<symbol id="i-send" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></symbol>
+<symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+<symbol id="i-model" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></symbol>
+<symbol id="i-layers" viewBox="0 0 24 24"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/></symbol>
+<symbol id="i-course" viewBox="0 0 24 24"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></symbol>
+<symbol id="i-mode" viewBox="0 0 24 24"><path d="M10 5H3"/><path d="M12 19H3"/><path d="M14 3v4"/><path d="M16 17v4"/><path d="M21 12h-9"/><path d="M21 19h-5"/><path d="M21 5h-7"/><path d="M8 10v4"/><path d="M8 12H3"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+</svg>
 <div class="layout">
-<aside class="side" aria-label="Study controls">
-  <div class="brand"><span class="mark" aria-hidden="true">S</span><div>Study Chat<div class="sub">Your local study assistant</div></div></div>
-  <div class="course-wrap"><label for="course">Course</label><select id="course" aria-label="Course" disabled><option>Checking index…</option></select></div>
-  <div class="course-wrap model-wrap"><label for="model">Study model</label><select id="model" aria-label="Study model" disabled><option>Checking models…</option></select></div>
-  <div class="course-wrap"><label for="mode">Mode</label><select id="mode" aria-label="Mode"><option value="explain">Explain from my notes</option><option value="solve">Solve a problem</option></select></div>
-  <div class="tools"><span class="section-label">Workspace</span><button class="tool primary" id="new">New chat</button><button class="tool" id="notes">Open notes folder</button><button class="tool" id="update">Update index</button></div>
-  <div class="quit"><button id="quit">Quit app</button><div class="local">RAG · On this PC</div></div>
+<aside class="side" aria-label="Navigation and workspace">
+  <div class="brand"><svg class="icon mark" aria-hidden="true"><use href="#i-brain"/></svg><div>Spectre Studio<div class="sub">Local AI Learning &amp; Reference</div></div></div>
+  <nav aria-label="Pages"><button type="button" class="nav" id="navChat" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg>Chat</button></nav>
+  <div class="tools"><span class="section-label">Workspace</span>
+    <button type="button" class="tool primary" id="new"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>New chat</button>
+    <button type="button" class="tool" id="notes"><svg class="icon" aria-hidden="true"><use href="#i-folder"/></svg>Open notes folder</button>
+    <button type="button" class="tool" id="update"><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg>Update index</button>
+  </div>
+  <section class="status-card" aria-label="Local status">
+    <div id="status"><span id="dot" class="dot"></span><span id="statusText">Checking LM Studio…</span></div>
+    <div class="extra"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg><span id="indexText">Checking notes index…</span></div>
+    <div class="extra"><svg class="icon" aria-hidden="true"><use href="#i-model"/></svg>RAG · On this PC</div>
+  </section>
+  <div class="quit"><button type="button" id="quit"><svg class="icon" aria-hidden="true"><use href="#i-power"/></svg>Quit app</button></div>
 </aside>
 <main class="main">
-  <header class="top"><strong id="title">Study session</strong><span class="status" id="status"><span id="dot" class="dot"></span><span id="statusText">Checking LM Studio…</span></span></header>
+  <header class="top">
+    <div class="page"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg><div><h1>Chat</h1><strong id="title">Study session</strong></div></div>
+    <div class="picks">
+      <div class="pick"><label for="course">Course</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-course"/></svg><select id="course" disabled><option>Checking index…</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
+      <div class="pick"><label for="model">Model</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-model"/></svg><select id="model" disabled><option>Checking models…</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
+      <div class="pick"><label for="mode">Mode</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-mode"/></svg><select id="mode"><option value="explain">Explain from my notes</option><option value="solve">Solve a problem</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
+      <div class="model-state" id="modelState" hidden><span class="dot"></span><span id="modelStateText"></span></div>
+    </div>
+  </header>
   <div class="scroll" id="scroll"><div class="thread" id="thread">
     <section class="welcome" id="welcome">
-      <div class="kicker">Notes in, answers out</div>
-      <h1>What are you<br>studying today?</h1>
-      <p>Ask a question and see which passages from your own notes informed the answer.</p>
+      <h2>Ask your notes</h2>
+      <p>Each answer shows the passages from your own notes that it used.</p>
       <div class="starters" id="starters" hidden></div>
     </section>
   </div></div>
   <div class="bottom">
-    <form class="composer" id="form"><textarea id="question" rows="1" maxlength="1800" aria-label="Your question" placeholder="Ask a question about your notes…" required></textarea><button type="submit" class="send primary" id="send" disabled>Ask</button></form>
+    <form class="composer" id="form"><textarea id="question" rows="1" maxlength="1800" aria-label="Your question" placeholder="Ask a question about your notes…" required></textarea><button type="submit" class="send primary" id="send" aria-label="Ask" title="Ask" disabled><svg class="icon" aria-hidden="true"><use href="#i-send"/></svg></button></form>
     <div class="foot" id="message" role="status">Enter to ask · Shift+Enter for a new line · Check original pages for exact OCR formulas.</div>
   </div>
 </main>
@@ -68,6 +182,14 @@ async function api(path,data={}) {
 }
 function notice(text,error=false){el.message.textContent=text;el.message.classList.toggle('error',error)}
 function online(on){$('dot').classList.toggle('on',on);$('statusText').textContent=on?'LM Studio connected':'LM Studio · connects when you ask'}
+// The selected model's state as last confirmed by LM Studio. Unknown hides the pill.
+function showModelState(state){
+  const text={loaded:'Model loaded',idle:'Model not loaded',pending:'Load not confirmed'}[state]||'';
+  $('modelState').hidden=!text;
+  $('modelStateText').textContent=text;
+  $('modelState').firstElementChild.classList.toggle('on',state==='loaded');
+}
+function statusState(status){return !status.online?'':status.pending_load?'pending':status.loaded?'loaded':'idle'}
 function controls(){
   el.send.disabled=busy||stopped||!indexed.length||!el.question.value.trim();
   el.question.disabled=busy||stopped;
@@ -119,6 +241,7 @@ function showCourses(out){
   if(!list.length){const none=document.createElement('option');none.textContent='No indexed courses';el.course.append(none)}
   else el.course.value=list.includes(previous)?previous:out.default_course;
   $('title').textContent=list.length?el.course.value+' study session':'Study session';
+  $('indexText').textContent='Notes index · '+(list.length?list.length+(list.length===1?' course':' courses'):'no courses yet');
   showStarters();
   controls();
 }
@@ -132,16 +255,41 @@ function reset(){
   el.question.focus();
 }
 function make(tag,cls,text){const node=document.createElement(tag);if(cls) node.className=cls;if(text) node.textContent=text;return node}
-function bottom(){el.scroll.scrollTop=el.scroll.scrollHeight}
+function icon(name,cls=''){
+  const space='http://www.w3.org/2000/svg', svg=document.createElementNS(space,'svg'), use=document.createElementNS(space,'use');
+  svg.setAttribute('class',('icon '+cls).trim());
+  svg.setAttribute('aria-hidden','true');
+  use.setAttribute('href','#i-'+name);
+  svg.append(use);
+  return svg;
+}
+function avatar(name,cls=''){const node=make('div',('avatar '+cls).trim());node.append(icon(name));return node}
+// Follow the answer while it's written, until the student scrolls away from the end.
+// Only their own input counts, not the app's scrolling or the text growing.
+let follow=true, scrolledAt=-Infinity, dragging=false;
+function studentScrolls(){scrolledAt=performance.now()}
+for(const kind of ['wheel','touchmove']) el.scroll.addEventListener(kind,studentScrolls,{passive:true});
+el.scroll.addEventListener('pointerdown',e=>{if(e.target===el.scroll&&e.offsetX>=el.scroll.clientWidth) dragging=true});
+for(const kind of ['pointerup','pointercancel']) window.addEventListener(kind,()=>{if(dragging){dragging=false;studentScrolls()}});
+window.addEventListener('keydown',e=>{
+  if(e.target!==el.question&&['PageUp','PageDown','Home','End','ArrowUp','ArrowDown',' '].includes(e.key)) studentScrolls();
+});
+el.scroll.addEventListener('scroll',()=>{
+  if(dragging||performance.now()-scrolledAt<600) follow=el.scroll.scrollHeight-el.scroll.scrollTop-el.scroll.clientHeight<40;
+});
+function bottom(){if(follow) el.scroll.scrollTop=el.scroll.scrollHeight}
+// The answer is finished: show it from its question, unless the student scrolled away.
+function land(turn){if(follow) turn.scrollIntoView({block:'start'})}
 function addTurn(question){
   el.welcome.hidden=true;
   const turn=make('article','turn');
   const you=make('div','you');
-  you.append(make('div','bubble',question));
+  you.append(make('div','bubble',question),avatar('user'));
   const reply=make('div','answer','Searching your notes and asking the study model…');
-  const label=make('div','reply-label','Study Chat');
-  turn.append(you,label,reply);
-  el.thread.append(turn);bottom();
+  const label=make('div','reply-label','Spectre Studio');
+  turn.append(you,avatar('brain','ai'),label,reply);
+  el.thread.append(turn);
+  follow=true;dragging=false;bottom();
   return {turn,reply,label};
 }
 // Collapsible reasoning. Plain text only, so nothing in it can become HTML.
@@ -182,23 +330,64 @@ function showLive(target,live){
   }
   bottom();
 }
-function addSources(turn,sources){
+// The app adds pages to the end of a source's name, as in "COURSE/a.pdf (PDF page 3, OCR)".
+// Anything that doesn't fit that pattern is shown whole.
+function sourceParts(name){
+  const [,path,pages]=name.match(/^(.*?)(?: \((PDF pages? \d[^()]*)\))?$/s)||['',name];
+  const slash=path.lastIndexOf('/');
+  return {path,folder:path.slice(0,Math.max(slash,0)),file:path.slice(slash+1),pages:pages||''};
+}
+function addSources(turn,sources,timing){
   if(!sources.length) return [];
-  const details=make('details','sources');
-  details.append(make('summary','', 'Retrieved passages ('+sources.length+')'));
-  const cards=[];
+  const panel=make('section','sources-panel');
+  const heading=make('h2');
+  heading.append(icon('layers'),'Sources ('+sources.length+')');
+  panel.append(heading);
+  const cards=[], files=new Set();
   sources.forEach((source,i)=>{
-    const entry=make('div','source');
-    entry.tabIndex=-1;
-    entry.append(make('strong','', '['+(i+1)+'] '+source.name),make('div','excerpt',source.text));
-    details.append(entry);
+    const {path,folder,file,pages}=sourceParts(source.name);
+    files.add(path);
+    const entry=make('details','source'), row=make('summary'), name=make('div','source-name');
+    row.title=source.name;
+    name.append(make('strong','',file));
+    if(folder) name.append(make('span','',folder));
+    row.append(make('span','source-number','['+(i+1)+']'),icon('file'),name);
+    if(pages) row.append(make('span','source-pages',pages));
+    row.append(icon('chevron','turns'));
+    // A long passage opens as a few lines. The button shows the rest of the same text.
+    const body=make('div','source-body'), excerpt=make('div','excerpt preview',source.text), more=make('button','more','Show full passage');
+    more.type='button';
+    more.setAttribute('aria-expanded','false');
+    more.hidden=true;
+    const fit=()=>{if(excerpt.classList.contains('preview')) more.hidden=excerpt.scrollHeight<=excerpt.clientHeight+1};
+    more.onclick=()=>{
+      const full=!excerpt.classList.toggle('preview');
+      more.textContent=full?'Show less':'Show full passage';
+      more.setAttribute('aria-expanded',String(full));
+      if(!full) entry.scrollIntoView({block:'nearest'});
+    };
+    new ResizeObserver(fit).observe(excerpt);
+    body.append(excerpt,more);
+    entry.append(row,body);
+    panel.append(entry);
     cards.push(()=>{
-      details.open=true;
-      entry.focus({preventScroll:true});
+      entry.open=true;
+      fit();
+      row.focus({preventScroll:true});
       entry.scrollIntoView({block:'nearest'});
     });
   });
-  turn.append(details);
+  const facts=make('div','source-facts');
+  const fact=(name,text)=>{const item=make('span');item.append(icon(name),text);facts.append(item)};
+  const count=(n,word)=>n+' '+word+(n===1?'':'s');
+  fact('layers','Retrieved: '+count(sources.length,'passage')+' from '+count(files.size,'file'));
+  if(timing){
+    fact('clock','Retrieval: '+timing.retrieval+' s');
+    fact('clock','Model setup: '+timing.model_setup+' s');
+    fact('clock','Answer: '+timing.answer+' s');
+  }
+  panel.append(facts);
+  turn.append(panel);
   return cards;
 }
 // Format study answers with a small, fixed set of DOM elements. Model and note
@@ -261,7 +450,7 @@ function renderMath({raw,tex,display},finished){
 function appendAnswerInline(target,text,citations,formulas,finished,depth=0){
   if(depth>=4){target.append(document.createTextNode(putMathBack(text,formulas)));return}
   // A * attached to a letter or number, as in z* or 2*3, is not an italic marker.
-  const tokens=/\x02\d+\x03|\x60[^\x60\n]+\x60|\*\*(?:[^*\n]|(?<!\*)\*(?!\*))+?\*\*|__[^_\n]+__|(?<![\p{L}\p{M}\p{N}\x03)*])\*(?=\S)(?:[^*\n]|(?<=[\p{L}\p{M}\p{N}])\*(?=[\p{L}\p{N}]))+?(?<!\s)\*(?![\p{L}\p{N}])|\[\[\d{1,3}\]\]|\[\d{1,3}\]/gu;
+  const tokens=/\x02\d+\x03|\x60[^\x60\n]+\x60|\*\*(?:[^*\n]|(?<!\*)\*(?!\*))+?\*\*|__[^_\n]+__|(?<![\p{L}\p{M}\p{N}\x03)*])\*(?=\S)(?:[^*\n]|(?<=[\p{L}\p{M}\p{N}])\*(?=[\p{L}\p{N}]))+?(?<!\s)\*(?![\p{L}\p{N}])|\[\[\d{1,3}\]\]|\[\d{1,3}\]|【\d{1,3}】/gu;
   let cursor=0;
   for(const match of text.matchAll(tokens)){
     const value=match[0];
@@ -275,7 +464,7 @@ function appendAnswerInline(target,text,citations,formulas,finished,depth=0){
       if(formula.display&&node.nodeType===Node.ELEMENT_NODE) cursor+=text.slice(cursor).match(/^[^\S\n]*\n|/)[0].length;
     }else if(value.charCodeAt(0)===96){
       target.append(make('code','',putMathBack(value.slice(1,-1),formulas)));
-    }else if(value[0]==='['){
+    }else if(value[0]==='['||value[0]==='【'){ // GPT-OSS cites as 【1】.
       const number=Number(value.replace(/\D/g,''));
       const openSource=citations[number-1];
       if(!openSource){target.append(document.createTextNode(value));continue}
@@ -403,18 +592,19 @@ el.form.addEventListener('submit',async e=>{
     const result=await request.finally(()=>{waiting=false;clearInterval(poll)});
     addReasoning(turn,result.reasoning);
     addToolLog(turn,result.tools);
-    const citations=addSources(turn,result.sources);
-    if(result.model) label.textContent='Study Chat · '+result.model;
+    const citations=addSources(turn,result.sources,result.timing);
+    if(result.model) label.textContent='Spectre Studio · '+result.model;
     showAnswer(reply,result.answer,citations);
     history.push({question});
+    if(result.model) showModelState('loaded');
     online(true);
-    const timing=result.timing;
-    notice(timing?'Retrieval '+timing.retrieval+' s · Model setup '+timing.model_setup+' s · Answer '+timing.answer+' s':hint);
+    notice(hint);
   }catch(error){
+    showModelState('');
     reply.textContent=error.message;reply.classList.add('error');
     el.question.value=question;
     notice('You can retry the same question.',true);
-  }finally{busy=false;controls();el.question.focus();bottom()}
+  }finally{busy=false;controls();el.question.focus();land(turn)}
 });
 el.question.addEventListener('input',controls);
 el.mode.addEventListener('change',()=>{
@@ -427,12 +617,12 @@ el.model.addEventListener('change',async()=>{
   const wanted=el.model.value;
   if(!wanted||busy||stopped) return;
   const name=el.model.selectedOptions[0].textContent;
-  busy=true;controls();
+  busy=true;controls();showModelState('');
   notice('Switching to '+name+'… The previous study model is unloaded before the new one loads.');
   try{
     const out=await api('model',{model:wanted});
     showModels(out.models,out.model);
-    online(true);notice(out.name+' is ready.');
+    online(true);showModelState('loaded');notice(out.name+' is ready.');
   }catch(error){
     showModels(modelOptions,activeModel);
     let state=' Could not verify which model is loaded.';
@@ -441,6 +631,7 @@ el.model.addEventListener('change',async()=>{
       online(status.online);
       if(status.online){
         showModels(status.models,status.model);
+        showModelState(statusState(status));
         const selected=el.model.selectedOptions[0];
         if(status.pending_load){
           state=' LM Studio may still be processing the load.';
@@ -453,6 +644,7 @@ el.model.addEventListener('change',async()=>{
     notice(error.message+state,true);
   }finally{busy=false;controls()}
 });
+$('navChat').onclick=()=>el.question.focus();
 $('new').onclick=reset;
 $('notes').onclick=async()=>{try{const out=await api('notes');notice(out.message)}catch(error){notice(error.message,true)}};
 $('update').onclick=async()=>{
@@ -466,11 +658,11 @@ $('update').onclick=async()=>{
   catch(error){notice(error.message,true)}finally{updating=false;clearInterval(poll);busy=false;controls()}
 };
 $('quit').onclick=async()=>{
-  try{await api('quit');stopped=true;controls();$('statusText').textContent='Study Chat closed';$('dot').classList.remove('on');notice('You can close this tab. Double-click Start Study Chat to reopen.')}
+  try{await api('quit');stopped=true;controls();$('statusText').textContent='Spectre Studio closed';$('dot').classList.remove('on');notice('You can close this tab. Open Spectre Studio again to continue.')}
   catch(error){notice(error.message,true)}
 };
 busy=true;controls();
-api('status').then(out=>{online(out.online);showCourses(out);showModels(out.models,out.model);if(!out.courses.length)notice('Add your notes to a course folder, then click Update index.');else if(out.starter_problems.length)notice(out.starter_problems.join(' · '),true)})
+api('status').then(out=>{online(out.online);showCourses(out);showModels(out.models,out.model);showModelState(statusState(out));if(!out.courses.length)notice('Add your notes to a course folder, then click Update index.');else if(out.starter_problems.length)notice(out.starter_problems.join(' · '),true)})
 .catch(error=>notice(error.message,true)).finally(()=>{busy=false;controls()});
 </script>
 </body>

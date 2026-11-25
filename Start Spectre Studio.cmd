@@ -6,7 +6,7 @@ if not exist ".venv\Scripts\pythonw.exe" (
     exit /b 1
 )
 if not exist "study_chat.html" (
-    echo Extract all three Study Chat files together before launching.
+    echo Extract all the Spectre Studio files together before launching.
     pause
     exit /b 1
 )

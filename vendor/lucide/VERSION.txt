@@ -1,0 +1,12 @@
+Lucide 1.79.0 (ISC license, see LICENSE)
+https://lucide.dev
+
+Icon shapes from the npm package:
+https://registry.npmjs.org/lucide-static/-/lucide-static-1.79.0.tgz
+SHA-512 (base64): 1Oq9qzywx2Sa16LRGju97VvqSMBxq2R9GtBWYW4sfX+qpNJRLNLJq2wWvA4NODfdgknHOJBkqhjxpFRlvXehLg==
+
+The shapes are written directly in study_chat.html as <symbol> elements, so no
+icon files are loaded. The brain shape is also used for spectre-studio.ico.
+
+Included: brain, message-square-more, plus, folder-open, refresh-cw, power, send,
+file-text, chevron-down, box, layers, graduation-cap, sliders-horizontal, user, clock.

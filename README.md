@@ -1,28 +1,29 @@
-# Study Chat
+# Spectre Studio
 
-**A local document search and Q&A app.** Drop your notes and PDFs into a folder, ask a question in plain English, and Study Chat finds the passages that answer it and shows you exactly where they came from: the file name and, for PDFs, the page number. Everything runs on your own computer. Your documents never leave it.
+**A local document search and Q&A app.** Drop your notes and PDFs into a folder, ask a question in plain English, and Spectre Studio finds the passages that answer it and shows you exactly where they came from: the file name and, for PDFs, the page number. Everything runs on your own computer. Your documents never leave it.
 
-I built it because hunting through a semester's worth of PDFs for one formula or definition was slow. Study Chat turns that into a few seconds.
+I built it because hunting through a semester's worth of PDFs for one formula or definition was slow. Spectre Studio turns that into a few seconds.
 
-![Study Chat answering a question from the sample notes, with its source passages expanded](docs/screenshot.png)
+![Spectre Studio answering a question from the sample notes, with its source passages expanded](docs/screenshot.png)
 
 ## What it does
 
 - **Searches your own documents.** Reads PDF, TXT and Markdown files, splits them into passages, and finds the ones that match your question by meaning, not only by keywords.
 - **Cites every source.** Each answer lists the passages it used, and you can expand them to read the original text. If your notes don't cover the question, it says so instead of guessing.
-- **Reads text inside images.** Many lecture PDFs have formulas embedded as pictures. Study Chat runs OCR on those images and tags the results with their PDF page, so they're searchable too.
+- **Reads text inside images.** Many lecture PDFs have formulas embedded as pictures. Spectre Studio runs OCR on those images and tags the results with their PDF page, so they're searchable too.
 - **Organizes by course.** One folder per class. Search a single course or switch between them from a dropdown.
 - **Two modes:**
   - **Explain from my notes** (default): answers questions using only what's in your documents.
   - **Solve a problem**: walks through a worked solution step by step, using the methods and formulas from your notes, then shows how to check the answer on a TI-84. The math comes from built-in calculation tools rather than the language model, so the numbers are reliable.
-- **Fast updates.** Study Chat fingerprints each file and only processes notes that are new or changed, so updating the index after adding one PDF takes seconds instead of minutes.
+- **Fast updates.** Spectre Studio fingerprints each file and only processes notes that are new or changed, so updating the index after adding one PDF takes seconds instead of minutes.
 - **Formatted math.** LaTeX formulas in answers are drawn with [KaTeX](https://katex.org) 0.19.1 (MIT license), which is included in `vendor/katex`, so nothing loads from the internet.
+- **Bundled icons.** The interface uses [Lucide](https://lucide.dev) 1.79.0 icons (ISC license, see `vendor/lucide`), built into the page.
 - **Model picker.** Choose which local model writes the answers. Qwen 27B (`qwen/qwen3.8-27b`) is the default.
 - **100% offline.** No API keys, no accounts, no cloud services.
 
 ## How it works
 
-Study Chat is a **retrieval-augmented generation (RAG)** app:
+Spectre Studio is a **retrieval-augmented generation (RAG)** app:
 
 1. **Ingest** (`ingest.py`): reads every file in `notes/<course>/`, extracts the text (plus OCR text from PDF images via Tesseract), and splits it into passages tagged with course, file and page.
 2. **Embed and store:** each passage is turned into a vector with the Nomic Embed v1.5 model, running on an NVIDIA GPU through PyTorch CUDA, and saved in a local ChromaDB database.
@@ -75,8 +76,8 @@ With Qwen split across both GPUs, generation ran at about 42 tokens/s (about 35 
            ...
    ```
 4. In LM Studio, load a chat model and turn on the **Local Server** (port 1234).
-5. Double-click **Setup Study Chat.cmd** once. It creates a **Study Chat** shortcut on your desktop.
-6. Open Study Chat from the shortcut and click **Update index** to build the search database.
+5. Double-click **Setup Spectre Studio.cmd** once. It creates a **Spectre Studio** shortcut on your desktop.
+6. Open Spectre Studio from the shortcut and click **Update index** to build the search database.
 
 ## Starter questions
 
@@ -89,13 +90,13 @@ detail = "How disc brakes work"
 question = "How does a disc brake slow a wheel?"
 ```
 
-Reopen Study Chat or click **Update index** to see your changes. Courses without this file show no cards. Everything under `notes` stays out of Git, so your own cards stay private.
+Reopen Spectre Studio or click **Update index** to see your changes. Courses without this file show no cards. Everything under `notes` stays out of Git, so your own cards stay private.
 
 ## Notes on accuracy
 
-- OCR can misread math symbols. For formulas you rely on, keep a typed version in a `.txt` file in the course folder. Study Chat prefers typed text over OCR when both exist.
+- OCR can misread math symbols. For formulas you rely on, keep a typed version in a `.txt` file in the course folder. Spectre Studio prefers typed text over OCR when both exist.
 - Answers are only as good as the documents behind them. Use the source passages to check anything important against the original.
 
 ## How this was built
 
-I designed Study Chat, tested it on my own hardware, and directed every change, working with AI coding assistants to write and review much of the code. I'm studying Computer Science (AI-Assisted Software Engineering) at UNC Charlotte, and this project is how I learned RAG, embeddings, vector databases and local LLM tooling hands-on.
+I designed Spectre Studio, tested it on my own hardware, and directed every change, working with AI coding assistants to write and review much of the code. I'm studying Computer Science (AI-Assisted Software Engineering) at UNC Charlotte, and this project is how I learned RAG, embeddings, vector databases and local LLM tooling hands-on.

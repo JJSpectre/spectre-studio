@@ -1,4 +1,4 @@
-"""Update the Study Chat index from the terminal."""
+"""Update the Spectre Studio index from the terminal."""
 
 from study_chat import AppError, rebuild
 

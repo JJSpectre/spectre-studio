@@ -1,4 +1,4 @@
-# Study Chat - Python packages (tested with Python 3.12 on Windows 11)
+# Spectre Studio - Python packages (tested with Python 3.12 on Windows 11)
 #
 # Install PyTorch FIRST with CUDA support so embeddings run on an NVIDIA GPU:
 #   pip install torch==2.11.0 --index-url https://download.pytorch.org/whl/cu128

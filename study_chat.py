@@ -54,7 +54,7 @@ NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 # is still thinking keeps sending tokens, so long reasoning never trips this.
 IDLE_TIMEOUT = 120
 MAX_ANSWER_SECONDS = 1200
-MAX_TOOL_ROUNDS = 20   # tool rounds before Study Chat asks for the final answer
+MAX_TOOL_ROUNDS = 20   # tool rounds before Spectre Studio asks for the final answer
 MAX_REPEATS = 3        # repeated identical calls before the same stop
 MAX_SEARCHES = 3       # search_notes calls per answer
 MAX_SOURCES = 10       # passages the model can see and cite
@@ -308,7 +308,7 @@ def model_options(catalog):
 def pending_load_error():
     return AppError(
         "LM Studio hasn't confirmed the model load. If it is still loading, wait and retry. "
-        "If it has stopped without loading the model, restart LM Studio and Study Chat, then retry."
+        "If it has stopped without loading the model, restart LM Studio and Spectre Studio, then retry."
     )
 
 
@@ -625,7 +625,7 @@ def split_reasoning(text):
 
 
 # ---------------------------------------------------------------------------
-# Solve-mode tools. The model asks for these by name; Study Chat runs them.
+# Solve-mode tools. The model asks for these by name; Spectre Studio runs them.
 # ---------------------------------------------------------------------------
 
 def _normalcdf(lower, upper, mean=0.0, sd=1.0):
@@ -1143,7 +1143,7 @@ def stream_completion(payload, started, tokens):
                 if now - started > MAX_ANSWER_SECONDS:
                     raise AppError(
                         f"The model was still generating after {MAX_ANSWER_SECONDS // 60} minutes, "
-                        "so Study Chat stopped waiting. Try a narrower question."
+                        "so Spectre Studio stopped waiting. Try a narrower question."
                     )
                 if now - last_update > 0.25:
                     _, visible = split_reasoning("".join(content_parts))
@@ -1423,7 +1423,7 @@ class Handler(BaseHTTPRequestHandler):
         if (self.headers.get("Host") != f"{HOST}:{PORT}"
                 or self.headers.get("Origin") != ORIGIN
                 or not secrets.compare_digest(self.headers.get("X-Study-Token", ""), TOKEN)):
-            return self.reply(403, {"error": "Open Study Chat locally and reload the page."})
+            return self.reply(403, {"error": "Open Spectre Studio locally and reload the page."})
         try:
             length = int(self.headers.get("Content-Length", "0"))
             if not 0 < length <= 16000:
@@ -1442,7 +1442,7 @@ class Handler(BaseHTTPRequestHandler):
             save_last_course(course)
             return self.reply(200, {"message": "Course saved."})
         if not WORK.acquire(blocking=False):
-            return self.reply(409, {"error": "Study Chat is busy. Wait for the current task to finish."})
+            return self.reply(409, {"error": "Spectre Studio is busy. Wait for the current task to finish."})
         try:
             if self.path == "/api/status":
                 result = app_status()
@@ -1462,7 +1462,7 @@ class Handler(BaseHTTPRequestHandler):
                 os.startfile(str(notes))
                 result = {"message": "Notes folder opened"}
             elif self.path == "/api/quit":
-                result = {"message": "Study Chat closed."}
+                result = {"message": "Spectre Studio closed."}
                 threading.Thread(target=self.server.shutdown, daemon=True).start()
             else:
                 return self.reply(404, {"error": "Not found."})
@@ -1471,7 +1471,7 @@ class Handler(BaseHTTPRequestHandler):
             return self.reply(400, {"error": str(error)})
         except Exception:
             traceback.print_exc()
-            return self.reply(500, {"error": f"Study Chat encountered an error. See {LOG.name} in rag-study."})
+            return self.reply(500, {"error": f"Spectre Studio encountered an error. See {LOG.name} in rag-study."})
         finally:
             if self.path == "/api/rebuild":
                 self.clear_index_progress()
@@ -1513,6 +1513,6 @@ if __name__ == "__main__":
             traceback.print_exc(file=log)
         if os.name == "nt":
             import ctypes
-            ctypes.windll.user32.MessageBoxW(None, f"{error}\n\nSee {LOG.name}.", "Study Chat", 0x10)
+            ctypes.windll.user32.MessageBoxW(None, f"{error}\n\nSee {LOG.name}.", "Spectre Studio", 0x10)
         else:
             raise

@@ -1,4 +1,4 @@
-"""Open the existing Study Chat backend in a standalone WebView2 window."""
+"""Open the local Spectre Studio backend in a standalone WebView2 window."""
 import ctypes
 import hashlib
 import logging
@@ -9,7 +9,7 @@ from threading import Event, Thread
 
 ROOT = Path(__file__).resolve().parent
 LOG = ROOT / "study-chat-desktop.log"
-ICON = ROOT / "study-chat.ico"
+ICON = ROOT / "spectre-studio.ico"
 
 
 def enable_right_click(window):
@@ -49,6 +49,19 @@ def enable_right_click(window):
         turn_on()
 
 
+def darken_title_bar(window):
+    """Match the Windows title bar to the sidebar, whatever the Windows theme is."""
+    try:
+        set_attribute = ctypes.windll.dwmapi.DwmSetWindowAttribute
+        handle = ctypes.c_void_p(window.native.Handle.ToInt64())
+        # 20: dark window buttons. 35 and 36: title bar and title colors, written
+        # as blue-green-red. Windows 10 ignores 35 and 36.
+        for attribute, value in ((20, 1), (35, 0x1C150F), (36, 0xFBF2EA)):
+            set_attribute(handle, attribute, ctypes.byref(ctypes.c_int(value)), 4)
+    except Exception:
+        logging.exception("Could not darken the title bar")
+
+
 def open_window():
     import study_chat as backend
     import webview
@@ -64,10 +77,11 @@ def open_window():
         backend.ORIGIN = f"http://{backend.HOST}:{backend.PORT}"
 
         window = webview.create_window(
-            "Study Chat", backend.ORIGIN, width=1140, height=810,
-            min_size=(690, 510), background_color="#f8f8f2", text_select=True,
+            "Spectre Studio", backend.ORIGIN, width=1360, height=860,
+            min_size=(690, 510), background_color="#0b1118", text_select=True,
         )
         window.events.before_show += lambda: enable_right_click(window)
+        window.events.before_show += lambda: darken_title_bar(window)
         closing = Event()
 
         def mark_closed():
@@ -82,20 +96,20 @@ def open_window():
                     try:
                         window.destroy()
                     except Exception:
-                        logging.exception("Could not close the Study Chat window")
+                        logging.exception("Could not close the Spectre Studio window")
 
         window.events.closed += mark_closed
         thread = Thread(target=serve, name="study-chat-server", daemon=True)
         thread.start()
-        logging.info("Study Chat desktop starting on %s", backend.ORIGIN)
+        logging.info("Spectre Studio desktop starting on %s", backend.ORIGIN)
         try:
-            webview.start(gui="edgechromium", private_mode=True)
+            webview.start(gui="edgechromium", private_mode=True, icon=str(ICON))
         finally:
             # The window's X stops this app's backend, not LM Studio or its models.
             closing.set()
             server.shutdown()
             thread.join(timeout=3)
-            logging.info("Study Chat desktop stopped")
+            logging.info("Spectre Studio desktop stopped")
 
 
 def launch_windows():
@@ -115,7 +129,7 @@ def launch_windows():
 
     try:
         if error == 183:
-            notify("Study Chat is already open. Look for its window on the taskbar.", 0x40)
+            notify("Spectre Studio is already open. Look for its window on the taskbar.", 0x40)
             return
         open_window()
     finally:
@@ -123,7 +137,7 @@ def launch_windows():
 
 
 def notify(text, flags=0x10):
-    ctypes.windll.user32.MessageBoxW(None, text, "Study Chat", flags)
+    ctypes.windll.user32.MessageBoxW(None, text, "Spectre Studio", flags)
 
 
 def main():
@@ -139,8 +153,8 @@ def main():
             launch_windows()
         except Exception as error:
             logging.exception("Desktop startup failed")
-            notify(f"Study Chat couldn't start.\n\n{error}\n\n"
-                   "Run Setup Study Chat again if pywebview is missing. "
+            notify(f"Spectre Studio couldn't start.\n\n{error}\n\n"
+                   "Run Setup Spectre Studio again if pywebview is missing. "
                    f"For details, see {LOG.name} in rag-study.")
 
 
