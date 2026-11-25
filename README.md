@@ -56,8 +56,8 @@ With Qwen split across both GPUs, generation ran at about 42 tokens/s (about 35 
 
 1. Clone the repo and open a terminal in its folder:
    ```
-   git clone https://github.com/JJSpectre/study-chat-local-rag.git
-   cd study-chat-local-rag
+   git clone https://github.com/JJSpectre/spectre-studio.git
+   cd spectre-studio
    ```
 2. Create a virtual environment and install the packages. Install PyTorch first, with CUDA support:
    ```
