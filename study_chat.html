@@ -56,15 +56,13 @@ button:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-vis
 /* Hidden pages keep their size, so an answer being written and the scroll position carry on. */
 .away{visibility:hidden}
 .main{display:grid;grid-template-rows:minmax(0,1fr) auto;min-height:0;min-width:0}
-.library-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px 20px;max-width:1270px;margin:0 auto;padding:20px 24px 0}
-.head-actions,.library-tools{display:flex;flex-wrap:wrap;align-items:center;gap:10px}.library-tools{width:100%;padding-top:14px;border-top:1px solid var(--line)}
-.head-actions .checked{margin-right:4px;text-align:right}
-.search-box{position:relative;flex:1 1 130px;max-width:400px}.search-box .icon{position:absolute;top:50%;left:12px;width:18px;height:18px;transform:translateY(-50%);color:var(--quiet);pointer-events:none}.library-tools .search-box input{padding-left:40px}
-.library-tools .pick-box{flex:1 1 180px;max-width:230px}.library-tools select{min-width:0;max-width:none;padding-left:14px}
-.views{display:flex;margin-left:auto;border:1px solid var(--control);border-radius:8px;background:var(--panel)}.views button{display:grid;place-items:center;width:42px;height:38px;border:0;border-radius:7px;background:none;color:var(--quiet)}.views button:hover{color:var(--ink)}.views button[aria-pressed=true]{background:var(--primary);color:#fff}
-.page{display:flex;align-items:center;gap:14px}.page>.icon{width:34px;height:34px;stroke-width:1.5;color:var(--accent)}
-.page h1{font-family:inherit;font-size:24px;font-weight:650;line-height:1.2;letter-spacing:0;margin:0}.page strong{font-weight:400;color:var(--quiet);font-size:14px}
-.checked{color:var(--quiet);font-size:12px;line-height:1.4}.checked span{display:block}.checked .when{color:var(--ink)}
+.library-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:15px 20px;max-width:1270px;margin:0 auto;padding:20px 24px 0}.library-head>.button{padding:9px 20px}
+.library-search{display:flex;gap:16px;width:100%}.search-box{position:relative;flex:1;min-width:0}.search-box .icon{position:absolute;top:50%;left:13px;width:18px;height:18px;transform:translateY(-50%);color:var(--quiet);pointer-events:none}.library-search .search-box input{padding:10px 14px 10px 42px}
+.views{display:flex;flex:none;border:1px solid var(--control);border-radius:8px;background:var(--panel)}.views button{display:grid;place-items:center;width:48px;border:0;border-radius:7px;background:none;color:var(--quiet)}.views button:hover{color:var(--ink)}.views button[aria-pressed=true]{background:var(--primary);color:#fff}
+.library-tools{display:flex;flex-wrap:wrap;align-items:center;gap:10px;width:100%}.library-tools select{width:auto;min-width:0;max-width:230px;padding:5px 30px 5px 11px;font-size:13px}.library-tools .button{padding:5px 12px;font-size:13px}.library-tools .checked{margin-left:auto}
+.page{display:flex;align-items:center;gap:14px}.page>.icon{width:42px;height:42px;stroke-width:1.5;color:var(--accent)}
+.page h1{font-family:inherit;font-size:26px;font-weight:650;line-height:1.2;letter-spacing:0;margin:0}.page strong{font-weight:400;color:var(--quiet);font-size:14px}
+.checked{color:var(--quiet);font-size:13px;line-height:1.4}.checked .when{color:var(--ink)}
 .pick label{display:block;font-size:12px;color:var(--quiet);margin:0 0 3px 2px}
 .pick-box{position:relative}.pick-box .icon{position:absolute;top:50%;left:11px;width:18px;height:18px;transform:translateY(-50%);color:var(--accent);pointer-events:none}
 .pick-box .chevron{left:auto;right:10px;color:var(--quiet)}
@@ -122,27 +120,23 @@ input:not([type=checkbox]){width:100%;min-width:0;padding:8px 12px;border:1px so
 .answer .katex{white-space:normal;font-size:1.1em}.answer .katex-display{margin:.5em 0;padding:.1em 0;overflow-x:auto;overflow-y:hidden}.answer .katex-display>.katex{white-space:nowrap}
 .answer .table-scroll{overflow-x:auto;margin:0 0 .7em}.answer table{border-collapse:collapse;font-size:.95em}.answer th,.answer td{border:1px solid var(--control);padding:5px 10px;text-align:left;vertical-align:top;overflow-wrap:normal}.answer th{background:#22324a;font-weight:600}
 #librariesPage .foot:empty{min-height:0;margin:0}#librariesPage .bottom:has(.foot:empty){padding:0}
-.library-list{max-width:1270px;margin:0 auto;padding:18px 24px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(295px,100%),1fr));gap:18px}
+.library-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;max-width:1270px;margin:0 auto;padding:16px 24px 24px}
 .library-list>p{grid-column:1/-1;margin:0;color:var(--quiet)}.library-list>p.error{color:var(--bad)}
-.library{--tint:#8fb0d6;position:relative;display:flex;flex-direction:column;min-width:0;border:1px solid var(--line);border-radius:12px;background:linear-gradient(180deg,var(--raised),var(--panel));overflow:hidden}
+.library{--tint:#8fb0d6;position:relative;display:flex;flex-direction:column;gap:13px;min-width:0;padding:18px 20px;border:1px solid var(--line);border-radius:12px;background:linear-gradient(180deg,var(--raised),var(--panel));overflow:hidden}.library>*{position:relative}
 .library.current{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
-.banner{display:grid;place-items:center;flex:none;height:104px;background:linear-gradient(120deg,color-mix(in srgb,var(--tint) 38%,#0b1118),color-mix(in srgb,var(--tint) 12%,#0b1118));color:var(--tint)}.banner .icon{width:50px;height:50px;stroke-width:1.5}
-.library-body{display:flex;flex-direction:column;flex:1;gap:12px;min-width:0;padding:14px 18px 18px}
-.library h2{font-size:19px;font-weight:650;line-height:1.25;margin:0;overflow-wrap:anywhere}.description{margin:6px 0 0;color:var(--quiet);font-size:14px;line-height:1.45;overflow-wrap:anywhere}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.chip{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--quiet);font-size:12px;line-height:1.4;padding:1px 10px;overflow-wrap:anywhere}.chip.on{border-color:var(--accent);color:var(--ink)}
-.library-counts{display:flex;flex-wrap:wrap;gap:6px 18px;color:var(--quiet);font-size:13px}.library-counts span{display:flex;align-items:center;gap:7px}.library-counts .icon{width:16px;height:16px;color:var(--accent)}
-.courses{border-top:1px solid var(--line);padding-top:10px;margin-top:auto}.courses summary{display:flex;align-items:center;gap:8px;border-radius:6px;color:var(--quiet);font-size:13px;cursor:pointer;list-style:none}.courses summary::-webkit-details-marker{display:none}.courses summary:hover{color:var(--ink)}.courses summary .icon{width:16px;height:16px}.courses[open] .turns{transform:rotate(180deg)}
-.library ul{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px}
-.course-row{display:flex;align-items:center;gap:12px;width:100%;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);text-align:left}.course-row:hover:not(:disabled){border-color:var(--accent)}
-.course-row>span{flex:1;min-width:0;overflow-wrap:anywhere}.course-row>span>span{display:block;color:var(--quiet);font-size:13px}.course-row>.icon{width:18px;height:18px;color:var(--accent)}
+.library .card-art{position:absolute;top:0;right:0;width:42%;height:calc(100% - 72px);max-height:190px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;color:var(--tint);opacity:.6;pointer-events:none;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--tint) 16%,transparent));mask-image:linear-gradient(90deg,transparent,#000 28%),linear-gradient(#000 70%,transparent);mask-composite:intersect}
+.card-head{display:flex;align-items:flex-start;gap:15px;max-width:60%}.icon-tile{display:grid;place-items:center;flex:none;width:54px;height:54px;border-radius:10px;background:linear-gradient(160deg,color-mix(in srgb,var(--tint) 34%,#0b1118),color-mix(in srgb,var(--tint) 14%,#0b1118));color:var(--tint)}.icon-tile .icon{width:30px;height:30px}
+.about{min-width:0}.library h2{font-size:21px;font-weight:650;line-height:1.25;margin:0;overflow-wrap:anywhere}.about p{margin:3px 0 0;color:var(--quiet);font-size:13px;line-height:1.4;overflow-wrap:anywhere}.about b{color:var(--accent);font-weight:600}
+.course-chips{display:flex;flex-wrap:wrap;gap:7px;max-width:62%;margin:0;padding:0;list-style:none}.course-chips li{max-width:100%}.course-chip{max-width:100%;padding:3px 12px;border:1px solid var(--control);border-radius:999px;background:#22324af2;color:var(--ink);font-size:12.5px;line-height:1.4;text-align:left;overflow-wrap:anywhere}.course-chip:hover:not(:disabled),.course-chip[aria-current]{border-color:var(--accent)}.course-chip.extra{border-color:var(--line);color:var(--accent)}
+.library-counts{display:flex;flex-wrap:wrap;gap:6px 26px;max-width:62%;font-size:13px}.library-counts span{display:flex;align-items:center;gap:7px}.library-counts .icon{width:16px;height:16px;color:var(--accent)}
+.card-actions{display:flex;align-items:center;gap:12px;margin-top:auto}.card-actions .library-note{flex:1}
 .library-note{margin:0;color:var(--quiet);font-size:13px;overflow-wrap:anywhere}
-.open-library{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 16px;border:1px solid var(--primary);border-radius:8px}.open-library .icon{width:18px;height:18px}
-.menu-button{position:absolute;top:10px;right:10px;display:grid;place-items:center;width:38px;height:32px;border:1px solid var(--control);border-radius:8px;background:#0b1118e6;color:var(--ink)}.menu-button:hover:not(:disabled){border-color:var(--accent)}
+.open-library{display:flex;flex:1;align-items:center;justify-content:space-between;gap:12px;min-width:0;padding:9px 18px;border:1px solid var(--control);border-radius:8px;background:var(--active);color:#fff;font-weight:600;text-align:left}.open-library:hover:not(:disabled){border-color:var(--accent);background:var(--primary)}.open-library .go{width:18px;height:18px;transform:rotate(-90deg)}
+.square{display:grid;place-items:center;flex:none;width:46px;height:42px;border:1px solid var(--control);border-radius:8px;background:#0b1118cc;color:var(--ink)}.square:hover:not(:disabled){border-color:var(--accent)}.square .icon{width:18px;height:18px}.upright{transform:rotate(90deg)}
 .menu{position:fixed;inset:auto;position-area:bottom span-left;position-try-fallbacks:flip-block;margin:4px 0;min-width:150px;padding:5px;border:1px solid var(--control);border-radius:10px;background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}
 .menu button{display:flex;align-items:center;gap:10px;width:100%;padding:8px 12px;border:0;border-radius:6px;background:none;color:var(--ink);text-align:left}.menu button:hover:not(:disabled){background:var(--raised)}.menu .icon{width:16px;height:16px;color:var(--accent)}
-.create-card{display:grid;place-content:center;justify-items:center;gap:4px;min-height:150px;padding:24px;border:1px dashed var(--control);border-radius:12px;background:#131c2880;color:var(--quiet);font-size:14px}.create-card strong{color:var(--ink);font-size:17px;font-weight:650}.create-card .icon{width:30px;height:30px;color:var(--accent)}.create-card:hover:not(:disabled){border-color:var(--accent);background:var(--panel)}
-.library-list.list{grid-template-columns:minmax(0,1fr);gap:10px}.list .library{flex-direction:row}.list .banner{width:72px;height:auto}.list .banner .icon{width:30px;height:30px}.list .library-body{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px 20px;padding:12px 62px 12px 16px}
-.list .library-body>*{grid-column:1/-1}.list .library-body>.about{grid-column:1}.list .open-library{grid-column:2;grid-row:1;align-self:start;padding:7px 14px}.list .courses{margin-top:0;padding-top:8px}.list .create-card{min-height:0;padding:14px}
+.library-list.list{grid-template-columns:minmax(0,1fr);gap:10px}.list .library{display:grid;grid-template-columns:minmax(0,1fr) auto 320px;align-items:center;gap:9px 24px;padding:12px 16px}.list .card-art{display:none}.list .card-head,.list .course-chips,.list .library-counts{max-width:none}.list .icon-tile{width:44px;height:44px}.list .icon-tile .icon{width:24px;height:24px}.list .library h2{font-size:18px}
+.list .card-head{grid-column:1}.list .library-counts{grid-column:2;grid-row:1}.list .card-actions{grid-column:3;grid-row:1;margin:0}.list .course-chips,.list .library>.library-note{grid-column:1/-1}.list .library-counts{flex-direction:column}
 #dashboardPage .scroll{scrollbar-gutter:auto}#dashboardPage .foot:empty{min-height:0;margin:0}#dashboardPage .bottom:has(.foot:empty){padding:0}
 .home-banner{--tint:#8fb0d6;position:relative;display:grid;place-items:center;min-height:168px;padding:16px 24px;border-bottom:1px solid var(--line);overflow:hidden;background:linear-gradient(90deg,color-mix(in srgb,var(--tint) 26%,#0b1118),color-mix(in srgb,var(--tint) 7%,#0b1118) 50%,color-mix(in srgb,var(--tint) 20%,#0b1118))}
 .art{position:absolute;top:0;left:0;width:calc(50% - 212px);height:100%;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;color:var(--tint);pointer-events:none;mask-image:linear-gradient(90deg,#000 75%,transparent)}.art.right{left:auto;right:0;opacity:.6;mask-image:linear-gradient(270deg,#000 75%,transparent)}.motif{stroke-width:2}
@@ -178,6 +172,7 @@ dialog fieldset{min-width:0;margin:0;padding:0;border:0}
 .reasoning .excerpt{max-height:340px;overflow:auto}.live{color:var(--quiet);font-style:italic}
 @media(min-width:1500px){.bar .pick-box .icon:first-child{display:block}.bar select{padding-left:38px}}
 @media(max-width:1119px){.home-banner{justify-items:end;min-height:140px}.art{width:calc(100% - 440px)}.art.right{display:none}.panels{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:1119px){.library-list{grid-template-columns:minmax(0,1fr)}.list .library{display:flex}.list .library>*{width:100%}.list .library-counts{flex-direction:row}}
 @media(max-width:900px){.tile:not(.off) span{display:none}}
 @media(max-width:720px){
   .home-banner{min-height:104px;padding:10px 12px}.art{width:calc(100% - 400px)}.home-pick{width:min(370px,100%)}.home{gap:10px;padding:10px 12px 12px}.panels{grid-template-columns:minmax(0,1fr);gap:10px}.libs{grid-row:auto}.libs ul{max-height:none}.empty{min-height:90px}.index-card{padding:10px 13px 12px}.index-wrap{padding:0 12px}.index-wrap .index-card{margin-top:10px}
@@ -195,7 +190,7 @@ dialog fieldset{min-width:0;margin:0;padding:0;border:0}
   .hardware summary:hover{border-color:var(--accent)}.hardware summary .icon{width:16px;height:16px}.hardware[open] .turns{transform:rotate(180deg)}
   .gpu-panel{position:absolute;top:calc(100% + 4px);right:0;width:280px;padding:12px 14px;border:1px solid var(--control);border-radius:10px;background:var(--panel);box-shadow:var(--shadow)}#gpus{gap:12px}.gpu-note{display:block}
   .bar{min-height:0;gap:6px 10px;padding:6px 12px}.field label{font-size:12px}
-  .bar select{padding:4px 24px 4px 9px}.library-head{gap:8px 10px;padding:10px 12px 0}.library-tools{gap:8px;padding-top:8px}.head-actions{gap:8px}.head-actions .button{padding:5px 10px;font-size:13px}.head-actions .checked{font-size:11px}.library-list{padding:12px;gap:12px}.banner{height:76px}
+  .bar select{padding:4px 24px 4px 9px}.library-head{gap:8px 10px;padding:10px 12px 0}.library-head>.button{padding:5px 12px}.library-search{gap:10px}.library-search .search-box input{padding-top:6px;padding-bottom:6px}.library-tools{gap:8px}.library-tools .checked{margin-left:0}.library-list{padding:12px;gap:12px}.library{padding:14px 16px}
   .composer .button{width:48px;padding:0}.composer .button span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
   .thread{padding:14px 12px}.bottom{padding:4px 12px 6px}.composer{padding:8px}
   .turn{grid-template-columns:minmax(0,1fr)}.turn>*{grid-column:1}.avatar{display:none}.starters{grid-template-columns:1fr}
@@ -243,7 +238,7 @@ dialog fieldset{min-width:0;margin:0;padding:0;border:0}
 <symbol id="i-cpu" viewBox="0 0 24 24"><path d="M12 20v2"/><path d="M12 2v2"/><path d="M17 20v2"/><path d="M17 2v2"/><path d="M2 12h2"/><path d="M2 17h2"/><path d="M2 7h2"/><path d="M20 12h2"/><path d="M20 17h2"/><path d="M20 7h2"/><path d="M7 20v2"/><path d="M7 2v2"/><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="8" y="8" width="8" height="8" rx="1"/></symbol>
 <symbol id="i-chart" viewBox="0 0 24 24"><path d="M5 21v-6"/><path d="M12 21V9"/><path d="M19 21V3"/></symbol>
 </svg>
-<!-- Our own circuit-trace art for the Dashboard's banner. -->
+<!-- Our own circuit-trace art for the Dashboard's banner and the library cards. -->
 <svg hidden aria-hidden="true">
 <symbol id="art-traces" viewBox="0 0 460 150"><g opacity=".5"><path d="M0 18H60l14-14H210M0 44H14l10 10M0 106H18l10-10M0 134H70l10 10H236M276 40H340l18-18H440M276 62H400M276 84H372l14 14H452M276 106H330l22 22H420M236 144l18-10H300M210 4l14 12H292"/><circle cx="440" cy="22" r="3.2" fill="currentColor" stroke="none"/><circle cx="400" cy="62" r="3.2" fill="currentColor" stroke="none"/><circle cx="452" cy="98" r="3.2" fill="currentColor" stroke="none"/><circle cx="420" cy="128" r="3.2" fill="currentColor" stroke="none"/><circle cx="300" cy="134" r="3.2" fill="currentColor" stroke="none"/><circle cx="292" cy="16" r="3.2" fill="currentColor" stroke="none"/><circle cx="24" cy="54" r="3.2" fill="currentColor" stroke="none"/><circle cx="28" cy="96" r="3.2" fill="currentColor" stroke="none"/></g></symbol>
 <symbol id="art-gears" viewBox="0 0 222 130"><path d="M124.4 60.6L135.7 62.5L135.7 73.5L124.4 75.4L121.9 84.8L130.7 92.1L125.3 101.6L114.5 97.6L107.6 104.5L111.6 115.3L102.1 120.7L94.8 111.9L85.4 114.4L83.5 125.7L72.5 125.7L70.6 114.4L61.2 111.9L53.9 120.7L44.4 115.3L48.4 104.5L41.5 97.6L30.7 101.6L25.3 92.1L34.1 84.8L31.6 75.4L20.3 73.5L20.3 62.5L31.6 60.6L34.1 51.2L25.3 43.9L30.7 34.4L41.5 38.4L48.4 31.5L44.4 20.7L53.9 15.3L61.2 24.1L70.6 21.6L72.5 10.3L83.5 10.3L85.4 21.6L94.8 24.1L102.1 15.3L111.6 20.7L107.6 31.5L114.5 38.4L125.3 34.4L130.7 43.9L121.9 51.2Z"/><circle cx="78" cy="68" r="30"/><circle cx="78" cy="68" r="12"/><path d="M206.3 37.8L214.7 39.2L214.7 48.8L206.3 50.2L203.5 58.1L208.9 64.6L202.8 71.9L195.5 67.6L188.2 71.8L188.2 80.3L178.9 82.0L176.0 74.0L167.7 72.5L162.3 79.0L154.0 74.3L156.9 66.3L151.6 59.9L143.2 61.4L139.9 52.4L147.3 48.2L147.3 39.8L139.9 35.6L143.2 26.6L151.6 28.1L156.9 21.7L154.0 13.7L162.3 9.0L167.7 15.5L176.0 14.0L178.9 6.0L188.2 7.7L188.2 16.2L195.5 20.4L202.8 16.1L208.9 23.4L203.5 29.9Z"/><circle cx="177" cy="44" r="13"/><path d="M78 38V56M78 80V98M48 68H66M90 68H108"/><circle cx="78" cy="38" r="3.2" fill="currentColor" stroke="none"/><circle cx="78" cy="98" r="3.2" fill="currentColor" stroke="none"/><circle cx="48" cy="68" r="3.2" fill="currentColor" stroke="none"/><circle cx="108" cy="68" r="3.2" fill="currentColor" stroke="none"/><circle cx="177" cy="44" r="3.2" fill="currentColor" stroke="none"/><path d="M177 92V108l10 10H216"/><circle cx="177" cy="92" r="3.2" fill="currentColor" stroke="none"/></symbol>
@@ -330,21 +325,21 @@ dialog fieldset{min-width:0;margin:0;padding:0;border:0}
     <div class="under"><div class="foot" id="message" role="status">Enter to ask · Shift+Enter for a new line · Check original pages for exact OCR formulas.</div><div class="scope-line"><span id="title">Checking index…</span> · <span id="courseStats">Counting files and passages…</span></div></div>
   </div>
 </section>
-<section class="main away" id="librariesPage" aria-label="Libraries">
+<section class="main away" id="librariesPage" aria-label="Knowledge Libraries">
   <div class="scroll">
     <header class="library-head">
-      <div class="page"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg><div><h1>Libraries</h1><strong>Courses by subject. Counts show what’s indexed.</strong></div></div>
-      <div class="head-actions">
-        <div class="checked"><span>Index last checked</span><span class="when" id="indexChecked">Loading…</span></div>
-        <button type="button" class="button" id="notes"><svg class="icon" aria-hidden="true"><use href="#i-folder"/></svg>Open notes folder</button>
-        <button type="button" class="button" id="update"><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg>Update index</button>
-        <button type="button" class="button primary manage" id="newLibrary" disabled><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>New library</button>
+      <div class="page"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg><div><h1>Knowledge Libraries</h1><strong>Organize your subjects, courses and reference materials</strong></div></div>
+      <button type="button" class="button primary manage" id="newLibrary" disabled><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Create library</button>
+      <div class="library-search">
+        <div class="search-box"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><input type="search" id="librarySearch" placeholder="Search libraries…" aria-label="Search libraries and courses" maxlength="100" autocomplete="off"></div>
+        <div class="views" role="group" aria-label="View"><button type="button" id="viewGrid" aria-label="Grid" title="Grid" aria-pressed="true"><svg class="icon" aria-hidden="true"><use href="#i-grid"/></svg></button><button type="button" id="viewList" aria-label="List" title="List" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-list"/></svg></button></div>
       </div>
       <div class="library-tools">
-        <div class="search-box"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><input type="search" id="librarySearch" placeholder="Search libraries…" aria-label="Search libraries and courses" maxlength="100" autocomplete="off"></div>
         <div class="pick-box"><select id="libraryFilter" aria-label="Category"><option value="all">All categories</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div>
         <div class="pick-box"><select id="librarySort" aria-label="Sort by"><option value="name">Sort: Name (A–Z)</option><option value="files">Sort: Most files</option><option value="passages">Sort: Most passages</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div>
-        <div class="views" role="group" aria-label="View"><button type="button" id="viewGrid" aria-label="Grid" title="Grid" aria-pressed="true"><svg class="icon" aria-hidden="true"><use href="#i-grid"/></svg></button><button type="button" id="viewList" aria-label="List" title="List" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-list"/></svg></button></div>
+        <div class="checked">Index last checked <span class="when" id="indexChecked">Loading…</span></div>
+        <button type="button" class="button" id="notes"><svg class="icon" aria-hidden="true"><use href="#i-folder"/></svg>Open notes folder</button>
+        <button type="button" class="button" id="update"><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg>Update index</button>
       </div>
     </header>
     <div class="index-wrap"><section class="index-card" aria-label="Updating the index" hidden></section></div>
@@ -527,7 +522,7 @@ function showStats(){
     library==='ready'&&!scope?'Nothing is searched until you choose a library':
     amount(files,'indexed file')+' · '+amount(passages,'passage');
 }
-// The Libraries page. Everything on it comes from the index or libraries.toml.
+// The Knowledge Libraries page. Everything on it comes from the index or libraries.toml.
 let libraryProblem='';
 function categoryOf(group){return group.category||'Uncategorized'}
 // Each category's icon, color and art. The name is always shown too.
@@ -618,7 +613,7 @@ function showOcr(state){
   statusLine($('homeOcr'),state==='ready',{ready:'Ready','no-english':'English data missing',missing:'Not found'}[state]??'Unavailable');
 }
 function checkOcr(){api('ocr',{},AbortSignal.timeout(15000)).then(out=>showOcr(out.state),()=>showOcr(''))}
-// Which Courses lists are open. Unsorted's starts open, since it's opened one course at a time.
+// Which cards show all their courses. Unsorted's does, since it's opened one course at a time.
 const coursesOpen=new Map([['unsorted',true]]);
 // The libraries that fit the search and category filter, in order. Unsorted is always last.
 function shownLibraries(){
@@ -642,88 +637,115 @@ function showLibraries(problem=libraryProblem){
   libraryProblem=problem;
   const list=$('libraryList');
   list.replaceChildren();
-  if(library!=='ready') return list.append(make('p',library==='loading'?'':'error',library==='loading'?'Reading your libraries…':'Libraries unavailable. The notes index couldn’t be read.'));
+  // While the index updates, the libraries read before it are still shown.
+  if(library==='unavailable'||!libraries.length) return list.append(make('p',library==='loading'?'':'error',library==='loading'?'Reading your libraries…':'Libraries unavailable. The notes index couldn’t be read.'));
   if(problem) list.append(make('p','error',problem));
   if(!indexed.length) list.append(make('p','','No indexed courses yet. Add your notes to a course folder, then click Update index.'));
   const scope=el.scope.value;
   const open=(button,id,target)=>{button.type='button';button.classList.add('open-scope');button.onclick=()=>openScope(id,target)};
   const shown=shownLibraries();
-  if(!shown.length) list.append(make('p','',libraries.length>1||indexed.length?'No libraries match your search or filter.':'No libraries yet. Click New library to make one.'));
+  if(!shown.length) list.append(make('p','',libraries.length>1||indexed.length?'No libraries match your search or filter.':'No libraries yet. Click Create library to make one.'));
   for(const group of shown){
     const unsorted=group.id==='unsorted';
-    const here=el.library.value===group.id, card=make('article','library'+(here?' current':'')), banner=make('div','banner'), body=make('div','library-body'), about=make('div','about'), chips=make('div','chips');
-    const [look,tint]=lookOf(group);
+    const here=el.library.value===group.id, card=make('article','library'+(here?' current':'')), head=make('div','card-head'), tile=make('span','icon-tile'), about=make('div','about'), line=make('p'), actions=make('div','card-actions');
+    const [look,tint,art]=lookOf(group);
     card.dataset.id=group.id;
     card.style.setProperty('--tint',tint);
-    banner.append(icon(look));
-    about.append(make('h2','',group.name));
-    if(!unsorted) chips.append(make('span','chip',categoryOf(group)));
-    if(here) chips.append(make('span','chip on','Selected in Chat'));
-    if(chips.childElementCount) about.append(chips);
-    if(group.description) about.append(make('p','description',group.description));
+    tile.append(icon(look));
+    line.append(unsorted?'Not in a library':[categoryOf(group),group.description].filter(Boolean).join(' · '));
+    if(here) line.append(' · ',make('b','','Selected in Chat'));
+    about.append(make('h2','',group.name),line);
+    head.append(tile,about);
+    card.append(cardArt(art),head);
+    if(group.courses.length) card.append(courseChips(group,open));
     const counts=make('div','library-counts');
-    for(const [name,text] of [['file',amount(group.files,'file')],['layers',amount(group.passages,'passage')],['course',amount(group.courses.length,'course')]]){
+    for(const [name,text] of [['file',amount(group.files,'file')],['layers',amount(group.passages,'passage')]]){
       const item=make('span');
       item.append(icon(name),text);
       counts.append(item);
     }
-    body.append(about,counts);
-    if(group.missing.length) body.append(make('p','library-note','Not indexed, so not searched: '+group.missing.join(', ')));
-    if(unsorted) body.append(make('p','library-note','Courses that aren’t in a library. Search them one at a time.'));
-    else if(!group.courses.length) body.append(make('p','library-note','Nothing to search yet. “Entire library” turns on once this has an indexed course.'));
-    if(group.courses.length){
-      const courses=make('details','courses'), summary=make('summary','','Courses'), rows=make('ul');
-      summary.append(icon('chevron','turns'));
-      courses.open=coursesOpen.get(group.id)??false;
-      courses.addEventListener('toggle',()=>coursesOpen.set(group.id,courses.open));
-      for(const course of group.courses){
-        const row=make('li'), button=make('button','course-row'), text=make('span'), {files,passages}=courseCounts(course);
-        text.append(course,make('span','',amount(files,'indexed file')+' · '+amount(passages,'passage')));
-        button.append(icon('course'),text,icon('chat'));
-        button.title='Open '+course+' in Chat';
-        if(here&&scope==='course:'+course) button.setAttribute('aria-current','true');
-        open(button,group.id,'course:'+course);
-        row.append(button);
-        rows.append(row);
-      }
-      courses.append(summary,rows);
-      body.append(courses);
-    }
-    if(!unsorted&&group.courses.length){
-      const button=make('button','open-library primary');
-      button.append('Open in Chat',icon('chat'));
-      button.setAttribute('aria-label','Open '+group.name+' in Chat');
+    card.append(counts);
+    if(group.missing.length) card.append(make('p','library-note','Not indexed, so not searched: '+group.missing.join(', ')));
+    if(unsorted) actions.append(make('p','library-note','Courses that aren’t in a library. Click one to open it in Chat.'));
+    else if(!group.courses.length) actions.append(make('p','library-note','Nothing to search yet.'));
+    else{
+      const button=make('button','open-library');
+      button.append('Open library',icon('chevron','go'));
+      button.title='Open '+group.name+' in Chat';
+      button.setAttribute('aria-label','Open library: '+group.name+', in Chat');
       open(button,group.id,'library:'+group.id);
-      body.append(button);
+      actions.append(button);
     }
-    if(!unsorted) body.append(...libraryMenu(group));
-    card.append(banner,body);
+    if(!unsorted){
+      const edit=make('button','square edit-button manage');
+      edit.type='button';
+      edit.title='Edit';
+      edit.setAttribute('aria-label','Edit '+group.name);
+      edit.append(icon('pencil'));
+      edit.onclick=()=>editLibrary(group);
+      actions.append(edit,...libraryMenu(group));
+    }
+    card.append(actions);
     list.append(card);
   }
-  const create=make('button','create-card manage');
-  create.type='button';
-  create.append(icon('plus'),make('strong','','Create New Library'),make('span','','Group courses for a subject, project or area of study.'));
-  create.onclick=()=>editLibrary();
-  list.append(create);
   controls();
 }
-// The "⋯" button on a library's card, and the menu it opens.
+// The category's art, where the card would have a photo.
+function cardArt(name){
+  const node=(tag,values,...inside)=>{
+    const item=document.createElementNS('http://www.w3.org/2000/svg',tag);
+    for(const [key,value] of Object.entries(values)) item.setAttribute(key,value);
+    item.append(...inside);
+    return item;
+  };
+  return node('svg',{class:'card-art',viewBox:'0 0 280 150',preserveAspectRatio:'xMaxYMin meet','aria-hidden':'true'},
+    node('g',{transform:'matrix(-1 0 0 1 280 0)'},node('use',{href:'#art-traces',width:460,height:150})),
+    node('use',{class:'motif',href:'#art-'+name,x:36,y:10,width:222,height:130}));
+}
+// A card's courses. Each opens in Chat. After the first four, the rest wait behind "+N more".
+function courseChips(group,open){
+  const list=make('ul','course-chips'), extra=[], here=el.library.value===group.id;
+  group.courses.forEach((course,number)=>{
+    const item=make('li'), chip=make('button','course-chip',course), {files,passages}=courseCounts(course);
+    const counts=amount(files,'indexed file')+' · '+amount(passages,'passage');
+    chip.title='Open '+course+' in Chat · '+counts;
+    chip.setAttribute('aria-label',course+', open in Chat, '+counts);
+    if(here&&el.scope.value==='course:'+course) chip.setAttribute('aria-current','true');
+    open(chip,group.id,'course:'+course);
+    item.append(chip);
+    list.append(item);
+    if(number>=4) extra.push(item);
+  });
+  if(extra.length){
+    const item=make('li'), more=make('button','course-chip extra');
+    const show=()=>{
+      const all=coursesOpen.get(group.id)??false;
+      for(const chip of extra) chip.hidden=!all;
+      more.textContent=all?'Show fewer':'+'+extra.length+' more';
+      more.setAttribute('aria-expanded',String(all));
+    };
+    more.type='button';
+    more.onclick=()=>{coursesOpen.set(group.id,!coursesOpen.get(group.id));show()};
+    show();
+    item.append(more);
+    list.append(item);
+  }
+  return list;
+}
+// The "⋮" button on a library's card, and the menu it opens.
 function libraryMenu(group){
-  const button=make('button','menu-button manage'), menu=make('div','menu');
+  const button=make('button','square menu-button manage'), menu=make('div','menu'), item=make('button','manage');
   button.type='button';
-  button.title='Edit or delete';
-  button.setAttribute('aria-label','Edit or delete '+group.name);
-  button.append(icon('more'));
+  button.title='More actions';
+  button.setAttribute('aria-label','More actions for '+group.name);
+  button.append(icon('more','upright'));
   menu.popover='auto';
   button.popoverTargetElement=menu;
-  for(const [text,name,action] of [['Edit','pencil',editLibrary],['Delete','trash',askDelete]]){
-    const item=make('button','manage');
-    item.type='button';
-    item.append(icon(name),text);
-    // Closing the menu first puts focus back on the "⋯" button, where the dialog returns it.
-    item.onclick=()=>{menu.hidePopover();action(group)};
-    menu.append(item);
-  }
+  item.type='button';
+  item.append(icon('trash'),'Delete');
+  // Closing the menu first puts focus back on the "⋮" button, where the dialog returns it.
+  item.onclick=()=>{menu.hidePopover();askDelete(group)};
+  menu.append(item);
   return [button,menu];
 }
 function showView(view){
@@ -816,7 +838,7 @@ $('libraryForm').addEventListener('submit',async e=>{
     card=showSaved(out,'Saved “'+name+'”.');
     if(!card&&!onDashboard()) notice('Saved “'+name+'”. Your search or filter is hiding it.');
   }catch(error){formSays('',error.message)}
-  finally{busy=false;controls();if(!$('libraryDialog').open) (onDashboard()?$('homeNew'):card?.querySelector('.menu-button')??$('newLibrary')).focus();else if(draft.stale) $('libraryReload').focus()}
+  finally{busy=false;controls();if(!$('libraryDialog').open) (onDashboard()?$('homeNew'):card?.querySelector('.edit-button')??$('newLibrary')).focus();else if(draft.stale) $('libraryReload').focus()}
 });
 // Read the changed file but keep what's in the form. Saving again is the student's choice.
 $('libraryReload').onclick=async()=>{
