@@ -16,6 +16,7 @@ import traceback
 import unicodedata
 import webbrowser
 from collections import Counter
+from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.error import HTTPError, URLError
@@ -25,6 +26,9 @@ ROOT = Path(__file__).resolve().parent
 DB = ROOT / "chroma_db"
 LOG = ROOT / "study-chat.log"
 LAST_COURSE = ROOT / "last_course.txt"
+LAST_CHECK = ROOT / "last_index_check.txt"
+# The pages ingest.py adds to a PDF's source: "COURSE/a.pdf (PDF page 3, OCR)".
+PAGE_LABEL = re.compile(r"(?<=\.pdf) \(PDF pages? \d+(?:–\d+)?(?:, OCR)?\)$", re.I)
 EMBED_MODEL = "nomic-ai/nomic-embed-text-v1.5"
 DOC_PREFIX = "search_document: "
 # Saved with the index. If either value changes, Update index re-embeds everything.
@@ -144,12 +148,62 @@ def index_collection():
     return COLLECTION
 
 
-def courses():
+def indexed_metadata():
+    """The metadata of every indexed passage that has a course."""
     if not (DB / "chroma.sqlite3").is_file():
         return []
     info = index_collection().get(include=["metadatas"])
-    return sorted({m["course"] for m in info["metadatas"] if m and m.get("course")},
-                  key=str.casefold)
+    return [m for m in info["metadatas"] if m and m.get("course")]
+
+
+def course_names(rows):
+    return sorted({m["course"] for m in rows}, key=str.casefold)
+
+
+def courses():
+    return course_names(indexed_metadata())
+
+
+def course_stats(rows):
+    """How many files and passages each course has. files is None if it can't be counted."""
+    passages = Counter(m["course"] for m in rows)
+    files = {course: set() for course in passages}
+    for m in rows:
+        source = m.get("source")
+        if not isinstance(source, str) or not source:
+            files[m["course"]] = None
+        elif files[m["course"]] is not None:
+            # One PDF has many labels, such as page ranges and OCR pages.
+            files[m["course"]].add(PAGE_LABEL.sub("", source))
+    return {course: {"files": None if found is None else len(found),
+                     "passages": passages[course]} for course, found in files.items()}
+
+
+def index_checked():
+    """When Update index last succeeded: a time, "" if never recorded, None if unreadable."""
+    try:
+        saved = LAST_CHECK.read_text(encoding="utf-8-sig").strip()
+        if datetime.fromisoformat(saved).tzinfo is None:
+            raise ValueError("the time has no time zone")
+        return saved
+    except FileNotFoundError:
+        return ""
+    except (OSError, ValueError) as error:
+        print(f"Couldn't read when the index was last checked: {error}", flush=True)
+        return None
+
+
+def save_index_checked():
+    """Record a successful update. The old time stays until the new one is fully written."""
+    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    temporary = LAST_CHECK.with_suffix(".tmp")
+    try:
+        temporary.write_text(now, encoding="utf-8")
+        temporary.replace(LAST_CHECK)
+    except OSError as error:
+        print(f"Couldn't save when the index was last checked: {error}", flush=True)
+        return None
+    return now
 
 
 def save_last_course(course):
@@ -199,8 +253,9 @@ def load_starters(course):
 
 
 def course_info():
-    """What the page needs to show the courses and their starter cards."""
-    names = courses()
+    """What the page needs to show the courses, their counts, and their starter cards."""
+    rows = indexed_metadata()
+    names = course_names(rows)
     starters, problems = {}, []
     for course in names:
         try:
@@ -209,6 +264,8 @@ def course_info():
             # A typo in one file only hides that course's cards.
             problems.append(str(error))
     return {"courses": names, "default_course": default_course(names),
+            "stats": course_stats(rows), "index_exists": (DB / "chroma.sqlite3").is_file(),
+            "index_checked": index_checked(),
             "starters": starters, "starter_problems": problems}
 
 
@@ -1379,7 +1436,10 @@ def rebuild(progress_callback=None):
         detail = index_summary("indexed", skipped, len(new), len(changed))
     if stale_ids:
         detail += f" Removed {len(stale_ids)} old."
-    return {"message": f"{heading} · {COLLECTION.count()} chunks · {detail}", **course_info()}
+    result = {"message": f"{heading} · {COLLECTION.count()} chunks · {detail}", **course_info()}
+    # Last, so a run that fails anywhere above keeps the previous time.
+    result["index_checked"] = save_index_checked()
+    return result
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -1446,6 +1506,8 @@ class Handler(BaseHTTPRequestHandler):
         try:
             if self.path == "/api/status":
                 result = app_status()
+            elif self.path == "/api/library":
+                result = course_info()
             elif self.path == "/api/model":
                 target = data.get("model")
                 _, name = activate_model(target)

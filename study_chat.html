@@ -39,6 +39,8 @@ button:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-v
 .top{border-bottom:1px solid var(--line);padding:12px 24px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 20px}
 .page{display:flex;align-items:center;gap:14px}.page>.icon{width:34px;height:34px;stroke-width:1.5;color:var(--accent)}
 .page h1{font-family:inherit;font-size:24px;font-weight:650;line-height:1.2;letter-spacing:0;margin:0}.page strong{font-weight:400;color:var(--quiet);font-size:14px}
+.stats{color:var(--quiet);font-size:13px;line-height:1.4}.stats::first-letter{text-transform:uppercase}
+.checked{margin:2px 0 0 49px;color:var(--quiet);font-size:12px;line-height:1.4}.checked span{display:block}.checked .when{color:var(--ink)}
 .picks{display:flex;flex-wrap:wrap;align-items:end;gap:10px}
 .pick label{display:block;font-size:12px;color:var(--quiet);margin:0 0 3px 2px}
 .pick-box{position:relative}.pick-box .icon{position:absolute;top:50%;left:11px;width:18px;height:18px;transform:translateY(-50%);color:var(--accent);pointer-events:none}
@@ -101,6 +103,7 @@ select:hover:not(:disabled){background:var(--raised)}option{background:var(--pan
   .side{flex:none;flex-flow:row wrap;align-items:center;gap:6px 10px;padding:7px 12px;border-right:0;border-bottom:1px solid var(--line);overflow:visible}
   .brand{font-size:16px;gap:8px}.mark{width:28px;height:28px}.sub,.section-label,.status-card .extra,nav,.page>.icon,.page h1{display:none}
   .tools{display:flex;gap:4px}.tool,.quit button{width:auto;gap:6px;padding:5px 8px;font-size:13px}.tool+.tool{margin-top:0}.tool .icon{width:16px;height:16px}
+  .checked{margin:0 0 0 4px;align-self:center;font-size:11px;line-height:1.3;white-space:nowrap}
   .status-card{margin:0 0 0 auto;padding:5px 9px;font-size:12px}
   .top{padding:6px 12px}.pick label{margin-bottom:0}select{min-width:0;max-width:170px;padding:5px 28px 5px 34px}.model-state{padding:5px 8px}
   .thread{padding:14px 12px}.bottom{padding:4px 12px 6px}.composer{padding:8px}
@@ -137,6 +140,7 @@ select:hover:not(:disabled){background:var(--raised)}option{background:var(--pan
     <button type="button" class="tool primary" id="new"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>New chat</button>
     <button type="button" class="tool" id="notes"><svg class="icon" aria-hidden="true"><use href="#i-folder"/></svg>Open notes folder</button>
     <button type="button" class="tool" id="update"><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg>Update index</button>
+    <div class="checked"><span>Index last checked</span><span class="when" id="indexChecked">Loading…</span></div>
   </div>
   <section class="status-card" aria-label="Local status">
     <div id="status"><span id="dot" class="dot"></span><span id="statusText">Checking LM Studio…</span></div>
@@ -147,7 +151,7 @@ select:hover:not(:disabled){background:var(--raised)}option{background:var(--pan
 </aside>
 <main class="main">
   <header class="top">
-    <div class="page"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg><div><h1>Chat</h1><strong id="title">Study session</strong></div></div>
+    <div class="page"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg><div><h1>Chat</h1><strong id="title">Study session</strong><div class="stats" id="courseStats">Counting files and passages…</div></div></div>
     <div class="picks">
       <div class="pick"><label for="course">Course</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-course"/></svg><select id="course" disabled><option>Checking index…</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
       <div class="pick"><label for="model">Model</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-model"/></svg><select id="model" disabled><option>Checking models…</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
@@ -232,6 +236,33 @@ function showStarters(){
   }
   el.starters.hidden=!cards.length;
 }
+// library says whether stats was read from the index: loading, ready or unavailable.
+let library='loading', stats={};
+// The selected course's counts.
+function showStats(){
+  const amount=(n,word)=>typeof n==='number'?n.toLocaleString()+' '+word+(n===1?'':'s'):word+'s unavailable';
+  const {files,passages}=Object.hasOwn(stats,el.course.value)?stats[el.course.value]:{};
+  $('courseStats').textContent=library==='loading'?'Counting files and passages…':
+    library==='ready'&&!indexed.length?'No indexed files yet':
+    amount(files,'indexed file')+' · '+amount(passages,'passage');
+}
+let checkedShown=false;
+function showChecked(out){
+  checkedShown=true;
+  const time=out.index_checked;
+  $('indexChecked').textContent=!out.index_exists?'No index yet':time===''?'No update recorded yet':
+    time?new Date(time).toLocaleString(undefined,{dateStyle:'medium',timeStyle:'short'}):'Unavailable';
+}
+// Read the index again after something failed, since part of it may have changed.
+async function refreshLibrary(){
+  try{showCourses(await api('library'))}
+  catch(_){
+    library='unavailable';stats={};
+    showStats();
+    $('indexText').textContent='Notes index · unavailable';
+    if(!checkedShown) $('indexChecked').textContent='Unavailable';
+  }
+}
 function showCourses(out){
   const list=out.courses, previous=el.course.value;
   indexed=list;
@@ -242,6 +273,9 @@ function showCourses(out){
   else el.course.value=list.includes(previous)?previous:out.default_course;
   $('title').textContent=list.length?el.course.value+' study session':'Study session';
   $('indexText').textContent='Notes index · '+(list.length?list.length+(list.length===1?' course':' courses'):'no courses yet');
+  library='ready';stats=out.stats;
+  showStats();
+  showChecked(out);
   showStarters();
   controls();
 }
@@ -612,7 +646,7 @@ el.mode.addEventListener('change',()=>{
   el.question.focus();
 });
 el.question.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();if(!el.send.disabled)el.form.requestSubmit(el.send)}});
-el.course.addEventListener('change',()=>{reset();$('title').textContent=el.course.value+' study session';showStarters();api('course',{course:el.course.value}).catch(()=>{})});
+el.course.addEventListener('change',()=>{reset();$('title').textContent=el.course.value+' study session';showStats();showStarters();api('course',{course:el.course.value}).catch(()=>{})});
 el.model.addEventListener('change',async()=>{
   const wanted=el.model.value;
   if(!wanted||busy||stopped) return;
@@ -649,13 +683,14 @@ $('new').onclick=reset;
 $('notes').onclick=async()=>{try{const out=await api('notes');notice(out.message)}catch(error){notice(error.message,true)}};
 $('update').onclick=async()=>{
   busy=true;controls();notice('Checking your notes for changes…');
+  library='loading';showStats();
   let updating=true;
   const poll=setInterval(async()=>{
     try{const out=await api('progress');if(updating&&out.message) notice(out.message)}
     catch(_){}
   },1000);
   try{const out=await api('rebuild');showCourses(out);notice([out.message,...out.starter_problems].join(' · '),out.starter_problems.length>0)}
-  catch(error){notice(error.message,true)}finally{updating=false;clearInterval(poll);busy=false;controls()}
+  catch(error){updating=false;notice(error.message,true);await refreshLibrary()}finally{updating=false;clearInterval(poll);busy=false;controls()}
 };
 $('quit').onclick=async()=>{
   try{await api('quit');stopped=true;controls();$('statusText').textContent='Spectre Studio closed';$('dot').classList.remove('on');notice('You can close this tab. Open Spectre Studio again to continue.')}
@@ -663,7 +698,7 @@ $('quit').onclick=async()=>{
 };
 busy=true;controls();
 api('status').then(out=>{online(out.online);showCourses(out);showModels(out.models,out.model);showModelState(statusState(out));if(!out.courses.length)notice('Add your notes to a course folder, then click Update index.');else if(out.starter_problems.length)notice(out.starter_problems.join(' · '),true)})
-.catch(error=>notice(error.message,true)).finally(()=>{busy=false;controls()});
+.catch(error=>{notice(error.message,true);return refreshLibrary()}).finally(()=>{busy=false;controls()});
 </script>
 </body>
 </html>

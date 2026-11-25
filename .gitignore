@@ -3,11 +3,12 @@
 __pycache__/
 *.pyc
 
-# Private data: course notes, search database, OCR cache, last course used
+# Private data: course notes, search database, OCR cache, last course used, last index check
 notes/
 chroma_db/
 .ocr_cache/
 last_course.txt
+last_index_check.*
 
 # Logs (can contain your questions)
 *.log
