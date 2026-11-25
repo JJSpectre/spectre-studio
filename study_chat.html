@@ -143,6 +143,22 @@ input:not([type=checkbox]){width:100%;min-width:0;padding:8px 12px;border:1px so
 .create-card{display:grid;place-content:center;justify-items:center;gap:4px;min-height:150px;padding:24px;border:1px dashed var(--control);border-radius:12px;background:#131c2880;color:var(--quiet);font-size:14px}.create-card strong{color:var(--ink);font-size:17px;font-weight:650}.create-card .icon{width:30px;height:30px;color:var(--accent)}.create-card:hover:not(:disabled){border-color:var(--accent);background:var(--panel)}
 .library-list.list{grid-template-columns:minmax(0,1fr);gap:10px}.list .library{flex-direction:row}.list .banner{width:72px;height:auto}.list .banner .icon{width:30px;height:30px}.list .library-body{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px 20px;padding:12px 62px 12px 16px}
 .list .library-body>*{grid-column:1/-1}.list .library-body>.about{grid-column:1}.list .open-library{grid-column:2;grid-row:1;align-self:start;padding:7px 14px}.list .courses{margin-top:0;padding-top:8px}.list .create-card{min-height:0;padding:14px}
+#dashboardPage .scroll{scrollbar-gutter:auto}#dashboardPage .foot:empty{min-height:0;margin:0}#dashboardPage .bottom:has(.foot:empty){padding:0}
+.home-banner{--tint:#8fb0d6;position:relative;display:grid;place-items:center;min-height:168px;padding:16px 24px;border-bottom:1px solid var(--line);overflow:hidden;background:linear-gradient(90deg,color-mix(in srgb,var(--tint) 26%,#0b1118),color-mix(in srgb,var(--tint) 7%,#0b1118) 50%,color-mix(in srgb,var(--tint) 20%,#0b1118))}
+.art{position:absolute;top:0;left:0;width:calc(50% - 212px);height:100%;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;color:var(--tint);pointer-events:none;mask-image:linear-gradient(90deg,#000 75%,transparent)}.art.right{left:auto;right:0;opacity:.6;mask-image:linear-gradient(270deg,#000 75%,transparent)}.motif{stroke-width:2}
+.home-pick{position:relative;width:min(400px,100%);text-align:center}.home-pick p{margin:8px 0 0;font-size:14px;line-height:1.4;overflow-wrap:anywhere}.home-pick p:empty{display:none}
+.home-pick select{max-width:none;padding:9px 44px 9px 56px;border:1.5px solid var(--accent);border-radius:999px;background:#0b1118f2;font-size:22px;font-weight:650}.home-pick .icon{left:20px;width:24px;height:24px;color:var(--tint)}.home-pick .chevron{left:auto;right:18px;width:20px;height:20px;color:var(--quiet)}
+.home{display:grid;gap:14px;max-width:1270px;margin:0 auto;padding:14px 24px 16px}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.tile{display:grid;justify-items:center;gap:1px;padding:12px;border:1px solid var(--control);border-radius:12px;background:linear-gradient(180deg,var(--raised),var(--panel));color:var(--ink);line-height:1.35}.tile:hover:not(:disabled){border-color:var(--accent);background:var(--raised)}.tile .icon{width:32px;height:32px;margin-bottom:5px;stroke-width:1.5;color:var(--accent)}.tile strong{font-size:16px;font-weight:600}.tile span{color:var(--quiet);font-size:13px}.tile.off{opacity:1;border-color:var(--line)}.tile.off .icon,.tile.off strong{opacity:.55}
+.panels{display:grid;grid-template-columns:minmax(0,9.5fr) minmax(0,12.5fr) minmax(0,16fr);gap:14px}.panel{display:flex;flex-direction:column;min-width:0;padding:12px 16px 13px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}.libs{grid-row:span 2}
+.panel h2{display:flex;align-items:center;gap:10px;margin:0 0 6px;padding-bottom:9px;border-bottom:1px solid var(--line);font-size:17px;font-weight:600;line-height:1.3}.panel h2 .icon{color:var(--accent)}
+.libs ul{display:grid;align-content:start;gap:4px;max-height:372px;margin:2px 0 14px;padding:0;overflow:auto;list-style:none;scrollbar-width:thin}.libs li{color:var(--quiet);font-size:14px;overflow-wrap:anywhere}.libs li.error{color:var(--bad)}.libs .button{margin-top:auto}
+.lib{display:flex;align-items:center;gap:13px;width:100%;padding:8px 10px;border:1px solid transparent;border-radius:8px;background:none;color:var(--ink);font-size:15px;text-align:left}.lib:hover{background:var(--raised)}.lib:focus-visible{outline-offset:-2px}.lib>span{flex:1;min-width:0;line-height:1.35;overflow-wrap:anywhere}.lib>span>span{display:block;color:var(--quiet);font-size:13px}.lib .icon{color:var(--tint)}.lib .go{width:18px;height:18px;color:var(--quiet);transform:rotate(-90deg)}
+.lib[aria-pressed=true]{background:var(--active);border-color:var(--accent)}.lib[aria-pressed=true]>span>span{color:var(--ink)}
+.empty{flex:1;display:grid;place-content:center;justify-items:center;gap:8px;min-height:120px;padding:8px 12px;color:var(--quiet);font-size:14px;line-height:1.45;text-align:center}.empty .icon{width:30px;height:30px;stroke-width:1.5;color:var(--control)}.empty p{max-width:300px;margin:0}
+.fact{display:flex;flex:1;align-items:center;gap:9px;min-height:37px;font-size:14px;line-height:1.35}.fact+.fact{border-top:1px solid var(--line)}.fact .icon{width:17px;height:17px;stroke-width:2.5;color:var(--quiet)}.fact.ok .icon{color:var(--good)}.fact span{flex:1;min-width:0}.fact b{padding:1px 10px;border:1px solid var(--line);border-radius:999px;font-size:13px;font-weight:400;line-height:1.5;text-align:center}
+.gpu-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:12px;margin-top:4px}.gpu-card{padding:10px 13px;border:1px solid var(--line);border-radius:10px;background:var(--raised);font-size:13px}.gpu-card>strong{display:block;font-size:15px;line-height:1.35}.gpu-card>div{margin-top:5px}.gpu-card .used{font-size:13px}.gpu-role{margin:0;color:var(--quiet);font-size:12px;line-height:1.5}p.gpu-role{margin-top:7px}.gpu-cards .gpu-state{color:var(--quiet);font-size:14px}
 dialog{width:min(560px,calc(100vw - 32px));max-height:calc(100dvh - 32px);padding:0;border:1px solid var(--control);border-radius:12px;background:var(--panel);color:var(--ink);box-shadow:var(--shadow);scrollbar-width:thin}dialog::backdrop{background:#000a}
 dialog form{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;padding:20px 22px}dialog h2{font-size:20px;font-weight:650;line-height:1.25;margin:0;overflow-wrap:anywhere}
 dialog p{margin:0;color:var(--quiet);font-size:14px;overflow-wrap:anywhere}dialog p.error{color:var(--bad)}dialog p.comments-note{padding:9px 12px;border:1px solid var(--warn);border-radius:8px;color:var(--warn)}dialog p.comments-note:focus{outline:2px solid var(--warn)}dialog p:empty{display:none}
@@ -155,7 +171,11 @@ dialog fieldset{min-width:0;margin:0;padding:0;border:0}
 .choice .icon{color:var(--accent)}.choice span span{display:block;color:var(--quiet);font-size:13px}.choice:hover:not(:disabled){border-color:var(--accent)}
 .reasoning .excerpt{max-height:340px;overflow:auto}.live{color:var(--quiet);font-style:italic}
 @media(min-width:1500px){.bar .pick-box .icon:first-child{display:block}.bar select{padding-left:38px}}
+@media(max-width:1119px){.home-banner{justify-items:end;min-height:140px}.art{width:calc(100% - 440px)}.art.right{display:none}.panels{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:900px){.tile:not(.off) span{display:none}}
 @media(max-width:720px){
+  .home-banner{min-height:104px;padding:10px 12px}.art{width:calc(100% - 400px)}.home-pick{width:min(370px,100%)}.home{gap:10px;padding:10px 12px 12px}.panels{grid-template-columns:minmax(0,1fr);gap:10px}.libs{grid-row:auto}.libs ul{max-height:none}.empty{min-height:90px}
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.tile{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:0 10px;padding:9px}.tile .icon{width:22px;height:22px;margin:0}.tile strong{font-size:14px}.tile:last-child:nth-child(odd){grid-column:1/-1}
   .layout{display:flex;flex-direction:column}.shell{flex:1}
   .side{position:relative;z-index:3;flex:none;flex-flow:row wrap;align-items:center;gap:3px 8px;padding:7px 12px;border-right:0;border-bottom:1px solid var(--line);overflow:visible}
   /* Quit ends the first row. The model, LM Studio and GPU memory are on the second. */
@@ -174,7 +194,7 @@ dialog fieldset{min-width:0;margin:0;padding:0;border:0}
   .thread{padding:14px 12px}.bottom{padding:4px 12px 6px}.composer{padding:8px}
   .turn{grid-template-columns:minmax(0,1fr)}.turn>*{grid-column:1}.avatar{display:none}.starters{grid-template-columns:1fr}
 }
-@media(forced-colors:active){.nav[aria-current=page],.composer textarea:focus{outline:2px solid Highlight}.dot.on{background:Highlight;forced-color-adjust:none}.answer ol>li::before,.source-number{border:1px solid}.gpu progress{appearance:auto}.views button[aria-pressed=true]{outline:2px solid Highlight;outline-offset:-2px}}
+@media(forced-colors:active){.nav[aria-current=page],.lib[aria-pressed=true],.composer textarea:focus{outline:2px solid Highlight}.dot.on{background:Highlight;forced-color-adjust:none}.answer ol>li::before,.source-number{border:1px solid}.gpu progress{appearance:auto}.views button[aria-pressed=true]{outline:2px solid Highlight;outline-offset:-2px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style>
 </head>
@@ -217,10 +237,23 @@ dialog fieldset{min-width:0;margin:0;padding:0;border:0}
 <symbol id="i-cpu" viewBox="0 0 24 24"><path d="M12 20v2"/><path d="M12 2v2"/><path d="M17 20v2"/><path d="M17 2v2"/><path d="M2 12h2"/><path d="M2 17h2"/><path d="M2 7h2"/><path d="M20 12h2"/><path d="M20 17h2"/><path d="M20 7h2"/><path d="M7 20v2"/><path d="M7 2v2"/><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="8" y="8" width="8" height="8" rx="1"/></symbol>
 <symbol id="i-chart" viewBox="0 0 24 24"><path d="M5 21v-6"/><path d="M12 21V9"/><path d="M19 21V3"/></symbol>
 </svg>
+<!-- Our own circuit-trace art for the Dashboard's banner. -->
+<svg hidden aria-hidden="true">
+<symbol id="art-traces" viewBox="0 0 460 150"><g opacity=".5"><path d="M0 18H60l14-14H210M0 44H14l10 10M0 106H18l10-10M0 134H70l10 10H236M276 40H340l18-18H440M276 62H400M276 84H372l14 14H452M276 106H330l22 22H420M236 144l18-10H300M210 4l14 12H292"/><circle cx="440" cy="22" r="3.2" fill="currentColor" stroke="none"/><circle cx="400" cy="62" r="3.2" fill="currentColor" stroke="none"/><circle cx="452" cy="98" r="3.2" fill="currentColor" stroke="none"/><circle cx="420" cy="128" r="3.2" fill="currentColor" stroke="none"/><circle cx="300" cy="134" r="3.2" fill="currentColor" stroke="none"/><circle cx="292" cy="16" r="3.2" fill="currentColor" stroke="none"/><circle cx="24" cy="54" r="3.2" fill="currentColor" stroke="none"/><circle cx="28" cy="96" r="3.2" fill="currentColor" stroke="none"/></g></symbol>
+<symbol id="art-gears" viewBox="0 0 222 130"><path d="M124.4 60.6L135.7 62.5L135.7 73.5L124.4 75.4L121.9 84.8L130.7 92.1L125.3 101.6L114.5 97.6L107.6 104.5L111.6 115.3L102.1 120.7L94.8 111.9L85.4 114.4L83.5 125.7L72.5 125.7L70.6 114.4L61.2 111.9L53.9 120.7L44.4 115.3L48.4 104.5L41.5 97.6L30.7 101.6L25.3 92.1L34.1 84.8L31.6 75.4L20.3 73.5L20.3 62.5L31.6 60.6L34.1 51.2L25.3 43.9L30.7 34.4L41.5 38.4L48.4 31.5L44.4 20.7L53.9 15.3L61.2 24.1L70.6 21.6L72.5 10.3L83.5 10.3L85.4 21.6L94.8 24.1L102.1 15.3L111.6 20.7L107.6 31.5L114.5 38.4L125.3 34.4L130.7 43.9L121.9 51.2Z"/><circle cx="78" cy="68" r="30"/><circle cx="78" cy="68" r="12"/><path d="M206.3 37.8L214.7 39.2L214.7 48.8L206.3 50.2L203.5 58.1L208.9 64.6L202.8 71.9L195.5 67.6L188.2 71.8L188.2 80.3L178.9 82.0L176.0 74.0L167.7 72.5L162.3 79.0L154.0 74.3L156.9 66.3L151.6 59.9L143.2 61.4L139.9 52.4L147.3 48.2L147.3 39.8L139.9 35.6L143.2 26.6L151.6 28.1L156.9 21.7L154.0 13.7L162.3 9.0L167.7 15.5L176.0 14.0L178.9 6.0L188.2 7.7L188.2 16.2L195.5 20.4L202.8 16.1L208.9 23.4L203.5 29.9Z"/><circle cx="177" cy="44" r="13"/><path d="M78 38V56M78 80V98M48 68H66M90 68H108"/><circle cx="78" cy="38" r="3.2" fill="currentColor" stroke="none"/><circle cx="78" cy="98" r="3.2" fill="currentColor" stroke="none"/><circle cx="48" cy="68" r="3.2" fill="currentColor" stroke="none"/><circle cx="108" cy="68" r="3.2" fill="currentColor" stroke="none"/><circle cx="177" cy="44" r="3.2" fill="currentColor" stroke="none"/><path d="M177 92V108l10 10H216"/><circle cx="177" cy="92" r="3.2" fill="currentColor" stroke="none"/></symbol>
+<symbol id="art-graph" viewBox="0 0 222 130"><path d="M24 10V112H206M24 86h-8M24 60h-8M24 34h-8M62 112v8M100 112v8M138 112v8M176 112v8"/><path d="M30 106C76 106 82 28 115 28S154 106 200 106"/><path stroke-dasharray="3 5" d="M115 28V112"/><circle cx="115" cy="28" r="4.5" fill="currentColor" stroke="none"/><circle cx="78" cy="72" r="3.2" fill="currentColor" stroke="none"/><circle cx="152" cy="72" r="3.2" fill="currentColor" stroke="none"/><circle cx="48" cy="103" r="3.2" fill="currentColor" stroke="none"/><circle cx="182" cy="103" r="3.2" fill="currentColor" stroke="none"/><path d="M204 20h-36l17 18-17 18h36"/></symbol>
+<symbol id="art-atom" viewBox="0 0 222 130"><ellipse cx="111" cy="65" rx="92" ry="24" transform="rotate(0 111 65)"/><ellipse cx="111" cy="65" rx="92" ry="24" transform="rotate(38 111 65)"/><ellipse cx="111" cy="65" rx="92" ry="24" transform="rotate(142 111 65)"/><circle cx="111" cy="65" r="13"/><circle cx="111" cy="65" r="6" fill="currentColor" stroke="none"/><circle cx="19" cy="65" r="4.5" fill="currentColor" stroke="none"/><circle cx="184" cy="9" r="4.5" fill="currentColor" stroke="none"/><circle cx="38" cy="8" r="4.5" fill="currentColor" stroke="none"/><circle cx="203" cy="65" r="4.5" fill="currentColor" stroke="none"/></symbol>
+<symbol id="art-chip" viewBox="0 0 222 130"><rect x="71" y="25" width="80" height="80" rx="8"/><rect x="89" y="43" width="44" height="44" rx="4"/><path d="M104 57l-7 8 7 8M118 57l7 8-7 8"/><path d="M88 25V12M88 105v13"/><circle cx="88" cy="10" r="3.2" fill="currentColor" stroke="none"/><circle cx="88" cy="120" r="3.2" fill="currentColor" stroke="none"/><path d="M111 25V12M111 105v13"/><circle cx="111" cy="10" r="3.2" fill="currentColor" stroke="none"/><circle cx="111" cy="120" r="3.2" fill="currentColor" stroke="none"/><path d="M134 25V12M134 105v13"/><circle cx="134" cy="10" r="3.2" fill="currentColor" stroke="none"/><circle cx="134" cy="120" r="3.2" fill="currentColor" stroke="none"/><path d="M71 46H40l-12 -12H14M151 46h31l12 -12h14"/><circle cx="12" cy="34" r="3.2" fill="currentColor" stroke="none"/><circle cx="210" cy="34" r="3.2" fill="currentColor" stroke="none"/><path d="M71 65H40l-12 0H14M151 65h31l12 0h14"/><circle cx="12" cy="65" r="3.2" fill="currentColor" stroke="none"/><circle cx="210" cy="65" r="3.2" fill="currentColor" stroke="none"/><path d="M71 84H40l-12 12H14M151 84h31l12 12h14"/><circle cx="12" cy="96" r="3.2" fill="currentColor" stroke="none"/><circle cx="210" cy="96" r="3.2" fill="currentColor" stroke="none"/></symbol>
+<symbol id="art-bars" viewBox="0 0 222 130"><path d="M20 114H206"/><rect x="34" y="84" width="24" height="30" rx="2"/><rect x="72" y="68" width="24" height="46" rx="2"/><rect x="110" y="74" width="24" height="40" rx="2"/><rect x="148" y="46" width="24" height="68" rx="2"/><path d="M34 62l38-18 38 8 46-32h36M180 10l12 10-12 10"/><circle cx="34" cy="62" r="3.2" fill="currentColor" stroke="none"/><circle cx="72" cy="44" r="3.2" fill="currentColor" stroke="none"/><circle cx="110" cy="52" r="3.2" fill="currentColor" stroke="none"/><circle cx="156" cy="20" r="3.2" fill="currentColor" stroke="none"/></symbol>
+<symbol id="art-pulse" viewBox="0 0 222 130"><path d="M111 118L62 70a31 31 0 0 1 49-38a31 31 0 0 1 49 38Z"/><path d="M0 70H78l10-18 16 40 14-52 12 30H222"/><circle cx="8" cy="70" r="3.2" fill="currentColor" stroke="none"/><circle cx="214" cy="70" r="3.2" fill="currentColor" stroke="none"/><circle cx="118" cy="40" r="3.2" fill="currentColor" stroke="none"/></symbol>
+<symbol id="art-book" viewBox="0 0 222 130"><path d="M111 30C92 14 56 14 26 20V108c30-6 66-6 85 10c19-16 55-16 85-10V20c-30-6-66-6-85 10ZM111 30V118"/><path d="M44 42c16-2 30 0 44 6M44 62c16-2 30 0 44 6M44 82c16-2 30 0 44 6M178 42c-16-2-30 0-44 6M178 62c-16-2-30 0-44 6M178 82c-16-2-30 0-44 6"/><circle cx="44" cy="42" r="3.2" fill="currentColor" stroke="none"/><circle cx="44" cy="62" r="3.2" fill="currentColor" stroke="none"/><circle cx="44" cy="82" r="3.2" fill="currentColor" stroke="none"/><circle cx="178" cy="42" r="3.2" fill="currentColor" stroke="none"/><circle cx="178" cy="62" r="3.2" fill="currentColor" stroke="none"/><circle cx="178" cy="82" r="3.2" fill="currentColor" stroke="none"/></symbol>
+<symbol id="art-notes" viewBox="0 0 222 130"><rect x="62" y="12" width="92" height="108" rx="8"/><path d="M50 30h22"/><circle cx="50" cy="30" r="3.2" fill="currentColor" stroke="none"/><path d="M50 54h22"/><circle cx="50" cy="54" r="3.2" fill="currentColor" stroke="none"/><path d="M50 78h22"/><circle cx="50" cy="78" r="3.2" fill="currentColor" stroke="none"/><path d="M50 102h22"/><circle cx="50" cy="102" r="3.2" fill="currentColor" stroke="none"/><path d="M86 38h48M86 58h48M86 78h28"/><path d="M188 34l-50 50-6 20 20-6 50-50a10 10 0 0 0-14-14ZM178 44l14 14"/><circle cx="134" cy="38" r="3.2" fill="currentColor" stroke="none"/><circle cx="134" cy="58" r="3.2" fill="currentColor" stroke="none"/></symbol>
+<symbol id="art-nodes" viewBox="0 0 222 130"><path d="M111 22l38 22v42l-38 22-38-22V44ZM111 22V4M149 44l24-14h24M149 86l24 14h24M111 108v18M73 86l-24 14H25M73 44L49 30H25"/><circle cx="111" cy="65" r="16"/><circle cx="111" cy="65" r="5" fill="currentColor" stroke="none"/><circle cx="111" cy="22" r="3.2" fill="currentColor" stroke="none"/><circle cx="149" cy="44" r="3.2" fill="currentColor" stroke="none"/><circle cx="149" cy="86" r="3.2" fill="currentColor" stroke="none"/><circle cx="111" cy="108" r="3.2" fill="currentColor" stroke="none"/><circle cx="73" cy="86" r="3.2" fill="currentColor" stroke="none"/><circle cx="73" cy="44" r="3.2" fill="currentColor" stroke="none"/><circle cx="197" cy="30" r="3.2" fill="currentColor" stroke="none"/><circle cx="197" cy="100" r="3.2" fill="currentColor" stroke="none"/><circle cx="25" cy="100" r="3.2" fill="currentColor" stroke="none"/><circle cx="25" cy="30" r="3.2" fill="currentColor" stroke="none"/></symbol>
+</svg>
 <div class="layout">
 <aside class="side" aria-label="Navigation and status">
   <div class="brand"><svg class="icon mark" aria-hidden="true"><use href="#i-brain"/></svg><div>Spectre Studio<div class="sub">Local AI Learning &amp; Reference</div></div></div>
-  <nav aria-label="Pages"><button type="button" class="nav" id="navLibraries"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg>Knowledge Libraries</button><button type="button" class="nav" id="navChat" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg>Chat</button></nav>
+  <nav aria-label="Pages"><button type="button" class="nav" id="navDashboard" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-house"/></svg>Dashboard</button><button type="button" class="nav" id="navLibraries"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg>Knowledge Libraries</button><button type="button" class="nav" id="navChat"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg>Chat</button></nav>
   <section class="model-card" aria-label="Model">
     <div class="line"><svg class="icon" aria-hidden="true"><use href="#i-model"/></svg><label for="model">Model</label></div>
     <div class="pick-box" id="modelPick"><select id="model" disabled><option>Checking models…</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div>
@@ -238,14 +271,44 @@ dialog fieldset{min-width:0;margin:0;padding:0;border:0}
   </section>
   <div class="quit"><button type="button" id="quit"><svg class="icon" aria-hidden="true"><use href="#i-power"/></svg>Quit app</button></div>
 </aside>
-<div class="shell" id="shell" data-page="chatPage">
+<div class="shell" id="shell" data-page="dashboardPage">
 <header class="bar">
-  <div class="field wide chat-only"><label for="library">Library</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg><select id="library" disabled><option>Checking index…</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
-  <div class="field wide chat-only"><label for="scope">Scope</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-course"/></svg><select id="scope" aria-label="Search scope" disabled><option>Checking index…</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
-  <div class="field slim chat-only"><label for="mode">Mode</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-mode"/></svg><select id="mode"><option value="explain" title="Explain from my notes">Explain</option><option value="solve" title="Solve a problem">Solve</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
+  <div class="field wide"><label for="library">Library</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg><select id="library" disabled><option>Checking index…</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
+  <div class="field wide"><label for="scope">Scope</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-course"/></svg><select id="scope" aria-label="Search scope" disabled><option>Checking index…</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
+  <div class="field slim"><label for="mode">Mode</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-mode"/></svg><select id="mode"><option value="explain" title="Explain from my notes">Explain</option><option value="solve" title="Solve a problem">Solve</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
 </header>
 <main class="pages">
-<section class="main" id="chatPage" aria-label="Chat">
+<section class="main" id="dashboardPage" aria-label="Dashboard">
+  <div class="scroll">
+    <h1 class="sr">Dashboard</h1>
+    <div class="home-banner" id="homeBanner">
+      <svg class="art left" viewBox="0 0 460 150" preserveAspectRatio="xMinYMid slice" aria-hidden="true"><use href="#art-traces"/><use class="motif" href="#art-nodes" x="40" y="10" width="222" height="130"/></svg>
+      <svg class="art right" viewBox="0 0 460 150" preserveAspectRatio="xMaxYMid slice" aria-hidden="true"><g transform="matrix(-1 0 0 1 460 0)"><use href="#art-traces"/></g><use class="motif" href="#art-nodes" x="198" y="10" width="222" height="130"/></svg>
+      <div class="home-pick"><div class="pick-box"><svg class="icon" aria-hidden="true"><use id="homeIcon" href="#i-layers"/></svg><select id="homeLibrary" aria-label="Library" disabled></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div><p id="homeLine"></p></div>
+    </div>
+    <div class="home">
+      <div class="tiles">
+        <button type="button" class="tile" id="homeAsk" disabled><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg><strong>Ask anything</strong><span>Chat in Explain mode</span></button>
+        <button type="button" class="tile" id="homeSolve" disabled><svg class="icon" aria-hidden="true"><use href="#i-mode"/></svg><strong>Solve a problem</strong><span>Chat in Solve mode</span></button>
+        <button type="button" class="tile" id="homeBrowse"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg><strong>Browse libraries</strong><span>Courses, search and index</span></button>
+      </div>
+      <div class="panels">
+        <section class="panel libs"><h2><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg>Knowledge Libraries</h2><ul id="homeList"></ul><button type="button" class="button manage" id="homeNew" disabled><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>New library</button></section>
+        <section class="panel"><h2><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>Recent Activity</h2><div class="empty"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg><p>Your recent chats will show here once saved chats are added.</p></div></section>
+        <section class="panel"><h2><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg>Learning Progress</h2><div class="empty"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg><p>Your progress will show here once quizzes are added. It will come only from your saved attempts.</p></div></section>
+        <section class="panel"><h2><svg class="icon" aria-hidden="true"><use href="#i-monitor"/></svg>System Status</h2>
+          <div class="fact" id="homeLm" title="When the app last asked"><svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg><span>LM Studio</span><b>Checking…</b></div>
+          <div class="fact" id="homeIndex"><svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg><span>Notes index</span><b>Checking…</b></div>
+          <div class="fact" id="homeOcr" title="Tesseract and its English data. Needed only for PDFs with text in images."><svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg><span>OCR (Tesseract)</span><b>Checking…</b></div>
+          <div class="fact"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg><span>Index last checked</span><b id="homeChecked">Loading…</b></div>
+        </section>
+        <section class="panel"><h2><svg class="icon" aria-hidden="true"><use href="#i-cpu"/></svg>Hardware Utilization</h2><div class="gpu-cards" id="homeGpus"><div class="gpu-state">Reading GPU memory…</div></div><p class="gpu-role">Whole-card memory, used by all apps.</p></section>
+      </div>
+    </div>
+  </div>
+  <div class="bottom"><div class="foot" id="homeMessage" role="status"></div></div>
+</section>
+<section class="main away" id="chatPage" aria-label="Chat">
   <h1 class="sr">Chat</h1>
   <div class="scroll" id="scroll"><div class="thread" id="thread">
     <section class="welcome" id="welcome">
@@ -321,7 +384,7 @@ async function api(path,data={},signal) {
 }
 function notice(text,error=false){
   el.message.textContent=text;el.message.classList.toggle('error',error);
-  $('libraryMessage').textContent=text===hint?'':text;$('libraryMessage').classList.toggle('error',error);
+  for(const id of ['homeMessage','libraryMessage']){$(id).textContent=text===hint?'':text;$(id).classList.toggle('error',error)}
 }
 // A line in the sidebar's status card. The check is only for something confirmed.
 function statusLine(line,ok,text){
@@ -329,7 +392,10 @@ function statusLine(line,ok,text){
   line.querySelector('use')?.setAttribute('href',ok?'#i-check':'#i-minus');
   line.lastElementChild.textContent=text;
 }
-function online(on){statusLine($('lmLine'),on,on?'LM Studio connected':'LM Studio · connects when you ask')}
+function online(on){
+  statusLine($('lmLine'),on,on?'LM Studio connected':'LM Studio · connects when you ask');
+  statusLine($('homeLm'),on,on?'Connected':'Connects when you ask');
+}
 // The selected model's state as last confirmed by LM Studio. Unknown hides the pill.
 function showModelState(state){
   const text={loaded:'Model loaded',idle:'Model not loaded',pending:'Load not confirmed'}[state]||'';
@@ -351,6 +417,7 @@ function controls(){
   for(const button of document.querySelectorAll('.choice,.open-scope,.in-dialog')) button.disabled=busy||stopped;
   for(const button of document.querySelectorAll('.manage')) button.disabled=busy||stopped||library!=='ready'||Boolean(libraryProblem);
   $('librarySave').disabled=busy||stopped||draft?.stale;
+  for(const id of ['homeAsk','homeSolve']) $(id).disabled=busy||stopped||!homeReady();
 }
 function showModels(models,active){
   modelOptions=models;
@@ -413,6 +480,7 @@ function changeScope(libraryId,scope){
   showScope(libraryId,scope);
   reset();
   showLibraries();
+  showHome();
   api('scope',{scope:el.scope.value}).catch(()=>{});
 }
 let starters={};
@@ -445,20 +513,94 @@ function showStats(){
 // The Libraries page. Everything on it comes from the index or libraries.toml.
 let libraryProblem='';
 function categoryOf(group){return group.category||'Uncategorized'}
-// Each category's icon and color. The name is always shown too.
+// Each category's icon, color and art. The name is always shown too.
 const looks={
-  'Math & Statistics':['course','#5cb3ff'],
-  'Science':['flask','#45d6a8'],
-  'Computing & IT':['code','#9aa4ff'],
-  'Engineering & Trades':['wrench','#f5a65b'],
-  'Business & Finance':['briefcase','#e8c65a'],
-  'Health Sciences':['heart','#ff8fa3'],
-  'Humanities & Languages':['book','#cfa0ff'],
-  'Personal Reference':['notebook','#72d6ee']};
+  'Math & Statistics':['course','#5cb3ff','graph'],
+  'Science':['flask','#45d6a8','atom'],
+  'Computing & IT':['code','#9aa4ff','chip'],
+  'Engineering & Trades':['wrench','#f5a65b','gears'],
+  'Business & Finance':['briefcase','#e8c65a','bars'],
+  'Health Sciences':['heart','#ff8fa3','pulse'],
+  'Humanities & Languages':['book','#cfa0ff','book'],
+  'Personal Reference':['notebook','#72d6ee','notes']};
 function lookOf(group){
-  return group.id==='unsorted'?['folder','#a3b4c6']:!group.category?['layers','#8fb0d6']:
-    Object.hasOwn(looks,group.category)?looks[group.category]:['tag','#b9c7d8'];
+  return group.id==='unsorted'?['folder','#a3b4c6','nodes']:!group.category?['layers','#8fb0d6','nodes']:
+    Object.hasOwn(looks,group.category)?looks[group.category]:['tag','#b9c7d8','nodes'];
 }
+// The Dashboard. homeId is the library picked there, which changes nothing in Chat until Ask
+// or Solve is clicked. With no pick, the Dashboard shows Chat's library.
+let homeId='';
+function homeGroups(){return library==='ready'?libraries.filter(group=>group.id!=='unsorted'):[]}
+function homeGroup(){
+  const groups=homeGroups(), find=id=>groups.find(group=>group.id===id);
+  return find(homeId)??find(el.library.value)??groups[0];
+}
+// With no libraries, Chat can still search a course under Unsorted.
+function homeReady(){return library==='ready'&&indexed.length>0&&(homeGroup()?.courses.length??1)>0}
+function showHome(){
+  const list=$('homeList'), select=$('homeLibrary'), groups=homeGroups(), unsorted=libraries.find(group=>group.id==='unsorted');
+  const none=library==='loading'?'Loading…':library==='ready'?'No libraries yet':'Unavailable';
+  select.replaceChildren();
+  list.replaceChildren();
+  select.disabled=!groups.length;
+  if(library==='ready'&&libraryProblem) list.append(make('li','error',libraryProblem));
+  if(!groups.length){
+    select.append(make('option','',none));
+    list.append(make('li',library==='unavailable'?'error':'',library==='loading'?'Reading your libraries…':library==='ready'?'No libraries yet.':'Libraries unavailable. The notes index couldn’t be read.'));
+  }
+  for(const group of [...groups,...library==='ready'&&unsorted?.courses.length?[unsorted]:[]]){
+    const row=make('li'), button=make('button','lib'), text=make('span'), [look,tint]=lookOf(group);
+    button.type='button';
+    button.style.setProperty('--tint',tint);
+    text.append(group.name,make('span','',(group.courses.length?amount(group.courses.length,'course'):'No indexed courses yet')+(group===unsorted?' · opens Libraries':'')));
+    button.append(icon(look),text);
+    if(group===unsorted){
+      button.append(icon('chevron','go'));
+      button.onclick=()=>showPage('librariesPage');
+    }else{
+      const option=make('option','',group.name);
+      option.value=group.id;
+      select.append(option);
+      button.dataset.id=group.id;
+      button.onclick=()=>pickHome(group.id);
+    }
+    row.append(button);
+    list.append(row);
+  }
+  showPick();
+}
+// The parts that follow the pick: the banner, the marked row, and whether there's anything to ask.
+function showPick(){
+  const group=homeGroup(), [look,tint,art]=group?lookOf(group):['layers','#8fb0d6','nodes'];
+  if(group) $('homeLibrary').value=group.id;
+  $('homeBanner').style.setProperty('--tint',tint);
+  $('homeIcon').setAttribute('href','#i-'+look);
+  for(const motif of document.querySelectorAll('#homeBanner .motif')) motif.setAttribute('href','#art-'+art);
+  $('homeLine').textContent=group?[categoryOf(group),group.description].filter(Boolean).join(' · '):
+    library==='ready'&&indexed.length?'Your courses are under Unsorted.':'';
+  for(const button of document.querySelectorAll('.lib[data-id]')) button.setAttribute('aria-pressed',String(button.dataset.id===group?.id));
+  const empty=library==='ready'&&!homeReady();
+  for(const [id,text] of [['homeAsk','Chat in Explain mode'],['homeSolve','Chat in Solve mode']]){
+    $(id).classList.toggle('off',empty);
+    $(id).lastElementChild.textContent=empty?'Nothing to search yet':text;
+  }
+  controls();
+}
+function pickHome(id){homeId=id;showPick()}
+// Go to Chat with the picked library. If Chat already has it, its course and conversation stay.
+function askHome(mode){
+  if(busy||stopped||!homeReady()) return;
+  const group=homeGroup();
+  el.mode.value=mode;
+  showPlaceholder();
+  if(group&&group.id!==el.library.value) openScope(group.id,'library:'+group.id);
+  else{showPage('chatPage');el.question.focus()}
+  controls();
+}
+function showOcr(state){
+  statusLine($('homeOcr'),state==='ready',{ready:'Ready','no-english':'English data missing',missing:'Not found'}[state]??'Unavailable');
+}
+function checkOcr(){api('ocr',{},AbortSignal.timeout(15000)).then(out=>showOcr(out.state),()=>showOcr(''))}
 // Which Courses lists are open. Unsorted's starts open, since it's opened one course at a time.
 const coursesOpen=new Map([['unsorted',true]]);
 // The libraries that fit the search and category filter, in order. Unsorted is always last.
@@ -655,9 +797,9 @@ $('libraryForm').addEventListener('submit',async e=>{
     }
     $('libraryDialog').close();
     card=showSaved(out,'Saved “'+name+'”.');
-    if(!card) notice('Saved “'+name+'”. Your search or filter is hiding it.');
+    if(!card&&!onDashboard()) notice('Saved “'+name+'”. Your search or filter is hiding it.');
   }catch(error){formSays('',error.message)}
-  finally{busy=false;controls();if(!$('libraryDialog').open) (card?.querySelector('.menu-button')??$('newLibrary')).focus();else if(draft.stale) $('libraryReload').focus()}
+  finally{busy=false;controls();if(!$('libraryDialog').open) (onDashboard()?$('homeNew'):card?.querySelector('.menu-button')??$('newLibrary')).focus();else if(draft.stale) $('libraryReload').focus()}
 });
 // Read the changed file but keep what's in the form. Saving again is the student's choice.
 $('libraryReload').onclick=async()=>{
@@ -723,18 +865,21 @@ for(const dialog of document.querySelectorAll('dialog')){
   dialog.querySelector('.cancel').onclick=()=>dialog.close();
   dialog.addEventListener('cancel',e=>{if(busy) e.preventDefault()});
 }
+function onDashboard(){return $('shell').dataset.page==='dashboardPage'}
 function showPage(name){
   $('shell').dataset.page=name;
-  for(const [page,nav] of [['chatPage','navChat'],['librariesPage','navLibraries']]){
+  for(const [page,nav] of [['dashboardPage','navDashboard'],['librariesPage','navLibraries'],['chatPage','navChat']]){
     const on=page===name;
     $(page).classList.toggle('away',!on);
     if(on) $(nav).setAttribute('aria-current','page');
     else $(nav).removeAttribute('aria-current');
   }
+  pollGpus();
 }
 // Open a library or course in Chat. The chat is cleared only if the scope changes.
 function openScope(libraryId,scope){
   if(busy||stopped) return;
+  if(el.library.value!==libraryId) homeId='';
   if(el.library.value!==libraryId||el.scope.value!==scope) changeScope(libraryId,scope);
   showPage('chatPage');
   el.question.focus();
@@ -743,7 +888,7 @@ let checkedShown=false;
 function showChecked(out){
   checkedShown=true;
   const time=out.index_checked;
-  $('indexChecked').textContent=!out.index_exists?'No index yet':time===''?'No update recorded yet':
+  $('indexChecked').textContent=$('homeChecked').textContent=!out.index_exists?'No index yet':time===''?'No update recorded yet':
     time?new Date(time).toLocaleString(undefined,{dateStyle:'medium',timeStyle:'short'}):'Unavailable';
 }
 // Read the index again after something failed, since part of it may have changed.
@@ -753,8 +898,10 @@ async function refreshLibrary(){
     library='unavailable';stats={};
     showStats();
     showLibraries();
+    showHome();
     statusLine($('indexLine'),false,'Notes index · unavailable');
-    if(!checkedShown) $('indexChecked').textContent='Unavailable';
+    statusLine($('homeIndex'),false,'Unavailable');
+    if(!checkedShown) $('indexChecked').textContent=$('homeChecked').textContent='Unavailable';
   }
 }
 // Mistakes in libraries.toml or a starters.toml file.
@@ -781,10 +928,12 @@ function showCourses(out){
   // The chat belongs to what it searched, so clear it if that changed.
   if(known&&before!==searched()) reset();
   statusLine($('indexLine'),list.length>0,'Notes index · '+(list.length?amount(list.length,'course'):'no courses yet'));
+  statusLine($('homeIndex'),list.length>0,list.length?amount(list.length,'course'):'No courses yet');
   $('appDot').classList.add('on');
   statusLine($('appLine'),true,'Running on this PC');
   showChecked(out);
   showLibraries(out.library_problem);
+  showHome();
   controls();
 }
 function showPlaceholder(){
@@ -1188,7 +1337,7 @@ el.mode.addEventListener('change',()=>{
   el.question.focus();
 });
 el.question.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();if(!el.send.disabled)el.form.requestSubmit(el.send)}});
-el.library.addEventListener('change',()=>changeScope(el.library.value));
+el.library.addEventListener('change',()=>{homeId='';changeScope(el.library.value)});
 el.scope.addEventListener('change',()=>changeScope(el.library.value,el.scope.value));
 el.model.addEventListener('change',async()=>{
   const wanted=el.model.value;
@@ -1225,7 +1374,7 @@ el.model.addEventListener('change',async()=>{
 function gpuName(gpu){return gpu.name.replace(/^(NVIDIA GeForce|AMD Radeon) /,'')}
 function showGpus(out){
   if(out.waiting) return;
-  const say=text=>$('gpus').replaceChildren(make('div','gpu-state',text));
+  const say=text=>{for(const id of ['gpus','homeGpus']) $(id).replaceChildren(make('div','gpu-state',text))};
   if(out.error) return say('GPU readings unavailable');
   if(!out.adapters.length) return say('No GPU readings on this PC');
   const known=n=>typeof n==='number'&&out.age<=10, gb=n=>(n/2**30).toFixed(1);
@@ -1234,22 +1383,36 @@ function showGpus(out){
     row.title=gpu.name+' · VRAM, adapter-wide, all apps · Shared memory '+(known(gpu.shared)?gb(gpu.shared)+' GB':'unavailable');
     head.append(make('strong','',gpuName(gpu)),make('span','used',used?gb(gpu.dedicated)+' / '+gb(gpu.total)+' GB':'unavailable'));
     row.append(head);
-    if(used){
-      const bar=make('progress');
-      bar.max=gpu.total;
-      bar.value=gpu.dedicated;
-      bar.setAttribute('aria-label',gpu.name+' dedicated memory');
-      row.append(bar);
-    }
+    if(used) row.append(gpuBar(gpu));
     return row;
   }));
+  // The embedding model uses cuda:0. With one NVIDIA card, that can only be that card.
+  const oneNvidia=out.adapters.filter(gpu=>gpu.nvidia).length===1;
+  $('homeGpus').replaceChildren(...out.adapters.map(gpu=>{
+    const card=make('div','gpu-card gpu'), used=known(gpu.dedicated)&&known(gpu.total), numbers=make('div');
+    card.title=gpu.name;
+    card.append(make('strong','',gpuName(gpu)),make('span','gpu-role','Shared '+(known(gpu.shared)?gb(gpu.shared)+' GB':'unavailable')));
+    if(used) card.append(gpuBar(gpu));
+    numbers.append(make('strong','',used?Math.round(100*gpu.dedicated/gpu.total)+'% VRAM':'VRAM unavailable'));
+    if(used) numbers.append(make('span','used',gb(gpu.dedicated)+' / '+gb(gpu.total)+' GB'));
+    card.append(numbers);
+    if(gpu.nvidia&&oneNvidia) card.append(make('span','gpu-role','Configured embedding device'));
+    return card;
+  }));
+}
+function gpuBar(gpu){
+  const bar=make('progress');
+  bar.max=gpu.total;
+  bar.value=gpu.dedicated;
+  bar.setAttribute('aria-label',gpu.name+' dedicated memory');
+  return bar;
 }
 // Read only while the meters can be seen. The next request is set after the last one
 // ends, so a slow reading never causes overlapping requests.
 // In a narrow window the meters are in a panel, so they can be seen only while it's open.
 const compact=matchMedia('(max-width:720px)');
 let gpuReady=false, gpuAsking=false, gpuTimer=0;
-function gpuWanted(){return gpuReady&&!stopped&&!document.hidden&&$('hardware').open}
+function gpuWanted(){return gpuReady&&!stopped&&!document.hidden&&($('hardware').open||onDashboard())}
 async function pollGpus(){
   clearTimeout(gpuTimer);
   if(stopped) return showGpus({error:true});
@@ -1269,8 +1432,13 @@ $('hardware').addEventListener('keydown',e=>{
   if(e.key==='Escape'&&compact.matches){$('hardware').open=false;$('hardware').querySelector('summary').focus()}
 });
 document.addEventListener('pointerdown',e=>{if(compact.matches&&!$('hardware').contains(e.target)) $('hardware').open=false});
+$('navDashboard').onclick=()=>showPage('dashboardPage');
 $('navChat').onclick=()=>{showPage('chatPage');el.question.focus()};
-$('navLibraries').onclick=()=>showPage('librariesPage');
+$('navLibraries').onclick=$('homeBrowse').onclick=()=>showPage('librariesPage');
+$('homeLibrary').addEventListener('change',()=>pickHome($('homeLibrary').value));
+$('homeAsk').onclick=()=>askHome('explain');
+$('homeSolve').onclick=()=>askHome('solve');
+$('homeNew').onclick=()=>editLibrary();
 $('librarySearch').addEventListener('input',()=>showLibraries());
 for(const id of ['libraryFilter','librarySort']) $(id).addEventListener('change',()=>showLibraries());
 $('new').onclick=()=>{showPage('chatPage');reset()};
@@ -1284,15 +1452,15 @@ $('update').onclick=async()=>{
     catch(_){}
   },1000);
   try{const out=await api('rebuild');showCourses(out);notice([out.message,...problems(out)].join(' · '),problems(out).length>0)}
-  catch(error){updating=false;notice(error.message,true);await refreshLibrary()}finally{updating=false;clearInterval(poll);busy=false;controls()}
+  catch(error){updating=false;notice(error.message,true);await refreshLibrary()}finally{updating=false;clearInterval(poll);busy=false;controls();checkOcr()}
 };
 $('quit').onclick=async()=>{
-  try{await api('quit');stopped=true;controls();statusLine($('lmLine'),false,'Spectre Studio closed');for(const id of ['appLine','indexLine']) $(id).hidden=true;notice('You can close this tab. Open Spectre Studio again to continue.')}
+  try{await api('quit');stopped=true;controls();statusLine($('lmLine'),false,'Spectre Studio closed');statusLine($('homeLm'),false,'App closed');for(const id of ['appLine','indexLine']) $(id).hidden=true;notice('You can close this tab. Open Spectre Studio again to continue.')}
   catch(error){notice(error.message,true)}
 };
-busy=true;controls();
-api('status').then(out=>{online(out.online);showCourses(out);showModels(out.models,out.model);showModelState(statusState(out));if(!out.courses.length)notice('Add your notes to a course folder, then click Update index on the Libraries page.');else if(problems(out).length)notice(problems(out).join(' · '),true)})
-.catch(error=>{notice(error.message,true);return refreshLibrary()}).finally(()=>{busy=false;controls();gpuReady=true;pollGpus()});
+busy=true;showHome();checkOcr();
+api('status').then(out=>{online(out.online);showCourses(out);showModels(out.models,out.model);showModelState(statusState(out));if(!out.courses.length)notice('Add your notes to a course folder, then click Update index on the Knowledge Libraries page.');else if(problems(out).length)notice(problems(out).join(' · '),true)})
+.catch(error=>{notice(error.message,true);statusLine($('lmLine'),false,'LM Studio · unavailable');statusLine($('homeLm'),false,'Unavailable');return refreshLibrary()}).finally(()=>{busy=false;controls();gpuReady=true;pollGpus()});
 </script>
 </body>
 </html>

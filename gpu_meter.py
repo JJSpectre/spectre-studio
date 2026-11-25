@@ -15,6 +15,7 @@ RETRY_SECONDS = 30       # after a failure, wait this long before setting up aga
 PDH_FMT_LARGE = 0x400
 PDH_MORE_DATA = 0x800007D2
 SOFTWARE_ADAPTER = 2
+NVIDIA = 0x10DE          # the PCI vendor ID
 DISPLAY_DRIVERS = r"SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}"
 COUNTERS = {"dedicated": r"\GPU Adapter Memory(*)\Dedicated Usage",
             "shared": r"\GPU Adapter Memory(*)\Shared Usage"}
@@ -104,7 +105,7 @@ def list_adapters():
                 release(adapter)
             software = bool(desc.flags & SOFTWARE_ADAPTER) or not desc.dedicated
             found[desc.luid.high & 0xFFFFFFFF, desc.luid.low] = {
-                "name": desc.name.strip(), "software": software,
+                "name": desc.name.strip(), "software": software, "nvidia": desc.vendor == NVIDIA,
                 "total": 0 if software else installed_size(desc)}
     finally:
         release(factory)
@@ -167,7 +168,8 @@ def sample():
     if set(usage["dedicated"]) != set(ADAPTERS):
         # First sample, or the adapters changed: a driver reset gives a card a new LUID.
         ADAPTERS = list_adapters()
-    adapters = [{"name": adapter["name"], "total": adapter["total"] or None,
+    adapters = [{"name": adapter["name"], "nvidia": adapter["nvidia"],
+                 "total": adapter["total"] or None,
                  "dedicated": usage["dedicated"].get(luid),
                  "shared": usage.get("shared", {}).get(luid)}
                 for luid, adapter in ADAPTERS.items() if not adapter["software"]]

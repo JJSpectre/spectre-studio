@@ -44,6 +44,23 @@ def find_tesseract():
     )
 
 
+def ocr_state():
+    """Whether OCR can run: ready, no-english, missing, or unavailable if it can't be checked."""
+    try:
+        tesseract = find_tesseract()
+    except SystemExit:
+        return "missing"
+    try:
+        result = subprocess.run([tesseract, "--list-langs"], stdin=subprocess.DEVNULL,
+                                capture_output=True, creationflags=NO_WINDOW, timeout=10)
+    except (OSError, subprocess.SubprocessError):
+        return "unavailable"
+    if result.returncode != 0:
+        return "unavailable"
+    # Older versions list the languages on stderr.
+    return "ready" if b"eng" in (result.stdout + b"\n" + result.stderr).split() else "no-english"
+
+
 def extract_image_text(image, tesseract):
     """Convert a PDF image to a clean PNG and OCR it locally."""
     if "A" in image.getbands() or "transparency" in image.info:

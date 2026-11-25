@@ -1843,6 +1843,10 @@ class Handler(BaseHTTPRequestHandler):
             # Never takes WORK, so the meters don't wait for answers or model switching.
             from gpu_meter import snapshot
             return self.reply(200, snapshot())
+        if self.path == "/api/ocr":
+            # Doesn't take WORK either. It only looks for Tesseract and its English data.
+            from ingest import ocr_state
+            return self.reply(200, {"state": ocr_state()})
         if self.path == "/api/scope":
             # Only remembered for next time. Each question's scope is checked when it's asked.
             scope = data.get("scope")
