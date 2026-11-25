@@ -16,6 +16,7 @@ import traceback
 import unicodedata
 import webbrowser
 from collections import Counter
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -27,6 +28,10 @@ DB = ROOT / "chroma_db"
 LOG = ROOT / "study-chat.log"
 LAST_COURSE = ROOT / "last_course.txt"
 LAST_CHECK = ROOT / "last_index_check.txt"
+LIBRARIES_FILE = ROOT / "libraries.toml"
+# The libraries as last shown on the page. A question uses these, so what it searches
+# matches what the page says. Read again when the app opens and after Update index.
+LIBRARIES = []
 # The pages ingest.py adds to a PDF's source: "COURSE/a.pdf (PDF page 3, OCR)".
 PAGE_LABEL = re.compile(r"(?<=\.pdf) \(PDF pages? \d+(?:–\d+)?(?:, OCR)?\)$", re.I)
 EMBED_MODEL = "nomic-ai/nomic-embed-text-v1.5"
@@ -164,6 +169,11 @@ def courses():
     return course_names(indexed_metadata())
 
 
+def source_path(source):
+    """The file a passage came from, without the pages added to its source."""
+    return PAGE_LABEL.sub("", source)
+
+
 def course_stats(rows):
     """How many files and passages each course has. files is None if it can't be counted."""
     passages = Counter(m["course"] for m in rows)
@@ -174,7 +184,7 @@ def course_stats(rows):
             files[m["course"]] = None
         elif files[m["course"]] is not None:
             # One PDF has many labels, such as page ranges and OCR pages.
-            files[m["course"]].add(PAGE_LABEL.sub("", source))
+            files[m["course"]].add(source_path(source))
     return {course: {"files": None if found is None else len(found),
                      "passages": passages[course]} for course, found in files.items()}
 
@@ -226,6 +236,24 @@ def default_course(names):
     return names[0] if names else ""
 
 
+def save_last_scope(scope_id):
+    """Remember what was searched: a course name, or "library:" and the library's id."""
+    save_last_course(scope_id.removeprefix("course:"))
+
+
+def default_scope(names):
+    """The library or course used last time, or the first course."""
+    try:
+        saved = LAST_COURSE.read_text(encoding="utf-8-sig").strip()
+    except (OSError, ValueError):
+        saved = ""
+    for library in LIBRARIES:
+        if saved == "library:" + library["id"] and any(c in names for c in library["courses"]):
+            return saved
+    course = default_course(names)
+    return "course:" + course if course else ""
+
+
 def load_starters(course):
     """Read the course's starter cards from notes/<course>/starters.toml, if it has any."""
     path = ROOT / "notes" / course / "starters.toml"
@@ -252,10 +280,67 @@ def load_starters(course):
     return starters
 
 
+def load_libraries():
+    """Read libraries.toml, which groups courses. Without the file there are no libraries."""
+    if not LIBRARIES_FILE.is_file():
+        return []
+    try:
+        data = tomllib.loads(LIBRARIES_FILE.read_text(encoding="utf-8-sig"))
+        rows = data.pop("library", [])
+        if data or not isinstance(rows, list) or not all(isinstance(row, dict) for row in rows):
+            raise ValueError("start each library with a [[library]] line")
+        libraries = []
+        for number, row in enumerate(rows, 1):
+            unknown = sorted(set(row) - {"id", "name", "category", "courses"})
+            if unknown:
+                raise ValueError(f"library {number} has an unknown setting, {unknown[0]}")
+            key, name = row.get("id"), row.get("name")
+            category, members = row.get("category", ""), row.get("courses")
+            if not isinstance(key, str) or not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,39}", key):
+                raise ValueError(f"library {number} needs an id of lowercase letters, digits and hyphens")
+            if key in ("all", "unsorted") or any(key == other["id"] for other in libraries):
+                raise ValueError(f"the id {key} is reserved or used twice")
+            if not isinstance(name, str) or not name.strip() or len(name) > 60 or not name.isprintable():
+                raise ValueError(f"library {number} needs a name of up to 60 characters")
+            if not isinstance(category, str) or len(category) > 40 or not category.isprintable():
+                raise ValueError(f"the category of library {number} must be up to 40 characters")
+            if not isinstance(members, list) or not all(isinstance(c, str) and c for c in members):
+                raise ValueError(f"library {number} needs a list of courses")
+            # A course listed twice in one library counts once.
+            libraries.append({"id": key, "name": name.strip(), "category": category.strip(),
+                              "courses": list(dict.fromkeys(members))})
+    except (OSError, ValueError) as error:
+        raise AppError(f"Couldn't read libraries.toml, so every course is under Unsorted: {error}") from error
+    return libraries
+
+
+def library_info(names, stats):
+    """Each library's indexed courses and totals. Unsorted has the courses in no library."""
+    listed = {course for library in LIBRARIES for course in library["courses"]}
+    groups = LIBRARIES + [{"id": "unsorted", "name": "Unsorted", "category": "",
+                           "courses": [course for course in names if course not in listed]}]
+    result = []
+    for group in groups:
+        found = [course for course in group["courses"] if course in stats]
+        files = [stats[course]["files"] for course in found]
+        result.append({**group, "courses": found,
+                       "missing": [course for course in group["courses"] if course not in stats],
+                       "files": None if None in files else sum(files),
+                       "passages": sum(stats[course]["passages"] for course in found)})
+    return result
+
+
 def course_info():
-    """What the page needs to show the courses, their counts, and their starter cards."""
+    """What the page needs to show the libraries, courses, counts, and starter cards."""
+    global LIBRARIES
     rows = indexed_metadata()
     names = course_names(rows)
+    stats = course_stats(rows)
+    library_problem = ""
+    try:
+        LIBRARIES = load_libraries()
+    except AppError as error:
+        LIBRARIES, library_problem = [], str(error)
     starters, problems = {}, []
     for course in names:
         try:
@@ -263,8 +348,9 @@ def course_info():
         except AppError as error:
             # A typo in one file only hides that course's cards.
             problems.append(str(error))
-    return {"courses": names, "default_course": default_course(names),
-            "stats": course_stats(rows), "index_exists": (DB / "chroma.sqlite3").is_file(),
+    return {"courses": names, "default_scope": default_scope(names),
+            "libraries": library_info(names, stats), "library_problem": library_problem,
+            "stats": stats, "index_exists": (DB / "chroma.sqlite3").is_file(),
             "index_checked": index_checked(),
             "starters": starters, "starter_problems": problems}
 
@@ -538,12 +624,55 @@ def keyword_ranking(query, documents):
     return [position for position in order if scores[position] > 0]
 
 
-def search_passages(query, where, limit, *, ask=None, skip=()):
+@dataclass(frozen=True)
+class Scope:
+    """The notes a question may search. Only search_scope() makes one."""
+    id: str
+    label: str      # what the page shows
+    heading: str    # what the model is told
+    files: tuple    # the files the question was narrowed to, if any
+    where: dict     # the search filter
+
+
+def search_scope(scope_id, files=()):
+    """Turn a library or course ID from the page into a search filter.
+
+    Every search uses this filter. Anything unknown or empty is an error, so a question
+    can never search more than was selected. files narrows the scope further.
+    """
+    kind, _, key = scope_id.partition(":") if isinstance(scope_id, str) else ("", "", "")
+    names = courses()
+    members, label, heading = [], "", ""
+    if kind == "course" and key in names:
+        members, label, heading = [key], key, f"Course: {key}"
+    elif kind == "library":
+        for library in LIBRARIES:
+            if library["id"] == key:
+                members = [course for course in library["courses"] if course in names]
+                label = library["name"] + " (entire library)"
+                heading = f"Library: {library['name']} (courses: {', '.join(members)})"
+    if not members:
+        raise AppError("Choose a library or course that has already been indexed.")
+    where = {"course": members[0] if len(members) == 1 else {"$in": members}}
+    files = tuple(sorted(set(files)))
+    if files:
+        found = {}
+        for metadata in index_collection().get(where=where, include=["metadatas"])["metadatas"]:
+            found.setdefault(source_path(metadata["source"]), set()).add(metadata["source"])
+        if not all(path in found for path in files):
+            raise AppError("That file isn't in the notes you selected. Name the file again or start a new chat.")
+        sources = sorted(set().union(*(found[path] for path in files)))
+        where = {"$and": [where, {"source": {"$in": sources}}]}
+    return Scope(scope_id, label, heading, files, where)
+
+
+def search_passages(query, scope, limit, *, ask=None, skip=()):
     """Return the best (metadata, text) passages by meaning and keywords combined.
 
     ask is the part of the query that asks for something. Texts in skip are left out.
     """
     ask = ask or query
+    where = scope.where
     collection = index_collection()
     # Keywords are read from the index itself, so they always match the current notes.
     rows = collection.get(where=where, include=["documents", "metadatas"])
@@ -591,9 +720,56 @@ def search_passages(query, where, limit, *, ask=None, skip=()):
     return found
 
 
+class FileChoice(Exception):
+    """A file name in the question could mean several files, so the student picks one."""
+
+
+def named_files(question, scope, picks):
+    """The files that the question names, such as chapter-1.pdf or unit1/chapter-1.pdf.
+
+    picks are the files the student chose when asked. They only count if the name they
+    were chosen for is in the question and could mean them.
+    """
+    picks, files = set(picks), set()
+    if re.search(r"\.(?:pdf|txt|md)\b", question, re.I):
+        rows = index_collection().get(where=scope.where, include=["metadatas"])
+        by_name = {}
+        for path in {source_path(metadata["source"]) for metadata in rows["metadatas"]}:
+            parts = ["notes", *path.casefold().split("/")]
+            for start in range(len(parts)):
+                by_name.setdefault("/".join(parts[start:]), set()).add(path)
+        text = question.casefold().replace("\\", "/")
+        names = "|".join(map(re.escape, sorted(by_name, key=len, reverse=True)))
+        end = None
+        for match in re.finditer(r"(?<![\w.-])(?:" + names + r")(?![\w-]|\.\w)", text):
+            name, start = match.group(), match.start()
+            options = by_name[name]
+            # "other/chapter-1.pdf", where no chapter-1.pdf is in a folder named other.
+            whole = {prefix + path.casefold() for path in options for prefix in ("", "notes/")}
+            wrong_folder = text[start - 1:start] == "/" and end != start - 1 and name not in whole
+            end = match.end()
+            if len(options) > 1 or wrong_folder:
+                shown = sorted(options, key=str.casefold)
+                options = options & picks
+                if not options:
+                    raise FileChoice({"name": "/".join(shown[0].split("/")[-name.count("/") - 1:]),
+                                      "files": shown, "picked": sorted(picks)})
+            files |= options
+    if not picks <= files:
+        raise AppError("That file isn't one of the choices for this question. Ask it again.")
+    return files
+
+
+def file_list(value):
+    """Check a list of file paths sent by the page. search_scope() checks that they exist."""
+    if (not isinstance(value, list) or len(value) > 20
+            or not all(isinstance(path, str) and path for path in value)):
+        raise AppError("Invalid file choice. Ask the question again.")
+    return value
+
+
 def prepare_question(data):
     question = data.get("question", "")
-    selected = data.get("course", "")
     history = data.get("history", [])
     if not isinstance(question, str) or not 1 <= len(question.strip()) <= 1800:
         raise AppError("Enter a question between 1 and 1,800 characters.")
@@ -601,9 +777,8 @@ def prepare_question(data):
     mode = data.get("mode", "explain")
     if mode not in ("explain", "solve"):
         raise AppError("Choose Explain or Solve.")
-    if not isinstance(selected, str) or selected not in courses():
-        raise AppError("Select a course that has already been indexed.")
-    save_last_course(selected)
+    scope = search_scope(data.get("scope"))
+    save_last_scope(scope.id)
     prior = []
     if isinstance(history, list):
         for turn in history[-2:]:
@@ -611,33 +786,21 @@ def prepare_question(data):
                 prior.append(turn["question"][:350])
     # Only carry context into retrieval when a question points back to earlier turns.
     follow_up = re.search(r"^(?:why\b|how about\b|what about\b|(?:what|how)\b[^.!?]{0,35}\b(?:it|that|this|they|those|them)\b)", question, re.I)
-    collection = index_collection()
-    where = {"course": selected}
-    matched_sources = set()
-    if re.search(r"\.(?:pdf|txt|md)\b", question, re.I):
-        rows = collection.get(where=where, include=["metadatas"])
-        sources_by_filename = {}
-        for metadata in rows["metadatas"]:
-            source = metadata["source"]
-            filename = re.split(r" \(PDF pages? \d", source, maxsplit=1)[0].rsplit("/", 1)[-1]
-            sources_by_filename.setdefault(filename.casefold(), set()).add(source)
-        if sources_by_filename:
-            filenames = sorted(sources_by_filename, key=len, reverse=True)
-            alternatives = "|".join(map(re.escape, filenames))
-            pattern = r"(?<![\w.-])(?:" + alternatives + r")(?![\w-]|\.\w)"
-            for match in re.finditer(pattern, question.casefold()):
-                matched_sources.update(sources_by_filename[match.group()])
-    if matched_sources:
-        where = {"$and": [where, {"source": {"$in": sorted(matched_sources)}}]}
-    if prior and follow_up and not matched_sources:
+    files = named_files(question, scope, file_list(data.get("files", [])))
+    if prior and follow_up and not files:
         # A short follow-up says too little by itself, so it isn't split up.
         query = ask = prior[-1] + "\nFollow-up: " + question
+        # It also stays on the files the previous answer was narrowed to.
+        if isinstance(history[-1], dict):
+            files = file_list(history[-1].get("files", []))
     else:
         query, ask = question, ask_part(question)
+    if files:
+        scope = search_scope(scope.id, files)
     sources = [{"name": metadata["source"], "text": text} for metadata, text
-               in search_passages(query, where, FIRST_SOURCES, ask=ask)]
+               in search_passages(query, scope, FIRST_SOURCES, ask=ask)]
     if not sources:
-        return [], []
+        return scope, [], []
 
     context = "\n\n".join(
         f"[{i}] {source['name']}\n{source['text']}" for i, source in enumerate(sources, 1)
@@ -645,14 +808,14 @@ def prepare_question(data):
     prior_text = "\n".join(prior) if prior else "(none)"
     heading = "Problem to solve" if mode == "solve" else "Current question"
     prompt = (
-        f"Course: {selected}\nPrevious questions (for context only):\n{prior_text}\n\n"
+        f"{scope.heading}\nPrevious questions (for context only):\n{prior_text}\n\n"
         f"{heading}: {question}\n\nRetrieved notes:\n{context}"
     )
     messages = [
         {"role": "system", "content": SOLVE_PROMPT if mode == "solve" else EXPLAIN_PROMPT},
         {"role": "user", "content": prompt},
     ]
-    return sources, messages
+    return scope, sources, messages
 
 
 def lm_http_error(error):
@@ -811,11 +974,11 @@ def calculate(expression):
     return format(value, ".10g")
 
 
-def search_notes(course, query, sources, limit=3):
-    """Find more passages in the same course and number them after the existing ones."""
+def search_notes(scope, query, sources, limit=3):
+    """Find more passages in the same scope and number them after the existing ones."""
     if not isinstance(query, str) or not query.strip():
         return "Error: give a short search query, such as a method name."
-    found = search_passages(query.strip()[:300], {"course": course},
+    found = search_passages(query.strip()[:300], scope,
                             min(limit, MAX_SOURCES - len(sources)),
                             skip=[source["text"] for source in sources])
     added = []
@@ -1106,7 +1269,7 @@ CALCULATE_TOOL = {"type": "function", "function": {
 SEARCH_TOOL = {"type": "function", "function": {
     "name": "search_notes",
     "description": (
-        "Search the student's notes for this course. Use it when the retrieved passages don't "
+        "Search the notes the student selected. Use it when the retrieved passages don't "
         "cover the method, searching by the method's name (for example 'two-proportion z-test "
         "formula'). New passages are numbered after the existing ones and can be cited the same way."
     ),
@@ -1143,7 +1306,7 @@ def run_tool(call, tools):
         tools["searches"] += 1
         query = args.get("query")
         LIVE.update(phase="tool", detail=f"Searching your notes for “{str(query)[:60]}”")
-        return search_notes(tools["course"], query, tools["sources"])
+        return search_notes(tools["scope"], query, tools["sources"])
     return f"Error: there is no tool named {call['name']}."
 
 
@@ -1227,7 +1390,7 @@ def stream_completion(payload, started, tokens):
 def generate_answer(model_id, messages, *, label="", tools=None):
     """Stream an answer, running any tools the model asks for.
 
-    tools is None (no tools) or a dict with course, sources, and searches.
+    tools is None (no tools) or a dict with scope, sources, and searches.
     Returns (answer, reasoning, tool_log).
     """
     messages = list(messages)
@@ -1310,19 +1473,25 @@ def generate_answer(model_id, messages, *, label="", tools=None):
 
 def ask(data):
     started = time.monotonic()
-    sources, messages = prepare_question(data)
+    try:
+        scope, sources, messages = prepare_question(data)
+    except FileChoice as choice:
+        return {"choose": choice.args[0]}
     retrieved = time.monotonic()
+    searched = {"label": scope.label, "files": scope.files}
     if not sources:
-        return {"answer": "I couldn't find any notes for this course.", "sources": []}
+        return {"answer": "I couldn't find any notes in what you selected.", "sources": [],
+                "searched": searched}
     instance, name = activate_model(ACTIVE_MODEL)
     loaded = time.monotonic()
     # Solve mode gets the calculator and note search. search_notes adds
     # passages to this same sources list, so new citations line up.
-    tools = ({"course": data["course"], "sources": sources, "searches": 0}
+    # It searches the same scope, including any file the question named.
+    tools = ({"scope": scope, "sources": sources, "searches": 0}
              if data.get("mode") == "solve" else None)
     answer, reasoning, tool_log = generate_answer(instance, messages, label=name, tools=tools)
     return {"answer": answer, "reasoning": reasoning, "tools": tool_log, "sources": sources,
-            "model": name, "timing": {
+            "searched": searched, "model": name, "timing": {
         "retrieval": round(retrieved - started, 2), "model_setup": round(loaded - retrieved, 2),
         "answer": round(time.monotonic() - loaded, 2),
     }}
@@ -1499,12 +1668,14 @@ class Handler(BaseHTTPRequestHandler):
             # Never takes WORK, so the meters don't wait for answers or model switching.
             from gpu_meter import snapshot
             return self.reply(200, snapshot())
-        if self.path == "/api/course":
-            course = data.get("course")
-            if not isinstance(course, str) or not 1 <= len(course) <= 255 or not course.isprintable():
-                return self.reply(400, {"error": "Select a course."})
-            save_last_course(course)
-            return self.reply(200, {"message": "Course saved."})
+        if self.path == "/api/scope":
+            # Only remembered for next time. Each question's scope is checked when it's asked.
+            scope = data.get("scope")
+            if (not isinstance(scope, str) or not 1 <= len(scope) <= 270 or not scope.isprintable()
+                    or not scope.startswith(("course:", "library:"))):
+                return self.reply(400, {"error": "Choose a library or course."})
+            save_last_scope(scope)
+            return self.reply(200, {"message": "Search scope saved."})
         if not WORK.acquire(blocking=False):
             return self.reply(409, {"error": "Spectre Studio is busy. Wait for the current task to finish."})
         try:

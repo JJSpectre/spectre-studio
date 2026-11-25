@@ -1,0 +1,16 @@
+# Example for libraries.toml, which groups courses into libraries.
+# Copy this file, name the copy libraries.toml, and list your own courses.
+# libraries.toml stays out of Git, because it shows your course names.
+#
+# Reopen Spectre Studio or click Update index to see your changes.
+# Removing a library here only removes the grouping. Your notes and index stay.
+
+[[library]]
+# A permanent ID: lowercase letters, digits and hyphens. Don't change it later.
+id = "automotive"
+# The name you see. You can change it at any time.
+name = "Automotive"
+# Optional.
+category = "Trade"
+# Course folder names, exactly as they appear under notes.
+courses = ["AUTO-101"]

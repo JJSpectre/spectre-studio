@@ -11,7 +11,7 @@ I built it because hunting through a semester's worth of PDFs for one formula or
 - **Searches your own documents.** Reads PDF, TXT and Markdown files, splits them into passages, and finds the ones that match your question by meaning, not only by keywords.
 - **Cites every source.** Each answer lists the passages it used, and you can expand them to read the original text. If your notes don't cover the question, it says so instead of guessing.
 - **Reads text inside images.** Many lecture PDFs have formulas embedded as pictures. Spectre Studio runs OCR on those images and tags the results with their PDF page, so they're searchable too.
-- **Organizes by course.** One folder per class. Search a single course or switch between them from a dropdown.
+- **Organizes by course and library.** One folder per class, and libraries that group classes. Search one course or a whole library. If a file name in your question fits more than one file, Spectre Studio asks which one you mean.
 - **Two modes:**
   - **Explain from my notes** (default): answers questions using only what's in your documents.
   - **Solve a problem**: walks through a worked solution step by step, using the methods and formulas from your notes, then shows how to check the answer on a TI-84. The math comes from built-in calculation tools rather than the language model, so the numbers are reliable.
@@ -28,7 +28,7 @@ Spectre Studio is a **retrieval-augmented generation (RAG)** app:
 1. **Ingest** (`ingest.py`): reads every file in `notes/<course>/`, extracts the text (plus OCR text from PDF images via Tesseract), and splits it into passages tagged with course, file and page.
 2. **Embed and store:** each passage is turned into a vector with the Nomic Embed v1.5 model, running on an NVIDIA GPU through PyTorch CUDA, and saved in a local ChromaDB database.
 3. **Update incrementally:** each PDF is fingerprinted (SHA-256), so unchanged files reuse their cached text and OCR. Only new or changed passages are embedded, and passages from deleted files are removed. The database is labeled with the embedding model that built it, so switching models triggers a full rebuild instead of mixing incompatible vectors. An update with no changes takes seconds.
-4. **Retrieve (hybrid search):** passages from the selected course are ranked by meaning (your question is embedded the same way and compared in ChromaDB) and by exact words (BM25 keyword search), then merged with weighted reciprocal rank fusion. The part of the question that asks for something counts most, so the story in a word problem doesn't crowd out the method. When a typed note and an OCR passage match about equally, the typed note comes first. The keyword ranking is built from the stored passages at question time, so it always matches the current index.
+4. **Retrieve (hybrid search):** passages from the selected course or library, or only the file your question names, are ranked by meaning (your question is embedded the same way and compared in ChromaDB) and by exact words (BM25 keyword search), then merged with weighted reciprocal rank fusion. The part of the question that asks for something counts most, so the story in a word problem doesn't crowd out the method. When a typed note and an OCR passage match about equally, the typed note comes first. The keyword ranking is built from the stored passages at question time, so it always matches the current index.
 5. **Answer:** the passages go to a language model running in LM Studio, which writes an answer that cites them as [1], [2] and so on.
 6. **Interface** (`study_chat.py`, `study_chat.html`, `study_app.pyw`): a small local web server and HTML interface, opened in its own desktop window with pywebview.
 
@@ -78,6 +78,24 @@ With Qwen split across both GPUs, generation ran at about 42 tokens/s (about 35 
 4. In LM Studio, load a chat model and turn on the **Local Server** (port 1234).
 5. Double-click **Setup Spectre Studio.cmd** once. It creates a **Spectre Studio** shortcut on your desktop.
 6. Open Spectre Studio from the shortcut and click **Update index** to build the search database.
+
+## Libraries
+
+A library groups courses so you can search them together. Copy `libraries.sample.toml`, name the copy `libraries.toml`, and list your course folders, with one `[[library]]` section per library:
+
+```toml
+[[library]]
+id = "automotive"
+name = "Automotive"
+category = "Trade"
+courses = ["AUTO-101"]
+```
+
+The `id` is permanent (lowercase letters, digits and hyphens). The `name` can change at any time, and the `category` is optional. Reopen Spectre Studio or click **Update index** to see your changes.
+
+- Grouping never moves notes or re-indexes anything. Removing a library only removes the grouping.
+- Courses in no library appear under **Unsorted**, where you search them one at a time.
+- `libraries.toml` stays out of Git, so your course names stay private.
 
 ## Starter questions
 
