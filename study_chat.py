@@ -317,11 +317,12 @@ def load_libraries(saved):
             raise ValueError("start each library with a [[library]] line")
         libraries = []
         for number, row in enumerate(rows, 1):
-            unknown = sorted(set(row) - {"id", "name", "category", "courses"})
+            unknown = sorted(set(row) - {"id", "name", "category", "description", "courses"})
             if unknown:
                 raise ValueError(f"library {number} has an unknown setting, {unknown[0]}")
             key, name = row.get("id"), row.get("name")
             category, members = row.get("category", ""), row.get("courses")
+            description = row.get("description", "")
             if not isinstance(key, str) or not re.fullmatch(r"[a-z0-9][a-z0-9-]{0,39}", key):
                 raise ValueError(f"library {number} needs an id of lowercase letters, digits and hyphens")
             if key in ("all", "unsorted") or any(key == other["id"] for other in libraries):
@@ -330,10 +331,13 @@ def load_libraries(saved):
                 raise ValueError(f"library {number} needs a name of up to 60 characters")
             if not isinstance(category, str) or len(category) > 40 or not category.isprintable():
                 raise ValueError(f"the category of library {number} must be up to 40 characters")
+            if not isinstance(description, str) or len(description) > 160 or not description.isprintable():
+                raise ValueError(f"the description of library {number} must be one line of up to 160 characters")
             if not isinstance(members, list) or not all(isinstance(c, str) and c for c in members):
                 raise ValueError(f"library {number} needs a list of courses")
             # A course listed twice in one library counts once.
             libraries.append({"id": key, "name": name.strip(), "category": category.strip(),
+                              "description": description.strip(),
                               "courses": list(dict.fromkeys(members))})
     except ValueError as error:
         raise AppError(f"Couldn't read libraries.toml: {error}") from error
@@ -365,6 +369,8 @@ def libraries_text(libraries):
         lines = ["[[library]]", f"id = {quote(library['id'])}", f"name = {quote(library['name'])}"]
         if library["category"]:
             lines.append(f"category = {quote(library['category'])}")
+        if library["description"]:
+            lines.append(f"description = {quote(library['description'])}")
         lines.append(f"courses = [{', '.join(map(quote, library['courses']))}]")
         tables.append("\n".join(lines) + "\n")
     return "\n".join(tables)
@@ -408,7 +414,7 @@ def write_libraries(libraries, saved):
 
 
 def library_text(value, what, limit):
-    """A name or category from the page. Any run of spaces or line breaks becomes one space."""
+    """A name, category or description from the page. Any run of spaces or line breaks becomes one space."""
     text = " ".join(value.split()) if isinstance(value, str) else None
     if text is None or len(text) > limit:
         raise AppError(f"The {what} must be up to {limit} characters.")
@@ -441,7 +447,7 @@ def save_library(data):
 
     def change(libraries):
         key = data.get("id", "")
-        library = {"id": "", "name": "", "category": "", "courses": []}
+        library = {"id": "", "name": "", "category": "", "description": "", "courses": []}
         if key:
             library = next((row for row in libraries if row["id"] == key), None)
             if library is None:
@@ -459,6 +465,7 @@ def save_library(data):
             raise AppError("Choose courses that have already been indexed.")
         order = dict.fromkeys(library["courses"] + indexed)
         library.update(name=name, category=library_text(data.get("category"), "category", 40),
+                       description=library_text(data.get("description", library["description"]), "description", 160),
                        courses=[course for course in order if course in chosen])
         if not key:
             library["id"] = new_library_id(name, libraries)
@@ -483,7 +490,7 @@ def delete_library(data):
 def library_info(names, stats):
     """Each library's indexed courses and totals. Unsorted has the courses in no library."""
     listed = {course for library in LIBRARIES for course in library["courses"]}
-    groups = LIBRARIES + [{"id": "unsorted", "name": "Unsorted", "category": "",
+    groups = LIBRARIES + [{"id": "unsorted", "name": "Unsorted", "category": "", "description": "",
                            "courses": [course for course in names if course not in listed]}]
     result = []
     for group in groups:

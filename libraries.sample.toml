@@ -12,7 +12,9 @@
 id = "automotive"
 # The name you see. You can change it at any time.
 name = "Automotive"
-# Optional.
-category = "Trade"
+# Optional. The app's own categories have their own icon and color.
+category = "Engineering & Trades"
+# Optional. One line, up to 160 characters.
+description = "Brakes, check engine codes and other shop notes."
 # Course folder names, exactly as they appear under notes.
 courses = ["AUTO-101"]

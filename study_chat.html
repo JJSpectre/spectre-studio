@@ -18,50 +18,58 @@ body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 "Segoe UI Var
 button,textarea,select,input{font:inherit}button{cursor:pointer}button:disabled,select:disabled{opacity:.55;cursor:default}
 button:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .icon{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.layout{display:grid;grid-template-columns:258px minmax(0,1fr);height:100dvh}
-.side{background:var(--side);border-right:1px solid var(--line);padding:22px 14px 14px;display:flex;flex-direction:column;gap:14px;min-height:0;overflow-y:auto}
-.brand{display:flex;align-items:center;gap:12px;padding:0 4px;font-weight:650;font-size:20px;line-height:1.2}
-.mark{width:42px;height:42px;stroke-width:1.5;color:var(--accent)}
-.sub{font-size:12px;color:var(--quiet);font-weight:400;margin-top:2px}
-.section-label{font-size:11px;letter-spacing:.1em;font-weight:650;text-transform:uppercase;color:var(--quiet);display:block;margin:0 0 8px 6px}
-.nav,.tool,.quit button{display:flex;align-items:center;gap:14px;width:100%;padding:10px 14px;border:1px solid transparent;border-radius:8px;background:none;color:var(--ink);text-align:left}
+.layout{display:grid;grid-template-columns:224px minmax(0,1fr);height:100dvh}
+.side{background:var(--side);border-right:1px solid var(--line);padding:11px 12px 12px;display:flex;flex-direction:column;gap:14px;min-height:0;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:10px;padding:0 2px;font-weight:650;font-size:18px;line-height:1.2}
+.mark{width:40px;height:40px;stroke-width:1.5;color:var(--accent)}
+.sub{font-size:11px;color:var(--quiet);font-weight:400;margin-top:2px;white-space:nowrap}
+.nav,.quit button{display:flex;align-items:center;gap:14px;width:100%;padding:10px 14px;border:1px solid transparent;border-radius:8px;background:none;color:var(--ink);text-align:left}
 .nav{font-size:16px}
 .nav[aria-current=page]{background:linear-gradient(90deg,var(--active),#1f4a82);border-color:#3f78bd;border-left:3px solid var(--accent)}
 .nav[aria-current=page] .icon{color:var(--accent)}
-.tool+.tool,.nav+.nav{margin-top:6px}.nav:not([aria-current]):hover{background:var(--raised)}
-.tool:hover:not(:disabled),.quit button:hover:not(:disabled){background:var(--raised)}
+.nav+.nav{margin-top:6px}.nav:not([aria-current]):hover,.quit button:hover:not(:disabled){background:var(--raised)}
 .button{display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 14px;border:1px solid var(--control);border-radius:8px;background:var(--panel);color:var(--ink);white-space:nowrap}.button .icon{width:18px;height:18px}
 .button:hover:not(:disabled){background:var(--raised);border-color:var(--accent)}
 .primary{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:600}
 .primary:hover:not(:disabled){background:var(--primary-hover)}
-.status-card{margin-top:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:12px 14px;font-size:13px;color:var(--quiet);display:grid;gap:8px}
-.status-card>div{display:flex;align-items:center;gap:10px}.status-card .icon{width:16px;height:16px;color:var(--accent)}
+.status-card{margin-top:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:12px 14px;font-size:13px;line-height:1.4;color:var(--quiet);display:grid;gap:9px}
+.line{display:flex;align-items:center;gap:9px;overflow-wrap:anywhere}.line .icon{width:16px;height:16px;stroke-width:2.5}.line.ok{color:var(--ink)}.line.ok .icon{color:var(--good)}
+.line .dot{margin:0 3px 0 4px}.line.head.ok{color:var(--good);font-weight:600}.gpu-lines{display:grid;gap:9px}
 .side{scrollbar-width:thin}
-.hardware{margin-top:-4px;border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:0 14px;color:var(--quiet);font-size:12px;line-height:1.4}
-.hardware summary{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-radius:6px;cursor:pointer;list-style:none}.hardware summary::-webkit-details-marker{display:none}
-.hardware .section-label{margin:0}.hardware .icon{width:16px;height:16px}.hardware[open] .icon{transform:rotate(180deg)}
-.gpu,.gpu-state{margin-bottom:10px}.gpu strong,.gpu .used{display:block;color:var(--ink);font-weight:400}.gpu strong{font-size:13px}
-.gpu progress{appearance:none;display:block;width:100%;height:7px;margin:4px 0 3px;border:0;border-radius:4px;overflow:hidden;background:var(--line)}
+.hardware{flex:none;margin-left:auto;color:var(--quiet);font-size:12px;line-height:1.35}.hardware summary{display:none}
+#gpus{display:flex;gap:12px}.gpu,.gpu-state{padding-left:12px;border-left:1px solid var(--line)}.gpu{width:158px}.gpu-state{display:flex;align-items:center;min-height:46px}
+.gpu strong,.gpu .used{color:var(--ink);font-weight:400}.gpu strong{font-size:13px;font-weight:600}.gpu>div{display:flex;justify-content:space-between;gap:6px;white-space:nowrap}.gpu>div span{font-size:11px}
+.gpu progress{appearance:none;display:block;width:100%;height:7px;margin:4px 0 0;border:0;border-radius:4px;overflow:hidden;background:var(--line)}
 .gpu progress::-webkit-progress-bar{background:var(--line)}.gpu progress::-webkit-progress-value{border-radius:4px;background:var(--accent)}
-.gpu-note{margin:0 0 10px;font-size:11px}
+.gpu-note{display:none;margin:10px 0 0;font-size:12px}
 .quit button{color:var(--quiet);font-size:14px;padding:8px 14px}.quit .icon{width:17px;height:17px}
+.shell{display:grid;grid-template:auto minmax(0,1fr)/minmax(0,1fr);min-height:0;min-width:0}
+.bar{position:relative;z-index:2;display:flex;align-items:center;gap:8px 10px;min-height:64px;padding:8px 14px;border-bottom:1px solid var(--line);background:var(--side)}
+.field{display:flex;align-items:center;gap:5px;flex:1 1 0;min-width:0;max-width:300px}.field.wide{flex-grow:1.1}.field.slim{flex-grow:.9;max-width:190px}
+.field label{flex:none;color:var(--quiet);font-size:13px}.field .pick-box{flex:1;min-width:0}
+.bar .pick-box .chevron{right:5px;width:16px;height:16px}.bar .pick-box .icon:first-child{display:none}
+.shell[data-page=librariesPage] .chat-only{display:none}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 .pages{display:grid;grid-template:minmax(0,1fr)/minmax(0,1fr);min-height:0;min-width:0}.pages>*{grid-area:1/1}
 /* Hidden pages keep their size, so an answer being written and the scroll position carry on. */
 .away{visibility:hidden}
-.main{display:grid;grid-template-rows:auto minmax(0,1fr) auto;min-height:0;min-width:0}
-.top{border-bottom:1px solid var(--line);padding:12px 24px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 20px}
+.main{display:grid;grid-template-rows:minmax(0,1fr) auto;min-height:0;min-width:0}
+.library-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:14px 20px;max-width:1270px;margin:0 auto;padding:20px 24px 0}
+.head-actions,.library-tools{display:flex;flex-wrap:wrap;align-items:center;gap:10px}.library-tools{width:100%;padding-top:14px;border-top:1px solid var(--line)}
+.head-actions .checked{margin-right:4px;text-align:right}
+.search-box{position:relative;flex:1 1 130px;max-width:400px}.search-box .icon{position:absolute;top:50%;left:12px;width:18px;height:18px;transform:translateY(-50%);color:var(--quiet);pointer-events:none}.library-tools .search-box input{padding-left:40px}
+.library-tools .pick-box{flex:1 1 180px;max-width:230px}.library-tools select{min-width:0;max-width:none;padding-left:14px}
+.views{display:flex;margin-left:auto;border:1px solid var(--control);border-radius:8px;background:var(--panel)}.views button{display:grid;place-items:center;width:42px;height:38px;border:0;border-radius:7px;background:none;color:var(--quiet)}.views button:hover{color:var(--ink)}.views button[aria-pressed=true]{background:var(--primary);color:#fff}
 .page{display:flex;align-items:center;gap:14px}.page>.icon{width:34px;height:34px;stroke-width:1.5;color:var(--accent)}
-.page h1{font-family:inherit;font-size:24px;font-weight:650;line-height:1.2;letter-spacing:0;margin:0}.page strong{font-weight:400;color:var(--quiet);font-size:14px}.page #title{color:var(--ink);overflow-wrap:anywhere}
-.stats{color:var(--quiet);font-size:13px;line-height:1.4}.stats::first-letter{text-transform:uppercase}
-.checked{margin:2px 0 0 49px;color:var(--quiet);font-size:12px;line-height:1.4}.checked span{display:block}.checked .when{color:var(--ink)}
-.picks{display:flex;flex-wrap:wrap;align-items:end;gap:10px}
+.page h1{font-family:inherit;font-size:24px;font-weight:650;line-height:1.2;letter-spacing:0;margin:0}.page strong{font-weight:400;color:var(--quiet);font-size:14px}
+.checked{color:var(--quiet);font-size:12px;line-height:1.4}.checked span{display:block}.checked .when{color:var(--ink)}
 .pick label{display:block;font-size:12px;color:var(--quiet);margin:0 0 3px 2px}
 .pick-box{position:relative}.pick-box .icon{position:absolute;top:50%;left:11px;width:18px;height:18px;transform:translateY(-50%);color:var(--accent);pointer-events:none}
 .pick-box .chevron{left:auto;right:10px;color:var(--quiet)}
 select{appearance:none;width:100%;min-width:130px;max-width:184px;padding:8px 34px 8px 38px;border:1px solid var(--control);border-radius:8px;background:var(--panel);color:var(--ink);text-align:left;text-overflow:ellipsis}
-#model,#mode{max-width:230px}select:hover:not(:disabled){background:var(--raised)}option{background:var(--panel);color:var(--ink)}
+.bar select{min-width:0;max-width:none;padding:7px 23px 7px 9px;font-size:14px}select:hover:not(:disabled){background:var(--raised)}option{background:var(--panel);color:var(--ink)}
 input:not([type=checkbox]){width:100%;min-width:0;padding:8px 12px;border:1px solid var(--control);border-radius:8px;background:var(--panel);color:var(--ink);caret-color:var(--accent)}input::placeholder{color:var(--quiet);opacity:1}input::-webkit-search-cancel-button{filter:invert(.8)}
-.model-state{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:8px 12px;font-size:13px;white-space:nowrap}
+.model-state{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:7px 9px;font-size:13px;white-space:nowrap}
 .dot{flex:none;display:inline-block;width:9px;height:9px;border-radius:50%;border:2px solid var(--warn)}.dot.on{border-color:var(--good);background:var(--good)}
 .scroll{overflow:auto;min-height:0}.thread{max-width:1080px;margin:0 auto;padding:22px 24px;min-height:100%}
 .welcome h2{font-size:22px;font-weight:650;line-height:1.25;margin:0 0 4px}.welcome p{color:var(--quiet);margin:0 0 16px}
@@ -86,7 +94,7 @@ input:not([type=checkbox]){width:100%;min-width:0;padding:8px 12px;border:1px so
 .sources-panel summary>.icon{width:24px;height:24px;stroke-width:1.75;color:var(--accent)}.sources-panel summary>.turns{width:20px;height:20px;color:var(--ink)}.source[open]>summary>.turns{transform:rotate(180deg)}
 .source-name{flex:1;min-width:0;line-height:1.35}.source-name span{color:var(--quiet);font-size:13px}
 .source-number{flex:none;min-width:30px;border-radius:5px;background:var(--active);color:#fff;font-size:13px;font-weight:600;text-align:center;padding:1px 6px}
-.source-pages{flex:none;color:var(--ink);font-size:14px}
+.source-pages{flex:none;min-width:165px;text-align:right;color:var(--ink);font-size:14px}
 .source-body{border-top:1px solid var(--line);padding:12px 16px 14px}
 .source-body .excerpt{max-width:800px;font-size:14px;line-height:1.6;color:#d3dfec}
 .preview{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:5;overflow:hidden}
@@ -98,6 +106,8 @@ input:not([type=checkbox]){width:100%;min-width:0;padding:8px 12px;border:1px so
 .composer textarea{resize:vertical;min-height:48px;max-height:180px;flex:1;min-width:0;border:1px solid var(--control);border-radius:10px;background:var(--raised);color:var(--ink);caret-color:var(--accent);padding:11px 14px}
 .composer textarea::placeholder{color:var(--quiet);opacity:1}
 .composer textarea:focus{border-color:var(--accent);outline:2px solid var(--accent);outline-offset:0}
+.composer .button{flex:none;height:48px;background:var(--raised)}
+.under{display:flex;flex-wrap:wrap;justify-content:space-between;gap:0 24px;max-width:1032px;margin:6px auto 0}.under .foot{margin:0}.scope-line{color:var(--quiet);font-size:12px;overflow-wrap:anywhere}.scope-line #title{color:var(--ink)}
 .send{display:grid;place-items:center;width:58px;height:48px;border:0;border-radius:10px}
 .foot{max-width:1032px;margin:6px auto 0;color:var(--quiet);font-size:12px;min-height:18px}.foot.error,.error{color:var(--bad)}
 .answer.formatted{white-space:normal}.answer.formatted>:last-child{margin-bottom:0}.answer p,.answer blockquote{white-space:pre-wrap;margin:0 0 .68em}
@@ -111,24 +121,31 @@ input:not([type=checkbox]){width:100%;min-width:0;padding:8px 12px;border:1px so
 .answer .katex{white-space:normal;font-size:1.1em}.answer .katex-display{margin:.5em 0;padding:.1em 0;overflow-x:auto;overflow-y:hidden}.answer .katex-display>.katex{white-space:nowrap}
 .answer .table-scroll{overflow-x:auto;margin:0 0 .7em}.answer table{border-collapse:collapse;font-size:.95em}.answer th,.answer td{border:1px solid var(--control);padding:5px 10px;text-align:left;vertical-align:top;overflow-wrap:normal}.answer th{background:#22324a;font-weight:600}
 #librariesPage .foot:empty{min-height:0;margin:0}#librariesPage .bottom:has(.foot:empty){padding:0}
-.library-list{max-width:1280px;margin:0 auto;padding:22px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr));gap:18px;align-items:start}
+.library-list{max-width:1270px;margin:0 auto;padding:18px 24px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(295px,100%),1fr));gap:18px}
 .library-list>p{grid-column:1/-1;margin:0;color:var(--quiet)}.library-list>p.error{color:var(--bad)}
-.library{border:1px solid var(--line);border-radius:12px;background:linear-gradient(180deg,var(--raised),var(--panel));padding:18px;display:grid;gap:14px}
-.library.current{border-color:var(--accent)}
-.library header{display:flex;align-items:center;gap:14px;min-width:0}.library-icon{display:grid;place-items:center;flex:none;width:48px;height:48px;border-radius:10px;background:var(--active);color:var(--accent)}.library-icon .icon{width:26px;height:26px}
-.library h2{font-size:19px;font-weight:650;line-height:1.25;margin:0;overflow-wrap:anywhere}.library header>div{min-width:0}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}.chip{border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--quiet);font-size:12px;line-height:1.4;padding:1px 10px;overflow-wrap:anywhere}.chip.on{border-color:var(--accent);color:var(--ink)}
-.library-counts{display:flex;flex-wrap:wrap;gap:6px 22px;color:var(--quiet);font-size:14px}.library-counts span{display:flex;align-items:center;gap:8px}.library-counts .icon{width:17px;height:17px;color:var(--accent)}
-.library ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.library{--tint:#8fb0d6;position:relative;display:flex;flex-direction:column;min-width:0;border:1px solid var(--line);border-radius:12px;background:linear-gradient(180deg,var(--raised),var(--panel));overflow:hidden}
+.library.current{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.banner{display:grid;place-items:center;flex:none;height:104px;background:linear-gradient(120deg,color-mix(in srgb,var(--tint) 38%,#0b1118),color-mix(in srgb,var(--tint) 12%,#0b1118));color:var(--tint)}.banner .icon{width:50px;height:50px;stroke-width:1.5}
+.library-body{display:flex;flex-direction:column;flex:1;gap:12px;min-width:0;padding:14px 18px 18px}
+.library h2{font-size:19px;font-weight:650;line-height:1.25;margin:0;overflow-wrap:anywhere}.description{margin:6px 0 0;color:var(--quiet);font-size:14px;line-height:1.45;overflow-wrap:anywhere}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.chip{display:flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--quiet);font-size:12px;line-height:1.4;padding:1px 10px;overflow-wrap:anywhere}.chip.on{border-color:var(--accent);color:var(--ink)}
+.library-counts{display:flex;flex-wrap:wrap;gap:6px 18px;color:var(--quiet);font-size:13px}.library-counts span{display:flex;align-items:center;gap:7px}.library-counts .icon{width:16px;height:16px;color:var(--accent)}
+.courses{border-top:1px solid var(--line);padding-top:10px;margin-top:auto}.courses summary{display:flex;align-items:center;gap:8px;border-radius:6px;color:var(--quiet);font-size:13px;cursor:pointer;list-style:none}.courses summary::-webkit-details-marker{display:none}.courses summary:hover{color:var(--ink)}.courses summary .icon{width:16px;height:16px}.courses[open] .turns{transform:rotate(180deg)}
+.library ul{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px}
 .course-row{display:flex;align-items:center;gap:12px;width:100%;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);text-align:left}.course-row:hover:not(:disabled){border-color:var(--accent)}
 .course-row>span{flex:1;min-width:0;overflow-wrap:anywhere}.course-row>span>span{display:block;color:var(--quiet);font-size:13px}.course-row>.icon{width:18px;height:18px;color:var(--accent)}
 .library-note{margin:0;color:var(--quiet);font-size:13px;overflow-wrap:anywhere}
-.open-library{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 16px;border:1px solid var(--primary);border-radius:8px}
-.library-actions{display:flex;gap:8px}.library-actions .button{flex:1;padding:6px 12px;font-size:14px}
+.open-library{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 16px;border:1px solid var(--primary);border-radius:8px}.open-library .icon{width:18px;height:18px}
+.menu-button{position:absolute;top:10px;right:10px;display:grid;place-items:center;width:38px;height:32px;border:1px solid var(--control);border-radius:8px;background:#0b1118e6;color:var(--ink)}.menu-button:hover:not(:disabled){border-color:var(--accent)}
+.menu{position:fixed;inset:auto;position-area:bottom span-left;position-try-fallbacks:flip-block;margin:4px 0;min-width:150px;padding:5px;border:1px solid var(--control);border-radius:10px;background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}
+.menu button{display:flex;align-items:center;gap:10px;width:100%;padding:8px 12px;border:0;border-radius:6px;background:none;color:var(--ink);text-align:left}.menu button:hover:not(:disabled){background:var(--raised)}.menu .icon{width:16px;height:16px;color:var(--accent)}
+.create-card{display:grid;place-content:center;justify-items:center;gap:4px;min-height:150px;padding:24px;border:1px dashed var(--control);border-radius:12px;background:#131c2880;color:var(--quiet);font-size:14px}.create-card strong{color:var(--ink);font-size:17px;font-weight:650}.create-card .icon{width:30px;height:30px;color:var(--accent)}.create-card:hover:not(:disabled){border-color:var(--accent);background:var(--panel)}
+.library-list.list{grid-template-columns:minmax(0,1fr);gap:10px}.list .library{flex-direction:row}.list .banner{width:72px;height:auto}.list .banner .icon{width:30px;height:30px}.list .library-body{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px 20px;padding:12px 62px 12px 16px}
+.list .library-body>*{grid-column:1/-1}.list .library-body>.about{grid-column:1}.list .open-library{grid-column:2;grid-row:1;align-self:start;padding:7px 14px}.list .courses{margin-top:0;padding-top:8px}.list .create-card{min-height:0;padding:14px}
 dialog{width:min(560px,calc(100vw - 32px));max-height:calc(100dvh - 32px);padding:0;border:1px solid var(--control);border-radius:12px;background:var(--panel);color:var(--ink);box-shadow:var(--shadow);scrollbar-width:thin}dialog::backdrop{background:#000a}
 dialog form{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;padding:20px 22px}dialog h2{font-size:20px;font-weight:650;line-height:1.25;margin:0;overflow-wrap:anywhere}
 dialog p{margin:0;color:var(--quiet);font-size:14px;overflow-wrap:anywhere}dialog p.error{color:var(--bad)}dialog p.comments-note{padding:9px 12px;border:1px solid var(--warn);border-radius:8px;color:var(--warn)}dialog p.comments-note:focus{outline:2px solid var(--warn)}dialog p:empty{display:none}
-dialog .pick label,dialog legend{font-size:13px;color:var(--quiet);margin:0 0 4px 2px;padding:0}dialog .pick select{max-width:none;padding-left:12px}#libraryCustom{margin-top:8px}
+dialog .pick label,dialog legend{font-size:13px;color:var(--quiet);margin:0 0 4px 2px;padding:0}dialog .pick select{max-width:none;padding-left:12px}dialog textarea{display:block;width:100%;min-height:62px;resize:vertical;padding:8px 12px;border:1px solid var(--control);border-radius:8px;background:var(--panel);color:var(--ink);caret-color:var(--accent)}dialog textarea::placeholder{color:var(--quiet);opacity:1}#libraryCustom{margin-top:8px}
 dialog fieldset{min-width:0;margin:0;padding:0;border:0}
 .checks{max-height:200px;min-height:60px;margin-top:8px;padding:4px;border:1px solid var(--line);border-radius:8px;background:var(--bg);overflow:auto;scrollbar-width:thin}.checks p{padding:8px 10px}
 .check{display:flex;align-items:center;gap:12px;padding:6px 10px;border-radius:6px;cursor:pointer}.check:hover{background:var(--raised)}.check input{flex:none;width:17px;height:17px;margin:0;accent-color:var(--accent)}.check span{min-width:0;overflow-wrap:anywhere}.check span span{display:block;color:var(--quiet);font-size:13px}
@@ -136,21 +153,29 @@ dialog fieldset{min-width:0;margin:0;padding:0;border:0}
 .choices{display:grid;gap:8px;margin-top:12px}.choice{display:flex;align-items:center;gap:12px;padding:9px 14px;border:1px solid var(--control);border-radius:8px;background:var(--raised);color:var(--ink);text-align:left;overflow-wrap:anywhere}
 .choice .icon{color:var(--accent)}.choice span span{display:block;color:var(--quiet);font-size:13px}.choice:hover:not(:disabled){border-color:var(--accent)}
 .reasoning .excerpt{max-height:340px;overflow:auto}.live{color:var(--quiet);font-style:italic}
-@media(max-width:1180px){.layout{grid-template-columns:220px minmax(0,1fr)}.brand{font-size:18px}.sub{font-size:11px}}
+@media(min-width:1500px){.bar .pick-box .icon:first-child{display:block}.bar select{padding-left:38px}.gpu{width:190px}}
+@media(max-width:1319px){
+  .layout{grid-template-columns:208px minmax(0,1fr)}.sub{display:none}
+  .hardware summary{display:flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid var(--line);border-radius:8px;background:var(--panel);font-size:13px;white-space:nowrap;cursor:pointer;list-style:none}.hardware summary::-webkit-details-marker{display:none}
+  .hardware summary:hover{border-color:var(--accent)}.hardware summary .icon{width:16px;height:16px}.hardware[open] .turns{transform:rotate(180deg)}
+  .gpu-panel{position:absolute;top:calc(100% - 4px);right:12px;width:min(300px,calc(100% - 24px));padding:12px 14px;border:1px solid var(--control);border-radius:10px;background:var(--panel);box-shadow:var(--shadow)}
+  #gpus{display:grid;gap:12px}.gpu,.gpu-state{width:auto;padding:0;border:0}.gpu-state{min-height:0}.gpu-note{display:block}
+}
+@media(max-width:1119px){.bar{flex-wrap:wrap}.field{flex:1 1 140px;max-width:none}.field.wide{flex:1 1 43%}.field.slim{flex:1 1 110px;max-width:none}.field label{min-width:46px}}
 @media(max-width:720px){
-  .layout{display:flex;flex-direction:column}.pages{flex:1}
+  .layout{display:flex;flex-direction:column}.shell{flex:1}
   .side{flex:none;flex-flow:row wrap;align-items:center;gap:6px 10px;padding:7px 12px;border-right:0;border-bottom:1px solid var(--line);overflow:visible}
-  .brand{font-size:16px;gap:8px}.mark{width:28px;height:28px}.sub,.section-label,.status-card .extra,.page>.icon,.page h1,.hardware{display:none}
-  nav{display:flex;gap:4px}.nav{width:auto;gap:6px;padding:5px 8px;font-size:13px}.nav .icon{width:16px;height:16px}.nav+.nav{margin-top:0}.tools,.quit{order:1}
-  .tools{display:flex;gap:4px}.tool,.quit button{width:auto;gap:6px;padding:5px 8px;font-size:13px}.tool+.tool{margin-top:0}.tool .icon{width:16px;height:16px}
-  .checked{margin:0 0 0 4px;align-self:center;font-size:11px;line-height:1.3;white-space:nowrap}
+  .brand{font-size:16px;gap:8px}.mark{width:28px;height:28px}.status-card .extra,.page>.icon,.page strong{display:none}.page h1{font-size:20px}
+  nav{display:flex;gap:4px}.nav{width:auto;gap:6px;padding:5px 8px;font-size:13px}.nav .icon{width:16px;height:16px}.nav+.nav{margin-top:0}
+  .quit{order:1}.quit button{width:auto;gap:6px;padding:5px 8px;font-size:13px}
   .status-card{margin:0 0 0 auto;padding:5px 9px;font-size:12px}
-  .top{padding:6px 12px}.pick label{margin-bottom:0}select{min-width:0;max-width:170px;padding:5px 28px 5px 34px}.model-state{padding:5px 8px}
-  .top{position:relative}.picks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));width:100%}.model-state{position:absolute;top:8px;right:12px}#model,#mode{max-width:none}.library-list{padding:14px 12px}
+  .bar{min-height:0;gap:6px 10px;padding:6px 12px}.field label{font-size:12px;min-width:42px}.model-state,.hardware summary{padding:4px 9px;font-size:12px}
+  .bar select{padding:4px 24px 4px 9px}.library-head{gap:8px 10px;padding:10px 12px 0}.library-tools{gap:8px;padding-top:8px}.head-actions{gap:8px}.head-actions .button{padding:5px 10px;font-size:13px}.head-actions .checked{font-size:11px}.library-list{padding:12px;gap:12px}.banner{height:76px}
+  .composer .button{width:48px;padding:0}.composer .button span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
   .thread{padding:14px 12px}.bottom{padding:4px 12px 6px}.composer{padding:8px}
   .turn{grid-template-columns:minmax(0,1fr)}.turn>*{grid-column:1}.avatar{display:none}.starters{grid-template-columns:1fr}
 }
-@media(forced-colors:active){.nav[aria-current=page],.composer textarea:focus{outline:2px solid Highlight}.dot.on{background:Highlight;forced-color-adjust:none}.answer ol>li::before,.source-number{border:1px solid}.gpu progress{appearance:auto}}
+@media(forced-colors:active){.nav[aria-current=page],.composer textarea:focus{outline:2px solid Highlight}.dot.on{background:Highlight;forced-color-adjust:none}.answer ol>li::before,.source-number{border:1px solid}.gpu progress{appearance:auto}.views button[aria-pressed=true]{outline:2px solid Highlight;outline-offset:-2px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 </style>
 </head>
@@ -172,41 +197,50 @@ dialog fieldset{min-width:0;margin:0;padding:0;border:0}
 <symbol id="i-mode" viewBox="0 0 24 24"><path d="M10 5H3"/><path d="M12 19H3"/><path d="M14 3v4"/><path d="M16 17v4"/><path d="M21 12h-9"/><path d="M21 19h-5"/><path d="M21 5h-7"/><path d="M8 10v4"/><path d="M8 12H3"/></symbol>
 <symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
 <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+<symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"/></symbol>
+<symbol id="i-flask" viewBox="0 0 24 24"><path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"/><path d="M6.453 15h11.094"/><path d="M8.5 2h7"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></symbol>
+<symbol id="i-briefcase" viewBox="0 0 24 24"><path d="M12 12h.01"/><path d="M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><path d="M22 13a18.15 18.15 0 0 1-20 0"/><rect width="20" height="14" x="2" y="6" rx="2"/></symbol>
+<symbol id="i-heart" viewBox="0 0 24 24"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/><path d="M3.22 13H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></symbol>
+<symbol id="i-book" viewBox="0 0 24 24"><path d="M12 5v16"/><path d="M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z"/></symbol>
+<symbol id="i-notebook" viewBox="0 0 24 24"><path d="M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4"/><path d="M2 6h4"/><path d="M2 10h4"/><path d="M2 14h4"/><path d="M2 18h4"/><path d="M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z"/></symbol>
+<symbol id="i-tag" viewBox="0 0 24 24"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></symbol>
+<symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></symbol>
+<symbol id="i-list" viewBox="0 0 24 24"><path d="M3 5h.01"/><path d="M3 12h.01"/><path d="M3 19h.01"/><path d="M8 5h13"/><path d="M8 12h13"/><path d="M8 19h13"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></symbol>
+<symbol id="i-pencil" viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
 </svg>
 <div class="layout">
-<aside class="side" aria-label="Navigation and workspace">
+<aside class="side" aria-label="Navigation and status">
   <div class="brand"><svg class="icon mark" aria-hidden="true"><use href="#i-brain"/></svg><div>Spectre Studio<div class="sub">Local AI Learning &amp; Reference</div></div></div>
   <nav aria-label="Pages"><button type="button" class="nav" id="navChat" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg>Chat</button><button type="button" class="nav" id="navLibraries"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg>Libraries</button></nav>
-  <div class="tools"><span class="section-label">Workspace</span>
-    <button type="button" class="tool primary" id="new"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>New chat</button>
-    <button type="button" class="tool" id="notes"><svg class="icon" aria-hidden="true"><use href="#i-folder"/></svg>Open notes folder</button>
-    <button type="button" class="tool" id="update"><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg>Update index</button>
-    <div class="checked"><span>Index last checked</span><span class="when" id="indexChecked">Loading…</span></div>
-  </div>
   <section class="status-card" aria-label="Local status">
-    <div id="status"><span id="dot" class="dot"></span><span id="statusText">Checking LM Studio…</span></div>
-    <div class="extra"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg><span id="indexText">Checking notes index…</span></div>
-    <div class="extra"><svg class="icon" aria-hidden="true"><use href="#i-model"/></svg>RAG · On this PC</div>
+    <div class="line head extra" id="appLine"><span class="dot" id="appDot"></span><span>Starting…</span></div>
+    <div class="line" id="lmLine"><svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg><span>Checking LM Studio…</span></div>
+    <div class="line extra" id="indexLine"><svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg><span>Checking notes index…</span></div>
+    <div class="extra gpu-lines" id="gpuLines"><div class="line"><svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg><span>Checking GPUs…</span></div></div>
   </section>
-  <details class="hardware" id="hardware" open>
-    <summary><span class="section-label">Hardware</span><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></summary>
-    <div id="gpus"><div class="gpu-state">Reading GPU memory…</div></div>
-    <p class="gpu-note">Adapter-wide usage, all apps</p>
-  </details>
   <div class="quit"><button type="button" id="quit"><svg class="icon" aria-hidden="true"><use href="#i-power"/></svg>Quit app</button></div>
 </aside>
+<div class="shell" id="shell" data-page="chatPage">
+<header class="bar">
+  <div class="field wide chat-only"><label for="library">Library</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg><select id="library" disabled><option>Checking index…</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
+  <div class="field wide chat-only"><label for="scope">Scope</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-course"/></svg><select id="scope" aria-label="Search scope" disabled><option>Checking index…</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
+  <div class="field"><label for="model">Model</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-model"/></svg><select id="model" disabled><option>Checking models…</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
+  <div class="model-state" id="modelState" hidden><span class="dot"></span><span id="modelStateText"></span></div>
+  <div class="field slim chat-only"><label for="mode">Mode</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-mode"/></svg><select id="mode"><option value="explain" title="Explain from my notes">Explain</option><option value="solve" title="Solve a problem">Solve</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
+  <details class="hardware" id="hardware" open>
+    <summary>GPU memory<svg class="icon turns" aria-hidden="true"><use href="#i-chevron"/></svg></summary>
+    <div class="gpu-panel"><div id="gpus"><div class="gpu-state">Reading GPU memory…</div></div><p class="gpu-note">Adapter-wide usage, all apps</p></div>
+  </details>
+</header>
 <main class="pages">
 <section class="main" id="chatPage" aria-label="Chat">
-  <header class="top">
-    <div class="page"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg><div><h1>Chat</h1><strong id="title">Checking index…</strong><div class="stats" id="courseStats">Counting files and passages…</div></div></div>
-    <div class="picks">
-      <div class="pick"><label for="library">Library</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg><select id="library" disabled><option>Checking index…</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
-      <div class="pick"><label for="scope">Search scope</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-course"/></svg><select id="scope" disabled><option>Checking index…</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
-      <div class="pick"><label for="model">Model</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-model"/></svg><select id="model" disabled><option>Checking models…</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
-      <div class="pick"><label for="mode">Mode</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-mode"/></svg><select id="mode"><option value="explain">Explain from my notes</option><option value="solve">Solve a problem</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
-      <div class="model-state" id="modelState" hidden><span class="dot"></span><span id="modelStateText"></span></div>
-    </div>
-  </header>
+  <h1 class="sr">Chat</h1>
   <div class="scroll" id="scroll"><div class="thread" id="thread">
     <section class="welcome" id="welcome">
       <h2>Ask your notes</h2>
@@ -215,23 +249,33 @@ dialog fieldset{min-width:0;margin:0;padding:0;border:0}
     </section>
   </div></div>
   <div class="bottom">
-    <form class="composer" id="form"><textarea id="question" rows="1" maxlength="1800" aria-label="Your question" placeholder="Ask a question about your notes…" required></textarea><button type="submit" class="send primary" id="send" aria-label="Ask" title="Ask" disabled><svg class="icon" aria-hidden="true"><use href="#i-send"/></svg></button></form>
-    <div class="foot" id="message" role="status">Enter to ask · Shift+Enter for a new line · Check original pages for exact OCR formulas.</div>
+    <form class="composer" id="form"><button type="button" class="button" id="new" title="New chat"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg><span>New chat</span></button><textarea id="question" rows="1" maxlength="1800" aria-label="Your question" placeholder="Ask a question about your notes…" required></textarea><button type="submit" class="send primary" id="send" aria-label="Ask" title="Ask" disabled><svg class="icon" aria-hidden="true"><use href="#i-send"/></svg></button></form>
+    <div class="under"><div class="foot" id="message" role="status">Enter to ask · Shift+Enter for a new line · Check original pages for exact OCR formulas.</div><div class="scope-line"><span id="title">Checking index…</span> · <span id="courseStats">Counting files and passages…</span></div></div>
   </div>
 </section>
 <section class="main away" id="librariesPage" aria-label="Libraries">
-  <header class="top"><div class="page"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg><div><h1>Libraries</h1><strong>Your courses, grouped in libraries.toml</strong></div></div>
-    <div class="picks">
-      <div class="pick"><label for="librarySearch">Search</label><input type="search" id="librarySearch" placeholder="Library or course" maxlength="100" autocomplete="off"></div>
-      <div class="pick"><label for="libraryFilter">Category</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-folder"/></svg><select id="libraryFilter"><option value="all">All categories</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
-      <div class="pick"><label for="librarySort">Sort by</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-mode"/></svg><select id="librarySort"><option value="name">Name</option><option value="files">Most files</option><option value="passages">Most passages</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
-      <button type="button" class="button primary manage" id="newLibrary" disabled><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>New library</button>
-    </div>
-  </header>
-  <div class="scroll"><div class="library-list" id="libraryList"><p>Reading your libraries…</p></div></div>
+  <div class="scroll">
+    <header class="library-head">
+      <div class="page"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg><div><h1>Libraries</h1><strong>Courses by subject. Counts show what’s indexed.</strong></div></div>
+      <div class="head-actions">
+        <div class="checked"><span>Index last checked</span><span class="when" id="indexChecked">Loading…</span></div>
+        <button type="button" class="button" id="notes"><svg class="icon" aria-hidden="true"><use href="#i-folder"/></svg>Open notes folder</button>
+        <button type="button" class="button" id="update"><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg>Update index</button>
+        <button type="button" class="button primary manage" id="newLibrary" disabled><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>New library</button>
+      </div>
+      <div class="library-tools">
+        <div class="search-box"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><input type="search" id="librarySearch" placeholder="Search libraries…" aria-label="Search libraries and courses" maxlength="100" autocomplete="off"></div>
+        <div class="pick-box"><select id="libraryFilter" aria-label="Category"><option value="all">All categories</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div>
+        <div class="pick-box"><select id="librarySort" aria-label="Sort by"><option value="name">Sort: Name (A–Z)</option><option value="files">Sort: Most files</option><option value="passages">Sort: Most passages</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div>
+        <div class="views" role="group" aria-label="View"><button type="button" id="viewGrid" aria-label="Grid" title="Grid" aria-pressed="true"><svg class="icon" aria-hidden="true"><use href="#i-grid"/></svg></button><button type="button" id="viewList" aria-label="List" title="List" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-list"/></svg></button></div>
+      </div>
+    </header>
+    <div class="library-list" id="libraryList"><p>Reading your libraries…</p></div>
+  </div>
   <div class="bottom"><div class="foot" id="libraryMessage" role="status"></div></div>
 </section>
 </main>
+</div>
 </div>
 <dialog id="libraryDialog" aria-labelledby="libraryFormTitle">
   <form id="libraryForm" autocomplete="off">
@@ -240,6 +284,7 @@ dialog fieldset{min-width:0;margin:0;padding:0;border:0}
     <div class="pick"><label for="libraryName">Name</label><input type="text" id="libraryName" maxlength="60"></div>
     <div class="pick"><label for="libraryCategory">Category</label><div class="pick-box"><select id="libraryCategory"></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div>
       <input type="text" id="libraryCustom" maxlength="40" placeholder="Your category" aria-label="Custom category" hidden></div>
+    <div class="pick"><label for="libraryDescription">Description (optional)</label><textarea id="libraryDescription" rows="2" maxlength="160"></textarea></div>
     <fieldset><legend>Indexed courses (optional)</legend><input type="search" id="courseFilter" maxlength="100" placeholder="Find a course" aria-label="Find a course"><div class="checks" id="courseChecks"></div></fieldset>
     <p id="libraryFormNote" role="status"></p>
     <p class="error" id="libraryFormError" role="alert"></p>
@@ -272,7 +317,13 @@ function notice(text,error=false){
   el.message.textContent=text;el.message.classList.toggle('error',error);
   $('libraryMessage').textContent=text===hint?'':text;$('libraryMessage').classList.toggle('error',error);
 }
-function online(on){$('dot').classList.toggle('on',on);$('statusText').textContent=on?'LM Studio connected':'LM Studio · connects when you ask'}
+// A line in the sidebar's status card. The check is only for something confirmed.
+function statusLine(line,ok,text){
+  line.classList.toggle('ok',ok);
+  line.querySelector('use')?.setAttribute('href',ok?'#i-check':'#i-minus');
+  line.lastElementChild.textContent=text;
+}
+function online(on){statusLine($('lmLine'),on,on?'LM Studio connected':'LM Studio · connects when you ask')}
 // The selected model's state as last confirmed by LM Studio. Unknown hides the pill.
 function showModelState(state){
   const text={loaded:'Model loaded',idle:'Model not loaded',pending:'Load not confirmed'}[state]||'';
@@ -288,6 +339,8 @@ function controls(){
   el.scope.disabled=el.library.disabled||!el.library.value;
   el.model.disabled=busy||stopped||!modelOptions.length;
   el.mode.disabled=busy||stopped;
+  // The whole choice, in case the dropdown is too narrow to show it.
+  for(const select of [el.library,el.scope,el.model,el.mode]){const chosen=select.selectedOptions[0];select.title=chosen?.title||chosen?.textContent||''}
   for(const id of ['new','notes','update','quit']) $(id).disabled=busy||stopped;
   for(const button of document.querySelectorAll('.choice,.open-scope,.in-dialog')) button.disabled=busy||stopped;
   for(const button of document.querySelectorAll('.manage')) button.disabled=busy||stopped||library!=='ready'||Boolean(libraryProblem);
@@ -381,6 +434,22 @@ function showStats(){
 // The Libraries page. Everything on it comes from the index or libraries.toml.
 let libraryProblem='';
 function categoryOf(group){return group.category||'Uncategorized'}
+// Each category's icon and color. The name is always shown too.
+const looks={
+  'Math & Statistics':['course','#5cb3ff'],
+  'Science':['flask','#45d6a8'],
+  'Computing & IT':['code','#9aa4ff'],
+  'Engineering & Trades':['wrench','#f5a65b'],
+  'Business & Finance':['briefcase','#e8c65a'],
+  'Health Sciences':['heart','#ff8fa3'],
+  'Humanities & Languages':['book','#cfa0ff'],
+  'Personal Reference':['notebook','#72d6ee']};
+function lookOf(group){
+  return group.id==='unsorted'?['folder','#a3b4c6']:!group.category?['layers','#8fb0d6']:
+    Object.hasOwn(looks,group.category)?looks[group.category]:['tag','#b9c7d8'];
+}
+// Which Courses lists are open. Unsorted's starts open, since it's opened one course at a time.
+const coursesOpen=new Map([['unsorted',true]]);
 // The libraries that fit the search and category filter, in order. Unsorted is always last.
 function shownLibraries(){
   const filter=$('libraryFilter'), was=filter.value, sort=$('librarySort').value, sorted=libraries.filter(group=>group.id!=='unsorted');
@@ -397,7 +466,7 @@ function shownLibraries(){
   const words=$('librarySearch').value.trim().toLowerCase();
   return [...sorted,...libraries.filter(group=>group.id==='unsorted'&&group.courses.length)].filter(group=>
     (filter.value==='all'||group.id!=='unsorted'&&filter.value==='is:'+categoryOf(group))&&
-    [group.name,group.id==='unsorted'?'':categoryOf(group),...group.courses,...group.missing].some(text=>text.toLowerCase().includes(words)));
+    [group.name,group.description,group.id==='unsorted'?'':categoryOf(group),...group.courses,...group.missing].some(text=>text.toLowerCase().includes(words)));
 }
 function showLibraries(problem=libraryProblem){
   libraryProblem=problem;
@@ -412,24 +481,31 @@ function showLibraries(problem=libraryProblem){
   if(!shown.length) list.append(make('p','',libraries.length>1||indexed.length?'No libraries match your search or filter.':'No libraries yet. Click New library to make one.'));
   for(const group of shown){
     const unsorted=group.id==='unsorted';
-    const here=el.library.value===group.id, card=make('article','library'+(here?' current':'')), head=make('header'), title=make('div'), chips=make('div','chips');
-    const badge=make('div','library-icon');
+    const here=el.library.value===group.id, card=make('article','library'+(here?' current':'')), banner=make('div','banner'), body=make('div','library-body'), about=make('div','about'), chips=make('div','chips');
+    const [look,tint]=lookOf(group);
     card.dataset.id=group.id;
-    badge.append(icon(unsorted?'folder':'layers'));
-    if(group.category) chips.append(make('span','chip',group.category));
+    card.style.setProperty('--tint',tint);
+    banner.append(icon(look));
+    about.append(make('h2','',group.name));
+    if(!unsorted) chips.append(make('span','chip',categoryOf(group)));
     if(here) chips.append(make('span','chip on','Selected in Chat'));
-    title.append(make('h2','',group.name));
-    if(chips.childElementCount) title.append(chips);
-    head.append(badge,title);
+    if(chips.childElementCount) about.append(chips);
+    if(group.description) about.append(make('p','description',group.description));
     const counts=make('div','library-counts');
-    for(const [name,text] of [['file',amount(group.files,'indexed file')],['layers',amount(group.passages,'passage')],['course',amount(group.courses.length,'course')]]){
+    for(const [name,text] of [['file',amount(group.files,'file')],['layers',amount(group.passages,'passage')],['course',amount(group.courses.length,'course')]]){
       const item=make('span');
       item.append(icon(name),text);
       counts.append(item);
     }
-    card.append(head,counts);
+    body.append(about,counts);
+    if(group.missing.length) body.append(make('p','library-note','Not indexed, so not searched: '+group.missing.join(', ')));
+    if(unsorted) body.append(make('p','library-note','Courses that aren’t in a library. Search them one at a time.'));
+    else if(!group.courses.length) body.append(make('p','library-note','Nothing to search yet. “Entire library” turns on once this has an indexed course.'));
     if(group.courses.length){
-      const rows=make('ul');
+      const courses=make('details','courses'), summary=make('summary','','Courses'), rows=make('ul');
+      summary.append(icon('chevron','turns'));
+      courses.open=coursesOpen.get(group.id)??false;
+      courses.addEventListener('toggle',()=>coursesOpen.set(group.id,courses.open));
       for(const course of group.courses){
         const row=make('li'), button=make('button','course-row'), text=make('span'), {files,passages}=courseCounts(course);
         text.append(course,make('span','',amount(files,'indexed file')+' · '+amount(passages,'passage')));
@@ -440,36 +516,53 @@ function showLibraries(problem=libraryProblem){
         row.append(button);
         rows.append(row);
       }
-      card.append(rows);
+      courses.append(summary,rows);
+      body.append(courses);
     }
-    if(group.missing.length) card.append(make('p','library-note','Not indexed, so not searched: '+group.missing.join(', ')));
-    if(unsorted) card.append(make('p','library-note','Courses that aren’t in a library. Search them one at a time.'));
-    else if(group.courses.length){
+    if(!unsorted&&group.courses.length){
       const button=make('button','open-library primary');
       button.append('Open in Chat',icon('chat'));
       button.setAttribute('aria-label','Open '+group.name+' in Chat');
       open(button,group.id,'library:'+group.id);
-      card.append(button);
+      body.append(button);
     }
-    if(!unsorted&&!group.courses.length) card.append(make('p','library-note','Nothing to search yet. “Entire library” turns on once this has an indexed course.'));
-    if(!unsorted){
-      const actions=make('div','library-actions');
-      for(const [text,action,cls] of [['Edit',editLibrary,'edit'],['Delete',askDelete,'delete']]){
-        const button=make('button','button manage '+cls,text);
-        button.type='button';
-        button.setAttribute('aria-label',text+' '+group.name);
-        button.onclick=()=>action(group);
-        actions.append(button);
-      }
-      card.append(actions);
-    }
+    if(!unsorted) body.append(...libraryMenu(group));
+    card.append(banner,body);
     list.append(card);
   }
+  const create=make('button','create-card manage');
+  create.type='button';
+  create.append(icon('plus'),make('strong','','Create New Library'),make('span','','Group courses for a subject, project or area of study.'));
+  create.onclick=()=>editLibrary();
+  list.append(create);
   controls();
+}
+// The "⋯" button on a library's card, and the menu it opens.
+function libraryMenu(group){
+  const button=make('button','menu-button manage'), menu=make('div','menu');
+  button.type='button';
+  button.title='Edit or delete';
+  button.setAttribute('aria-label','Edit or delete '+group.name);
+  button.append(icon('more'));
+  menu.popover='auto';
+  button.popoverTargetElement=menu;
+  for(const [text,name,action] of [['Edit','pencil',editLibrary],['Delete','trash',askDelete]]){
+    const item=make('button','manage');
+    item.type='button';
+    item.append(icon(name),text);
+    // Closing the menu first puts focus back on the "⋯" button, where the dialog returns it.
+    item.onclick=()=>{menu.hidePopover();action(group)};
+    menu.append(item);
+  }
+  return [button,menu];
+}
+function showView(view){
+  $('libraryList').classList.toggle('list',view==='list');
+  for(const [id,name] of [['viewGrid','grid'],['viewList','list']]) $(id).setAttribute('aria-pressed',String(name===view));
 }
 // The form that makes or changes a library. draft is what it's working on. Its revision says
 // which version of libraries.toml it started from, so saving can't undo a hand edit.
-const categories=['Math & Statistics','Science','Computing & IT','Engineering & Trades','Business & Finance','Health Sciences','Humanities & Languages','Personal Reference'];
+const categories=Object.keys(looks);
 let draft=null;
 for(const [value,text] of [['','Uncategorized'],...categories.map(name=>[name,name]),['custom','Custom category']]){
   const option=make('option','',text);
@@ -516,6 +609,7 @@ function editLibrary(group){
   draft={id:group?.id??'',revision,stale:false,picked:new Set(group?[...group.courses,...group.missing]:[])};
   $('libraryFormTitle').textContent=group?'Edit library':'New library';
   $('libraryName').value=group?.name??'';
+  $('libraryDescription').value=group?.description??'';
   $('libraryCategory').value=listed?category:'custom';
   $('libraryCustom').value=listed?'':category;
   $('courseFilter').value='';
@@ -541,7 +635,7 @@ $('libraryForm').addEventListener('submit',async e=>{
   busy=true;controls();formSays('Saving…');
   let card;
   try{
-    const out=await api('library-save',{id:draft.id,revision:draft.revision,name,category,courses:draftCourses().filter(course=>draft.picked.has(course))});
+    const out=await api('library-save',{id:draft.id,revision:draft.revision,name,category,description:$('libraryDescription').value,courses:draftCourses().filter(course=>draft.picked.has(course))});
     if(out.conflict){
       draft.stale=true;
       $('libraryReload').hidden=false;
@@ -552,7 +646,7 @@ $('libraryForm').addEventListener('submit',async e=>{
     card=showSaved(out,'Saved “'+name+'”.');
     if(!card) notice('Saved “'+name+'”. Your search or filter is hiding it.');
   }catch(error){formSays('',error.message)}
-  finally{busy=false;controls();if(!$('libraryDialog').open) (card?.querySelector('.edit')??$('newLibrary')).focus();else if(draft.stale) $('libraryReload').focus()}
+  finally{busy=false;controls();if(!$('libraryDialog').open) (card?.querySelector('.menu-button')??$('newLibrary')).focus();else if(draft.stale) $('libraryReload').focus()}
 });
 // Read the changed file but keep what's in the form. Saving again is the student's choice.
 $('libraryReload').onclick=async()=>{
@@ -566,7 +660,7 @@ $('libraryReload').onclick=async()=>{
     draft.stale=false;
     $('libraryReload').hidden=true;
     const now=libraries.find(group=>group.id===draft.id);
-    if(now) formSays('libraries.toml now has “'+now.name+'” · '+categoryOf(now)+' · '+([...now.courses,...now.missing].join(', ')||'no courses')+'. Save replaces that with what’s in this form.');
+    if(now) formSays('libraries.toml now has “'+now.name+'” · '+categoryOf(now)+' · '+(now.description||'no description')+' · '+([...now.courses,...now.missing].join(', ')||'no courses')+'. Save replaces that with what’s in this form.');
     else if(draft.id){
       draft.id='';
       $('libraryFormTitle').textContent='New library';
@@ -612,11 +706,14 @@ $('libraryCategory').addEventListener('change',()=>{showCustom();if(!$('libraryC
 $('courseFilter').addEventListener('input',showChecks);
 $('courseFilter').addEventListener('keydown',e=>{if(e.key==='Enter') e.preventDefault()});
 $('newLibrary').onclick=()=>editLibrary();
+$('viewGrid').onclick=()=>showView('grid');
+$('viewList').onclick=()=>showView('list');
 for(const dialog of document.querySelectorAll('dialog')){
   dialog.querySelector('.cancel').onclick=()=>dialog.close();
   dialog.addEventListener('cancel',e=>{if(busy) e.preventDefault()});
 }
 function showPage(name){
+  $('shell').dataset.page=name;
   for(const [page,nav] of [['chatPage','navChat'],['librariesPage','navLibraries']]){
     const on=page===name;
     $(page).classList.toggle('away',!on);
@@ -645,7 +742,7 @@ async function refreshLibrary(){
     library='unavailable';stats={};
     showStats();
     showLibraries();
-    $('indexText').textContent='Notes index · unavailable';
+    statusLine($('indexLine'),false,'Notes index · unavailable');
     if(!checkedShown) $('indexChecked').textContent='Unavailable';
   }
 }
@@ -672,13 +769,19 @@ function showCourses(out){
   showScope(chosen,scope);
   // The chat belongs to what it searched, so clear it if that changed.
   if(known&&before!==searched()) reset();
-  $('indexText').textContent='Notes index · '+(list.length?list.length+(list.length===1?' course':' courses'):'no courses yet');
+  statusLine($('indexLine'),list.length>0,'Notes index · '+(list.length?amount(list.length,'course'):'no courses yet'));
+  $('appDot').classList.add('on');
+  statusLine($('appLine'),true,'Running on this PC');
   showChecked(out);
   showLibraries(out.library_problem);
   controls();
 }
+function showPlaceholder(){
+  el.question.placeholder=history.length?'Ask a follow-up question…':el.mode.value==='solve'?'Type or paste a problem to solve…':'Ask a question about your notes…';
+}
 function reset(){
   history=[];
+  showPlaceholder();
   for(const turn of el.thread.querySelectorAll('.turn')) turn.remove();
   el.welcome.hidden=false;
   el.question.value='';
@@ -784,8 +887,8 @@ function addSources(turn,sources,timing,searched){
     name.append(make('strong','',file));
     if(folder) name.append(make('span','',folder));
     row.append(make('span','source-number','['+(i+1)+']'),icon('file'),name);
-    if(pages) row.append(make('span','source-pages',pages));
-    row.append(icon('chevron','turns'));
+    // Blank for a plain-text or Markdown source, which has no pages.
+    row.append(make('span','source-pages',pages),icon('chevron','turns'));
     // A long passage opens as a few lines. The button shows the rest of the same text.
     const body=make('div','source-body'), excerpt=make('div','excerpt preview',source.text), more=make('button','more','Show full passage');
     more.type='button';
@@ -1056,6 +1159,7 @@ async function ask(question,mode,files=[]){
     if(result.model) label.textContent='Spectre Studio · '+result.model;
     showAnswer(reply,result.answer,citations);
     history.push({question,files:result.searched.files});
+    showPlaceholder();
     if(result.model) showModelState('loaded');
     online(true);
     notice(hint);
@@ -1068,7 +1172,8 @@ async function ask(question,mode,files=[]){
 }
 el.question.addEventListener('input',controls);
 el.mode.addEventListener('change',()=>{
-  el.question.placeholder=el.mode.value==='solve'?'Type or paste a problem to solve…':'Ask a question about your notes…';
+  showPlaceholder();
+  controls();
   el.question.focus();
 });
 el.question.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();if(!el.send.disabled)el.form.requestSubmit(el.send)}});
@@ -1106,15 +1211,30 @@ el.model.addEventListener('change',async()=>{
   }finally{busy=false;controls()}
 });
 // GPU memory. A reading that failed or is over 10 seconds old says unavailable, never 0.
+function gpuName(gpu){return gpu.name.replace(/^(NVIDIA GeForce|AMD Radeon) /,'')}
+// The status card's GPUs, from the newest reading.
+function showDetected(out){
+  if(out.waiting) return;
+  const found=out.adapters??[], lines=found.length?found.map(gpu=>gpuName(gpu)+' detected'):[out.error?'GPU readings unavailable':'No GPU readings on this PC'];
+  $('gpuLines').replaceChildren(...lines.map(text=>{
+    const line=make('div','line');
+    line.append(icon('minus'),make('span'));
+    statusLine(line,found.length>0,text);
+    return line;
+  }));
+}
 function showGpus(out){
   if(out.waiting) return;
+  showDetected(out);
   const say=text=>$('gpus').replaceChildren(make('div','gpu-state',text));
   if(out.error) return say('GPU readings unavailable');
   if(!out.adapters.length) return say('No GPU readings on this PC');
   const known=n=>typeof n==='number'&&out.age<=10, gb=n=>(n/2**30).toFixed(1);
   $('gpus').replaceChildren(...out.adapters.map(gpu=>{
-    const row=make('div','gpu'), used=known(gpu.dedicated)&&known(gpu.total);
-    row.append(make('strong','',gpu.name));
+    const row=make('div','gpu'), head=make('div'), used=known(gpu.dedicated)&&known(gpu.total);
+    row.title=gpu.name+' · Adapter-wide usage, all apps';
+    head.append(make('strong','',gpuName(gpu)),make('span','','Shared '+(known(gpu.shared)?gb(gpu.shared)+' GB':'unavailable')));
+    row.append(head,make('span','used','VRAM '+(used?gb(gpu.dedicated)+' / '+gb(gpu.total)+' GB':'unavailable')));
     if(used){
       const bar=make('progress');
       bar.max=gpu.total;
@@ -1122,16 +1242,15 @@ function showGpus(out){
       bar.setAttribute('aria-label',gpu.name+' dedicated memory');
       row.append(bar);
     }
-    row.append(make('span','used','Dedicated '+(used?gb(gpu.dedicated)+' / '+gb(gpu.total)+' GB':'unavailable')));
-    row.append(make('span','','Shared '+(known(gpu.shared)?gb(gpu.shared)+' GB':'unavailable')));
     return row;
   }));
 }
 // Read only while the meters can be seen. The next request is set after the last one
 // ends, so a slow reading never causes overlapping requests.
-const narrow=matchMedia('(max-width:720px)');
+// In a narrower window the meters are in a panel, so they can be seen only while it's open.
+const compact=matchMedia('(max-width:1319px)');
 let gpuReady=false, gpuAsking=false, gpuTimer=0;
-function gpuWanted(){return gpuReady&&!stopped&&!document.hidden&&!narrow.matches&&$('hardware').open}
+function gpuWanted(){return gpuReady&&!stopped&&!document.hidden&&$('hardware').open}
 async function pollGpus(){
   clearTimeout(gpuTimer);
   if(stopped) return showGpus({error:true});
@@ -1143,8 +1262,14 @@ async function pollGpus(){
   if(gpuWanted()) gpuTimer=setTimeout(pollGpus,3000);
 }
 document.addEventListener('visibilitychange',pollGpus);
-narrow.addEventListener('change',pollGpus);
+function fitGpus(){$('hardware').open=!compact.matches}
+fitGpus();
+compact.addEventListener('change',fitGpus);
 $('hardware').addEventListener('toggle',pollGpus);
+$('hardware').addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&compact.matches){$('hardware').open=false;$('hardware').querySelector('summary').focus()}
+});
+document.addEventListener('pointerdown',e=>{if(compact.matches&&!$('hardware').contains(e.target)) $('hardware').open=false});
 $('navChat').onclick=()=>{showPage('chatPage');el.question.focus()};
 $('navLibraries').onclick=()=>showPage('librariesPage');
 $('librarySearch').addEventListener('input',()=>showLibraries());
@@ -1163,12 +1288,15 @@ $('update').onclick=async()=>{
   catch(error){updating=false;notice(error.message,true);await refreshLibrary()}finally{updating=false;clearInterval(poll);busy=false;controls()}
 };
 $('quit').onclick=async()=>{
-  try{await api('quit');stopped=true;controls();$('statusText').textContent='Spectre Studio closed';$('dot').classList.remove('on');notice('You can close this tab. Open Spectre Studio again to continue.')}
+  try{await api('quit');stopped=true;controls();statusLine($('lmLine'),false,'Spectre Studio closed');for(const id of ['appLine','indexLine','gpuLines']) $(id).hidden=true;notice('You can close this tab. Open Spectre Studio again to continue.')}
   catch(error){notice(error.message,true)}
 };
 busy=true;controls();
-api('status').then(out=>{online(out.online);showCourses(out);showModels(out.models,out.model);showModelState(statusState(out));if(!out.courses.length)notice('Add your notes to a course folder, then click Update index.');else if(problems(out).length)notice(problems(out).join(' · '),true)})
-.catch(error=>{notice(error.message,true);return refreshLibrary()}).finally(()=>{busy=false;controls();gpuReady=true;pollGpus()});
+api('status').then(out=>{online(out.online);showCourses(out);showModels(out.models,out.model);showModelState(statusState(out));if(!out.courses.length)notice('Add your notes to a course folder, then click Update index on the Libraries page.');else if(problems(out).length)notice(problems(out).join(' · '),true)})
+.catch(error=>{notice(error.message,true);return refreshLibrary()}).finally(()=>{busy=false;controls();gpuReady=true;pollGpus();
+  // With the meters out of sight, read once for the status card.
+  if(!gpuWanted()) api('gpu',{},AbortSignal.timeout(4000)).then(showDetected,()=>showDetected({error:true}));
+});
 </script>
 </body>
 </html>

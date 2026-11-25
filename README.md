@@ -13,8 +13,8 @@ I built it because hunting through a semester's worth of PDFs for one formula or
 - **Reads text inside images.** Many lecture PDFs have formulas embedded as pictures. Spectre Studio runs OCR on those images and tags the results with their PDF page, so they're searchable too.
 - **Organizes by course and library.** One folder per class, and libraries that group classes. Search one course or a whole library. If a file name in your question fits more than one file, Spectre Studio asks which one you mean.
 - **Two modes:**
-  - **Explain from my notes** (default): answers questions using only what's in your documents.
-  - **Solve a problem**: walks through a worked solution step by step, using the methods and formulas from your notes, then shows how to check the answer on a TI-84. The math comes from built-in calculation tools rather than the language model, so the numbers are reliable.
+  - **Explain** (default): answers questions using only what's in your documents.
+  - **Solve**: walks through a worked solution step by step, using the methods and formulas from your notes, then shows how to check the answer on a TI-84. The math comes from built-in calculation tools rather than the language model, so the numbers are reliable.
 - **Fast updates.** Spectre Studio fingerprints each file and only processes notes that are new or changed, so updating the index after adding one PDF takes seconds instead of minutes.
 - **Formatted math.** LaTeX formulas in answers are drawn with [KaTeX](https://katex.org) 0.19.1 (MIT license), which is included in `vendor/katex`, so nothing loads from the internet.
 - **Bundled icons.** The interface uses [Lucide](https://lucide.dev) 1.79.0 icons (ISC license, see `vendor/lucide`), built into the page.
@@ -77,11 +77,11 @@ With Qwen split across both GPUs, generation ran at about 42 tokens/s (about 35 
    ```
 4. In LM Studio, load a chat model and turn on the **Local Server** (port 1234).
 5. Double-click **Setup Spectre Studio.cmd** once. It creates a **Spectre Studio** shortcut on your desktop.
-6. Open Spectre Studio from the shortcut and click **Update index** to build the search database.
+6. Open Spectre Studio from the shortcut, go to the **Libraries** page and click **Update index** to build the search database.
 
 ## Libraries
 
-A library groups courses so you can search them together. On the **Libraries** page, click **New library**, give it a name and category, and tick the indexed courses that belong to it. You can edit or delete a library at any time, and search, sort and filter the list. A library can start empty, but it can't be searched until it has an indexed course.
+A library groups courses so you can search them together. On the **Libraries** page, click **New library**, give it a name, a category and an optional description, and tick the indexed courses that belong to it. The **⋯** button on a library's card edits or deletes it. You can search, sort and filter the list, and show it as a grid or a list. A library can start empty, but it can't be searched until it has an indexed course.
 
 Libraries are saved in `libraries.toml`, which you can also edit by hand. To start that way, copy `libraries.sample.toml` and name the copy `libraries.toml`. Each library is one `[[library]]` section:
 
@@ -89,11 +89,12 @@ Libraries are saved in `libraries.toml`, which you can also edit by hand. To sta
 [[library]]
 id = "automotive"
 name = "Automotive"
-category = "Trade"
+category = "Engineering & Trades"
+description = "Brakes, check engine codes and other shop notes."
 courses = ["AUTO-101"]
 ```
 
-The `id` is permanent (lowercase letters, digits and hyphens). Libraries made in the app get one automatically. The `name` can change at any time, and the `category` is optional. After a hand edit, reopen Spectre Studio or click **Update index** to see your changes.
+The `id` is permanent (lowercase letters, digits and hyphens). Libraries made in the app get one automatically. The `name` can change at any time. The `category` and `description` (one line, up to 160 characters) are optional. The app's own categories have their own icon and color, and any other category gets a tag. After a hand edit, reopen Spectre Studio or click **Update index** to see your changes.
 
 - Grouping never moves notes or re-indexes anything. Deleting a library only removes the grouping.
 - Saving in the app rewrites `libraries.toml` and removes any comments in it. The app asks before it does that. `libraries.toml.bak` holds only the version from just before the last save, so the next save replaces it. If the file changed since the page loaded it, or has a mistake in it, the app won't save over it.
