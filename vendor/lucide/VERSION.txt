@@ -11,4 +11,5 @@ icon files are loaded. The brain shape is also used for spectre-studio.ico.
 Included: brain, message-square-more, plus, folder-open, refresh-cw, power, send,
 file-text, chevron-down, box, layers, graduation-cap, sliders-horizontal, user, clock,
 check, minus, wrench, flask-conical, code-xml, briefcase-business, heart-pulse, book-open,
-notebook-pen, tag, ellipsis, layout-grid, list, search, pencil, trash-2.
+notebook-pen, tag, ellipsis, layout-grid, list, search, pencil, trash-2, house, monitor,
+cpu, chart-no-axes-column-increasing.

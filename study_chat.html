@@ -24,7 +24,7 @@ button:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-vis
 .mark{width:40px;height:40px;stroke-width:1.5;color:var(--accent)}
 .sub{font-size:11px;color:var(--quiet);font-weight:400;margin-top:2px;white-space:nowrap}
 .nav,.quit button{display:flex;align-items:center;gap:14px;width:100%;padding:10px 14px;border:1px solid transparent;border-radius:8px;background:none;color:var(--ink);text-align:left}
-.nav{font-size:16px}
+.nav{gap:11px;padding:10px;font-size:15px}
 .nav[aria-current=page]{background:linear-gradient(90deg,var(--active),#1f4a82);border-color:#3f78bd;border-left:3px solid var(--accent)}
 .nav[aria-current=page] .icon{color:var(--accent)}
 .nav+.nav{margin-top:6px}.nav:not([aria-current]):hover,.quit button:hover:not(:disabled){background:var(--raised)}
@@ -32,13 +32,15 @@ button:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-vis
 .button:hover:not(:disabled){background:var(--raised);border-color:var(--accent)}
 .primary{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:600}
 .primary:hover:not(:disabled){background:var(--primary-hover)}
-.status-card{margin-top:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:12px 14px;font-size:13px;line-height:1.4;color:var(--quiet);display:grid;gap:9px}
+.model-card,.hardware,.status-card{border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:12px 14px;font-size:13px;line-height:1.4;color:var(--quiet)}.model-card,.status-card{display:grid;gap:9px}
+.model-card{margin-top:auto}.model-card select{min-width:0;max-width:none;padding:6px 28px 6px 10px;font-size:14px}.model-card strong{color:var(--ink);font-weight:600;overflow-wrap:anywhere}
+.model-state{display:flex;align-items:center;gap:9px;color:var(--ink);white-space:nowrap}.model-state .dot{margin:0 3px 0 4px}
 .line{display:flex;align-items:center;gap:9px;overflow-wrap:anywhere}.line .icon{width:16px;height:16px;stroke-width:2.5}.line.ok{color:var(--ink)}.line.ok .icon{color:var(--good)}
-.line .dot{margin:0 3px 0 4px}.line.head.ok{color:var(--good);font-weight:600}.gpu-lines{display:grid;gap:9px}
+.line .dot{margin:0 3px 0 4px}.line.head.ok{color:var(--good);font-weight:600}
 .side{scrollbar-width:thin}
-.hardware{flex:none;margin-left:auto;color:var(--quiet);font-size:12px;line-height:1.35}.hardware summary{display:none}
-#gpus{display:flex;gap:12px}.gpu,.gpu-state{padding-left:12px;border-left:1px solid var(--line)}.gpu{width:158px}.gpu-state{display:flex;align-items:center;min-height:46px}
-.gpu strong,.gpu .used{color:var(--ink);font-weight:400}.gpu strong{font-size:13px;font-weight:600}.gpu>div{display:flex;justify-content:space-between;gap:6px;white-space:nowrap}.gpu>div span{font-size:11px}
+.hardware summary{display:none}
+#gpus{display:grid;gap:9px}
+.gpu strong,.gpu .used{color:var(--ink)}.gpu strong{font-weight:600}.gpu>div{display:flex;flex-wrap:wrap;justify-content:space-between;gap:0 6px}.gpu .used{font-size:12px;white-space:nowrap}
 .gpu progress{appearance:none;display:block;width:100%;height:7px;margin:4px 0 0;border:0;border-radius:4px;overflow:hidden;background:var(--line)}
 .gpu progress::-webkit-progress-bar{background:var(--line)}.gpu progress::-webkit-progress-value{border-radius:4px;background:var(--accent)}
 .gpu-note{display:none;margin:10px 0 0;font-size:12px}
@@ -48,9 +50,9 @@ button:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-vis
 .field{display:flex;align-items:center;gap:5px;flex:1 1 0;min-width:0;max-width:300px}.field.wide{flex-grow:1.1}.field.slim{flex-grow:.9;max-width:190px}
 .field label{flex:none;color:var(--quiet);font-size:13px}.field .pick-box{flex:1;min-width:0}
 .bar .pick-box .chevron{right:5px;width:16px;height:16px}.bar .pick-box .icon:first-child{display:none}
-.shell[data-page=librariesPage] .chat-only{display:none}
+.shell:not([data-page=chatPage]) .bar{display:none}
 .sr{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
-.pages{display:grid;grid-template:minmax(0,1fr)/minmax(0,1fr);min-height:0;min-width:0}.pages>*{grid-area:1/1}
+.pages{grid-row:2;display:grid;grid-template:minmax(0,1fr)/minmax(0,1fr);min-height:0;min-width:0}.pages>*{grid-area:1/1}
 /* Hidden pages keep their size, so an answer being written and the scroll position carry on. */
 .away{visibility:hidden}
 .main{display:grid;grid-template-rows:minmax(0,1fr) auto;min-height:0;min-width:0}
@@ -69,7 +71,6 @@ button:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-vis
 select{appearance:none;width:100%;min-width:130px;max-width:184px;padding:8px 34px 8px 38px;border:1px solid var(--control);border-radius:8px;background:var(--panel);color:var(--ink);text-align:left;text-overflow:ellipsis}
 .bar select{min-width:0;max-width:none;padding:7px 23px 7px 9px;font-size:14px}select:hover:not(:disabled){background:var(--raised)}option{background:var(--panel);color:var(--ink)}
 input:not([type=checkbox]){width:100%;min-width:0;padding:8px 12px;border:1px solid var(--control);border-radius:8px;background:var(--panel);color:var(--ink);caret-color:var(--accent)}input::placeholder{color:var(--quiet);opacity:1}input::-webkit-search-cancel-button{filter:invert(.8)}
-.model-state{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:7px 9px;font-size:13px;white-space:nowrap}
 .dot{flex:none;display:inline-block;width:9px;height:9px;border-radius:50%;border:2px solid var(--warn)}.dot.on{border-color:var(--good);background:var(--good)}
 .scroll{overflow:auto;min-height:0}.thread{max-width:1080px;margin:0 auto;padding:22px 24px;min-height:100%}
 .welcome h2{font-size:22px;font-weight:650;line-height:1.25;margin:0 0 4px}.welcome p{color:var(--quiet);margin:0 0 16px}
@@ -153,23 +154,21 @@ dialog fieldset{min-width:0;margin:0;padding:0;border:0}
 .choices{display:grid;gap:8px;margin-top:12px}.choice{display:flex;align-items:center;gap:12px;padding:9px 14px;border:1px solid var(--control);border-radius:8px;background:var(--raised);color:var(--ink);text-align:left;overflow-wrap:anywhere}
 .choice .icon{color:var(--accent)}.choice span span{display:block;color:var(--quiet);font-size:13px}.choice:hover:not(:disabled){border-color:var(--accent)}
 .reasoning .excerpt{max-height:340px;overflow:auto}.live{color:var(--quiet);font-style:italic}
-@media(min-width:1500px){.bar .pick-box .icon:first-child{display:block}.bar select{padding-left:38px}.gpu{width:190px}}
-@media(max-width:1319px){
-  .layout{grid-template-columns:208px minmax(0,1fr)}.sub{display:none}
-  .hardware summary{display:flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid var(--line);border-radius:8px;background:var(--panel);font-size:13px;white-space:nowrap;cursor:pointer;list-style:none}.hardware summary::-webkit-details-marker{display:none}
-  .hardware summary:hover{border-color:var(--accent)}.hardware summary .icon{width:16px;height:16px}.hardware[open] .turns{transform:rotate(180deg)}
-  .gpu-panel{position:absolute;top:calc(100% - 4px);right:12px;width:min(300px,calc(100% - 24px));padding:12px 14px;border:1px solid var(--control);border-radius:10px;background:var(--panel);box-shadow:var(--shadow)}
-  #gpus{display:grid;gap:12px}.gpu,.gpu-state{width:auto;padding:0;border:0}.gpu-state{min-height:0}.gpu-note{display:block}
-}
-@media(max-width:1119px){.bar{flex-wrap:wrap}.field{flex:1 1 140px;max-width:none}.field.wide{flex:1 1 43%}.field.slim{flex:1 1 110px;max-width:none}.field label{min-width:46px}}
+@media(min-width:1500px){.bar .pick-box .icon:first-child{display:block}.bar select{padding-left:38px}}
 @media(max-width:720px){
   .layout{display:flex;flex-direction:column}.shell{flex:1}
-  .side{flex:none;flex-flow:row wrap;align-items:center;gap:6px 10px;padding:7px 12px;border-right:0;border-bottom:1px solid var(--line);overflow:visible}
-  .brand{font-size:16px;gap:8px}.mark{width:28px;height:28px}.status-card .extra,.page>.icon,.page strong{display:none}.page h1{font-size:20px}
-  nav{display:flex;gap:4px}.nav{width:auto;gap:6px;padding:5px 8px;font-size:13px}.nav .icon{width:16px;height:16px}.nav+.nav{margin-top:0}
-  .quit{order:1}.quit button{width:auto;gap:6px;padding:5px 8px;font-size:13px}
-  .status-card{margin:0 0 0 auto;padding:5px 9px;font-size:12px}
-  .bar{min-height:0;gap:6px 10px;padding:6px 12px}.field label{font-size:12px;min-width:42px}.model-state,.hardware summary{padding:4px 9px;font-size:12px}
+  .side{position:relative;z-index:3;flex:none;flex-flow:row wrap;align-items:center;gap:3px 8px;padding:7px 12px;border-right:0;border-bottom:1px solid var(--line);overflow:visible}
+  /* Quit ends the first row. The model, LM Studio and GPU memory are on the second. */
+  .side::after{content:"";order:1;flex-basis:100%}
+  .brand{font-size:15px;gap:8px}.sub,.nav .icon,.model-card .line .icon{display:none}.mark{width:28px;height:28px}.status-card .extra,.page>.icon,.page strong{display:none}.page h1{font-size:20px}
+  nav{display:flex;gap:4px}.nav{width:auto;padding:5px 7px;font-size:13px}.nav+.nav{margin-top:0}
+  .quit{order:1;margin-left:auto}.quit button{width:auto;gap:6px;padding:5px 8px;font-size:13px}
+  .model-card,.status-card,.hardware{order:2;font-size:12px}.model-card{display:flex;flex:1 1 220px;align-items:center;gap:8px;min-width:0;margin:0;padding:0;border:0;background:none}.model-card .pick-box,.model-card strong{flex:1;min-width:0}.model-card select{padding:4px 26px 4px 9px;font-size:13px}
+  .model-state,.status-card{padding:4px 9px;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+  .hardware{order:3;position:relative;padding:0;border:0;background:none}.hardware summary{display:flex;align-items:center;gap:8px;padding:4px 9px;border:1px solid var(--line);border-radius:8px;background:var(--panel);white-space:nowrap;cursor:pointer;list-style:none}.hardware summary::-webkit-details-marker{display:none}
+  .hardware summary:hover{border-color:var(--accent)}.hardware summary .icon{width:16px;height:16px}.hardware[open] .turns{transform:rotate(180deg)}
+  .gpu-panel{position:absolute;top:calc(100% + 4px);right:0;width:280px;padding:12px 14px;border:1px solid var(--control);border-radius:10px;background:var(--panel);box-shadow:var(--shadow)}#gpus{gap:12px}.gpu-note{display:block}
+  .bar{min-height:0;gap:6px 10px;padding:6px 12px}.field label{font-size:12px}
   .bar select{padding:4px 24px 4px 9px}.library-head{gap:8px 10px;padding:10px 12px 0}.library-tools{gap:8px;padding-top:8px}.head-actions{gap:8px}.head-actions .button{padding:5px 10px;font-size:13px}.head-actions .checked{font-size:11px}.library-list{padding:12px;gap:12px}.banner{height:76px}
   .composer .button{width:48px;padding:0}.composer .button span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
   .thread{padding:14px 12px}.bottom{padding:4px 12px 6px}.composer{padding:8px}
@@ -213,16 +212,29 @@ dialog fieldset{min-width:0;margin:0;padding:0;border:0}
 <symbol id="i-search" viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></symbol>
 <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/></symbol>
 <symbol id="i-trash" viewBox="0 0 24 24"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+<symbol id="i-house" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+<symbol id="i-monitor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></symbol>
+<symbol id="i-cpu" viewBox="0 0 24 24"><path d="M12 20v2"/><path d="M12 2v2"/><path d="M17 20v2"/><path d="M17 2v2"/><path d="M2 12h2"/><path d="M2 17h2"/><path d="M2 7h2"/><path d="M20 12h2"/><path d="M20 17h2"/><path d="M20 7h2"/><path d="M7 20v2"/><path d="M7 2v2"/><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="8" y="8" width="8" height="8" rx="1"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><path d="M5 21v-6"/><path d="M12 21V9"/><path d="M19 21V3"/></symbol>
 </svg>
 <div class="layout">
 <aside class="side" aria-label="Navigation and status">
   <div class="brand"><svg class="icon mark" aria-hidden="true"><use href="#i-brain"/></svg><div>Spectre Studio<div class="sub">Local AI Learning &amp; Reference</div></div></div>
-  <nav aria-label="Pages"><button type="button" class="nav" id="navChat" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg>Chat</button><button type="button" class="nav" id="navLibraries"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg>Libraries</button></nav>
+  <nav aria-label="Pages"><button type="button" class="nav" id="navLibraries"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg>Knowledge Libraries</button><button type="button" class="nav" id="navChat" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg>Chat</button></nav>
+  <section class="model-card" aria-label="Model">
+    <div class="line"><svg class="icon" aria-hidden="true"><use href="#i-model"/></svg><label for="model">Model</label></div>
+    <div class="pick-box" id="modelPick"><select id="model" disabled><option>Checking models…</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div>
+    <strong id="modelName" hidden></strong>
+    <div class="model-state" id="modelState" hidden><span class="dot"></span><span id="modelStateText"></span></div>
+  </section>
+  <details class="hardware" id="hardware" open>
+    <summary>GPU memory<svg class="icon turns" aria-hidden="true"><use href="#i-chevron"/></svg></summary>
+    <div class="gpu-panel"><div id="gpus"><div class="gpu-state">Reading GPU memory…</div></div><p class="gpu-note">Adapter-wide usage, all apps</p></div>
+  </details>
   <section class="status-card" aria-label="Local status">
     <div class="line head extra" id="appLine"><span class="dot" id="appDot"></span><span>Starting…</span></div>
     <div class="line" id="lmLine"><svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg><span>Checking LM Studio…</span></div>
     <div class="line extra" id="indexLine"><svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg><span>Checking notes index…</span></div>
-    <div class="extra gpu-lines" id="gpuLines"><div class="line"><svg class="icon" aria-hidden="true"><use href="#i-minus"/></svg><span>Checking GPUs…</span></div></div>
   </section>
   <div class="quit"><button type="button" id="quit"><svg class="icon" aria-hidden="true"><use href="#i-power"/></svg>Quit app</button></div>
 </aside>
@@ -230,13 +242,7 @@ dialog fieldset{min-width:0;margin:0;padding:0;border:0}
 <header class="bar">
   <div class="field wide chat-only"><label for="library">Library</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg><select id="library" disabled><option>Checking index…</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
   <div class="field wide chat-only"><label for="scope">Scope</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-course"/></svg><select id="scope" aria-label="Search scope" disabled><option>Checking index…</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
-  <div class="field"><label for="model">Model</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-model"/></svg><select id="model" disabled><option>Checking models…</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
-  <div class="model-state" id="modelState" hidden><span class="dot"></span><span id="modelStateText"></span></div>
   <div class="field slim chat-only"><label for="mode">Mode</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-mode"/></svg><select id="mode"><option value="explain" title="Explain from my notes">Explain</option><option value="solve" title="Solve a problem">Solve</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
-  <details class="hardware" id="hardware" open>
-    <summary>GPU memory<svg class="icon turns" aria-hidden="true"><use href="#i-chevron"/></svg></summary>
-    <div class="gpu-panel"><div id="gpus"><div class="gpu-state">Reading GPU memory…</div></div><p class="gpu-note">Adapter-wide usage, all apps</p></div>
-  </details>
 </header>
 <main class="pages">
 <section class="main" id="chatPage" aria-label="Chat">
@@ -363,6 +369,11 @@ function showModels(models,active){
     el.model.append(option);
     el.model.value='';
   }else el.model.value=active;
+  // With only one model there's nothing to pick, so show its name.
+  const only=models.length===1&&models[0].id===active;
+  $('modelPick').hidden=only;
+  $('modelName').hidden=!only;
+  $('modelName').textContent=only?models[0].name:'';
   controls();
 }
 // The scope's ID, "library:" or "course:" and a name, is all the server gets. It builds the search.
@@ -1212,29 +1223,17 @@ el.model.addEventListener('change',async()=>{
 });
 // GPU memory. A reading that failed or is over 10 seconds old says unavailable, never 0.
 function gpuName(gpu){return gpu.name.replace(/^(NVIDIA GeForce|AMD Radeon) /,'')}
-// The status card's GPUs, from the newest reading.
-function showDetected(out){
-  if(out.waiting) return;
-  const found=out.adapters??[], lines=found.length?found.map(gpu=>gpuName(gpu)+' detected'):[out.error?'GPU readings unavailable':'No GPU readings on this PC'];
-  $('gpuLines').replaceChildren(...lines.map(text=>{
-    const line=make('div','line');
-    line.append(icon('minus'),make('span'));
-    statusLine(line,found.length>0,text);
-    return line;
-  }));
-}
 function showGpus(out){
   if(out.waiting) return;
-  showDetected(out);
   const say=text=>$('gpus').replaceChildren(make('div','gpu-state',text));
   if(out.error) return say('GPU readings unavailable');
   if(!out.adapters.length) return say('No GPU readings on this PC');
   const known=n=>typeof n==='number'&&out.age<=10, gb=n=>(n/2**30).toFixed(1);
   $('gpus').replaceChildren(...out.adapters.map(gpu=>{
     const row=make('div','gpu'), head=make('div'), used=known(gpu.dedicated)&&known(gpu.total);
-    row.title=gpu.name+' · Adapter-wide usage, all apps';
-    head.append(make('strong','',gpuName(gpu)),make('span','','Shared '+(known(gpu.shared)?gb(gpu.shared)+' GB':'unavailable')));
-    row.append(head,make('span','used','VRAM '+(used?gb(gpu.dedicated)+' / '+gb(gpu.total)+' GB':'unavailable')));
+    row.title=gpu.name+' · VRAM, adapter-wide, all apps · Shared memory '+(known(gpu.shared)?gb(gpu.shared)+' GB':'unavailable');
+    head.append(make('strong','',gpuName(gpu)),make('span','used',used?gb(gpu.dedicated)+' / '+gb(gpu.total)+' GB':'unavailable'));
+    row.append(head);
     if(used){
       const bar=make('progress');
       bar.max=gpu.total;
@@ -1247,8 +1246,8 @@ function showGpus(out){
 }
 // Read only while the meters can be seen. The next request is set after the last one
 // ends, so a slow reading never causes overlapping requests.
-// In a narrower window the meters are in a panel, so they can be seen only while it's open.
-const compact=matchMedia('(max-width:1319px)');
+// In a narrow window the meters are in a panel, so they can be seen only while it's open.
+const compact=matchMedia('(max-width:720px)');
 let gpuReady=false, gpuAsking=false, gpuTimer=0;
 function gpuWanted(){return gpuReady&&!stopped&&!document.hidden&&$('hardware').open}
 async function pollGpus(){
@@ -1288,15 +1287,12 @@ $('update').onclick=async()=>{
   catch(error){updating=false;notice(error.message,true);await refreshLibrary()}finally{updating=false;clearInterval(poll);busy=false;controls()}
 };
 $('quit').onclick=async()=>{
-  try{await api('quit');stopped=true;controls();statusLine($('lmLine'),false,'Spectre Studio closed');for(const id of ['appLine','indexLine','gpuLines']) $(id).hidden=true;notice('You can close this tab. Open Spectre Studio again to continue.')}
+  try{await api('quit');stopped=true;controls();statusLine($('lmLine'),false,'Spectre Studio closed');for(const id of ['appLine','indexLine']) $(id).hidden=true;notice('You can close this tab. Open Spectre Studio again to continue.')}
   catch(error){notice(error.message,true)}
 };
 busy=true;controls();
 api('status').then(out=>{online(out.online);showCourses(out);showModels(out.models,out.model);showModelState(statusState(out));if(!out.courses.length)notice('Add your notes to a course folder, then click Update index on the Libraries page.');else if(problems(out).length)notice(problems(out).join(' · '),true)})
-.catch(error=>{notice(error.message,true);return refreshLibrary()}).finally(()=>{busy=false;controls();gpuReady=true;pollGpus();
-  // With the meters out of sight, read once for the status card.
-  if(!gpuWanted()) api('gpu',{},AbortSignal.timeout(4000)).then(showDetected,()=>showDetected({error:true}));
-});
+.catch(error=>{notice(error.message,true);return refreshLibrary()}).finally(()=>{busy=false;controls();gpuReady=true;pollGpus()});
 </script>
 </body>
 </html>
