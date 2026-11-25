@@ -126,7 +126,7 @@ input:not([type=checkbox]){width:100%;min-width:0;padding:8px 12px;border:1px so
 .library.current{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .library .card-art{position:absolute;top:0;right:0;width:42%;height:calc(100% - 72px);max-height:190px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;color:var(--tint);opacity:.6;pointer-events:none;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--tint) 16%,transparent));mask-image:linear-gradient(90deg,transparent,#000 28%),linear-gradient(#000 70%,transparent);mask-composite:intersect}
 .card-head{display:flex;align-items:flex-start;gap:15px;max-width:60%}.icon-tile{display:grid;place-items:center;flex:none;width:54px;height:54px;border-radius:10px;background:linear-gradient(160deg,color-mix(in srgb,var(--tint) 34%,#0b1118),color-mix(in srgb,var(--tint) 14%,#0b1118));color:var(--tint)}.icon-tile .icon{width:30px;height:30px}
-.about{min-width:0}.library h2{font-size:21px;font-weight:650;line-height:1.25;margin:0;overflow-wrap:anywhere}.about p{margin:3px 0 0;color:var(--quiet);font-size:13px;line-height:1.4;overflow-wrap:anywhere}.about b{color:var(--accent);font-weight:600}
+.about{min-width:0}.library h2{font-size:21px;font-weight:650;line-height:1.25;margin:0;overflow-wrap:anywhere}.about p{margin:3px 0 0;color:var(--quiet);font-size:13px;line-height:1.4;overflow-wrap:anywhere}.here-badge{display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:1px 10px 1px 7px;border:1px solid var(--accent);border-radius:999px;background:var(--panel);color:var(--ink);font-size:12px;line-height:1.5;white-space:nowrap}.here-badge .icon{width:13px;height:13px;stroke-width:3;color:var(--accent)}
 .course-chips{display:flex;flex-wrap:wrap;gap:7px;max-width:62%;margin:0;padding:0;list-style:none}.course-chips li{max-width:100%}.course-chip{max-width:100%;padding:3px 12px;border:1px solid var(--control);border-radius:999px;background:#22324af2;color:var(--ink);font-size:12.5px;line-height:1.4;text-align:left;overflow-wrap:anywhere}.course-chip:hover:not(:disabled),.course-chip[aria-current]{border-color:var(--accent)}.course-chip.extra{border-color:var(--line);color:var(--accent)}
 .library-counts{display:flex;flex-wrap:wrap;gap:6px 26px;max-width:62%;font-size:13px}.library-counts span{display:flex;align-items:center;gap:7px}.library-counts .icon{width:16px;height:16px;color:var(--accent)}
 .card-actions{display:flex;align-items:center;gap:12px;margin-top:auto}.card-actions .library-note{flex:1}
@@ -641,7 +641,6 @@ function showLibraries(problem=libraryProblem){
   if(library==='unavailable'||!libraries.length) return list.append(make('p',library==='loading'?'':'error',library==='loading'?'Reading your libraries…':'Libraries unavailable. The notes index couldn’t be read.'));
   if(problem) list.append(make('p','error',problem));
   if(!indexed.length) list.append(make('p','','No indexed courses yet. Add your notes to a course folder, then click Update index.'));
-  const scope=el.scope.value;
   const open=(button,id,target)=>{button.type='button';button.classList.add('open-scope');button.onclick=()=>openScope(id,target)};
   const shown=shownLibraries();
   if(!shown.length) list.append(make('p','',libraries.length>1||indexed.length?'No libraries match your search or filter.':'No libraries yet. Click Create library to make one.'));
@@ -653,8 +652,12 @@ function showLibraries(problem=libraryProblem){
     card.style.setProperty('--tint',tint);
     tile.append(icon(look));
     line.append(unsorted?'Not in a library':[categoryOf(group),group.description].filter(Boolean).join(' · '));
-    if(here) line.append(' · ',make('b','','Selected in Chat'));
     about.append(make('h2','',group.name),line);
+    if(here){
+      const badge=make('span','here-badge');
+      badge.append(icon('check'),'Selected in Chat');
+      about.append(badge);
+    }
     head.append(tile,about);
     card.append(cardArt(art),head);
     if(group.courses.length) card.append(courseChips(group,open));

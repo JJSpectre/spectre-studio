@@ -1,10 +1,10 @@
 # Example for libraries.toml, which groups courses into libraries.
-# The Libraries page in Spectre Studio can make this file for you. To make it by hand:
+# The Knowledge Libraries page in Spectre Studio can make this file for you. To make it by hand:
 # Copy this file, name the copy libraries.toml, and list your own courses.
 # libraries.toml stays out of Git, because it shows your course names.
 #
 # After a hand edit, reopen Spectre Studio or click Update index to see your changes.
-# Saving on the Libraries page rewrites the file, so comments in it are lost.
+# Saving on the Knowledge Libraries page rewrites the file, so comments in it are lost.
 # Removing a library here only removes the grouping. Your notes and index stay.
 
 [[library]]

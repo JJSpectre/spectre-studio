@@ -18,7 +18,9 @@ I built it because hunting through a semester's worth of PDFs for one formula or
 - **Fast updates.** Spectre Studio fingerprints each file and only processes notes that are new or changed, so updating the index after adding one PDF takes seconds instead of minutes.
 - **Formatted math.** LaTeX formulas in answers are drawn with [KaTeX](https://katex.org) 0.19.1 (MIT license), which is included in `vendor/katex`, so nothing loads from the internet.
 - **Bundled icons.** The interface uses [Lucide](https://lucide.dev) 1.79.0 icons (ISC license, see `vendor/lucide`), built into the page.
-- **Model picker.** Choose which local model writes the answers. Qwen 27B (`qwen/qwen3.8-27b`) is the default.
+- **Dashboard.** The app opens on a dashboard where you pick a library and go straight to asking or solving. It shows whether LM Studio, the notes index and OCR are ready, when the index was last checked, and how much memory each GPU is using.
+- **Model picker with live status.** Choose which local model writes the answers. Qwen 27B (`qwen/qwen3.8-27b`) is the default. The sidebar shows whether the model is loaded, loading or not loaded, as LM Studio reports it, including when you load or unload it there.
+- **Indexing progress.** While the index updates, one percentage covers both reading pages and embedding passages. You also see which file and page it's on, or how many passages are done.
 - **100% offline.** No API keys, no accounts, no cloud services.
 
 ## How it works
@@ -77,11 +79,11 @@ With Qwen split across both GPUs, generation ran at about 42 tokens/s (about 35 
    ```
 4. In LM Studio, load a chat model and turn on the **Local Server** (port 1234).
 5. Double-click **Setup Spectre Studio.cmd** once. It creates a **Spectre Studio** shortcut on your desktop.
-6. Open Spectre Studio from the shortcut, go to the **Libraries** page and click **Update index** to build the search database.
+6. Open Spectre Studio from the shortcut, go to the **Knowledge Libraries** page and click **Update index** to build the search database.
 
 ## Libraries
 
-A library groups courses so you can search them together. On the **Libraries** page, click **New library**, give it a name, a category and an optional description, and tick the indexed courses that belong to it. The **⋯** button on a library's card edits or deletes it. You can search, sort and filter the list, and show it as a grid or a list. A library can start empty, but it can't be searched until it has an indexed course.
+A library groups courses so you can search them together. On the **Knowledge Libraries** page, click **Create library**, give it a name, a category and an optional description, and tick the indexed courses that belong to it. On a library's card, the pencil edits it and the **⋮** button deletes it. You can search, sort and filter the list, and show it as a grid or a list. A library can start empty, but it can't be searched until it has an indexed course.
 
 Libraries are saved in `libraries.toml`, which you can also edit by hand. To start that way, copy `libraries.sample.toml` and name the copy `libraries.toml`. Each library is one `[[library]]` section:
 

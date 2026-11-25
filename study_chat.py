@@ -32,7 +32,7 @@ LAST_CHECK = ROOT / "last_index_check.txt"
 LIBRARIES_FILE = ROOT / "libraries.toml"
 # The libraries as last shown on the page. A question uses these, so what it searches
 # matches what the page says. Read again when the app opens, after Update index,
-# and after the Libraries page saves.
+# and after the Knowledge Libraries page saves.
 LIBRARIES = []
 # The pages ingest.py adds to a PDF's source: "COURSE/a.pdf (PDF page 3, OCR)".
 PAGE_LABEL = re.compile(r"(?<=\.pdf) \(PDF pages? \d+(?:–\d+)?(?:, OCR)?\)$", re.I)
@@ -425,7 +425,7 @@ def library_text(value, what, limit):
 
 
 def change_libraries(data, change):
-    """Apply a change from the Libraries page, if libraries.toml is still what the page loaded."""
+    """Apply a change from the Knowledge Libraries page, if libraries.toml is still what it loaded."""
     saved = library_bytes()
     try:
         libraries = load_libraries(saved)
