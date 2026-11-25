@@ -6,6 +6,7 @@ __pycache__/
 # Private data: course notes, libraries, search database, OCR cache, last course used, last index check
 notes/
 /libraries.toml
+/libraries.toml.*
 chroma_db/
 .ocr_cache/
 last_course.txt

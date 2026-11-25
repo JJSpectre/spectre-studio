@@ -81,7 +81,9 @@ With Qwen split across both GPUs, generation ran at about 42 tokens/s (about 35 
 
 ## Libraries
 
-A library groups courses so you can search them together. Copy `libraries.sample.toml`, name the copy `libraries.toml`, and list your course folders, with one `[[library]]` section per library:
+A library groups courses so you can search them together. On the **Libraries** page, click **New library**, give it a name and category, and tick the indexed courses that belong to it. You can edit or delete a library at any time, and search, sort and filter the list. A library can start empty, but it can't be searched until it has an indexed course.
+
+Libraries are saved in `libraries.toml`, which you can also edit by hand. To start that way, copy `libraries.sample.toml` and name the copy `libraries.toml`. Each library is one `[[library]]` section:
 
 ```toml
 [[library]]
@@ -91,11 +93,12 @@ category = "Trade"
 courses = ["AUTO-101"]
 ```
 
-The `id` is permanent (lowercase letters, digits and hyphens). The `name` can change at any time, and the `category` is optional. Reopen Spectre Studio or click **Update index** to see your changes.
+The `id` is permanent (lowercase letters, digits and hyphens). Libraries made in the app get one automatically. The `name` can change at any time, and the `category` is optional. After a hand edit, reopen Spectre Studio or click **Update index** to see your changes.
 
-- Grouping never moves notes or re-indexes anything. Removing a library only removes the grouping.
+- Grouping never moves notes or re-indexes anything. Deleting a library only removes the grouping.
+- Saving in the app rewrites `libraries.toml` and removes any comments in it. The app asks before it does that. `libraries.toml.bak` holds only the version from just before the last save, so the next save replaces it. If the file changed since the page loaded it, or has a mistake in it, the app won't save over it.
 - Courses in no library appear under **Unsorted**, where you search them one at a time.
-- `libraries.toml` stays out of Git, so your course names stay private.
+- `libraries.toml` and its backup stay out of Git, so your course names stay private.
 
 ## Starter questions
 

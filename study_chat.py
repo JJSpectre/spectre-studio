@@ -1,5 +1,6 @@
 """Local browser UI for the existing rag-study installation."""
 import ast
+import hashlib
 import json
 import math
 import os
@@ -30,7 +31,8 @@ LAST_COURSE = ROOT / "last_course.txt"
 LAST_CHECK = ROOT / "last_index_check.txt"
 LIBRARIES_FILE = ROOT / "libraries.toml"
 # The libraries as last shown on the page. A question uses these, so what it searches
-# matches what the page says. Read again when the app opens and after Update index.
+# matches what the page says. Read again when the app opens, after Update index,
+# and after the Libraries page saves.
 LIBRARIES = []
 # The pages ingest.py adds to a PDF's source: "COURSE/a.pdf (PDF page 3, OCR)".
 PAGE_LABEL = re.compile(r"(?<=\.pdf) \(PDF pages? \d+(?:–\d+)?(?:, OCR)?\)$", re.I)
@@ -242,7 +244,8 @@ def save_last_scope(scope_id):
 
 
 def default_scope(names):
-    """The library or course used last time, or the first course."""
+    """The library or course used last time, or the first course. Empty if the library used
+    last time is gone or has nothing indexed, so the page asks instead of picking for you."""
     try:
         saved = LAST_COURSE.read_text(encoding="utf-8-sig").strip()
     except (OSError, ValueError):
@@ -250,6 +253,8 @@ def default_scope(names):
     for library in LIBRARIES:
         if saved == "library:" + library["id"] and any(c in names for c in library["courses"]):
             return saved
+    if saved.startswith("library:"):
+        return ""
     course = default_course(names)
     return "course:" + course if course else ""
 
@@ -280,12 +285,33 @@ def load_starters(course):
     return starters
 
 
-def load_libraries():
-    """Read libraries.toml, which groups courses. Without the file there are no libraries."""
-    if not LIBRARIES_FILE.is_file():
+def library_bytes():
+    """What is in libraries.toml now, or None without the file."""
+    try:
+        return LIBRARIES_FILE.read_bytes()
+    except FileNotFoundError:
+        return None
+    except OSError as error:
+        raise AppError(f"Couldn't read libraries.toml: {error}") from error
+
+
+def library_revision(saved):
+    """Identifies one exact version of libraries.toml, so a hand edit is noticed."""
+    return "" if saved is None else hashlib.sha256(saved).hexdigest()
+
+
+def library_comments(saved):
+    """Whether the file has comments, which saving from the page would remove."""
+    text = (saved or b"").decode("utf-8-sig", errors="replace")
+    return "#" in re.sub(r""""(?:\\.|[^"\\\n])*"|'[^'\n]*'""", "", text)
+
+
+def load_libraries(saved):
+    """Read the contents of libraries.toml, which groups courses. Without the file there are no libraries."""
+    if saved is None:
         return []
     try:
-        data = tomllib.loads(LIBRARIES_FILE.read_text(encoding="utf-8-sig"))
+        data = tomllib.loads(saved.decode("utf-8-sig"))
         rows = data.pop("library", [])
         if data or not isinstance(rows, list) or not all(isinstance(row, dict) for row in rows):
             raise ValueError("start each library with a [[library]] line")
@@ -309,9 +335,149 @@ def load_libraries():
             # A course listed twice in one library counts once.
             libraries.append({"id": key, "name": name.strip(), "category": category.strip(),
                               "courses": list(dict.fromkeys(members))})
-    except (OSError, ValueError) as error:
-        raise AppError(f"Couldn't read libraries.toml, so every course is under Unsorted: {error}") from error
+    except ValueError as error:
+        raise AppError(f"Couldn't read libraries.toml: {error}") from error
     return libraries
+
+
+class LibraryConflict(Exception):
+    """libraries.toml isn't the version the page loaded."""
+
+
+def new_library_id(name, libraries):
+    """A permanent ID from the library's first name. The random ending means a deleted
+    library's ID isn't used again, so an old saved scope can't open a different library."""
+    plain = unicodedata.normalize("NFKD", name).encode("ascii", "ignore").decode().lower()
+    start = re.sub(r"[^a-z0-9]+", "-", plain).strip("-")[:31].strip("-") or "library"
+    while True:
+        key = f"{start}-{secrets.token_hex(4)}"
+        if all(key != library["id"] for library in libraries):
+            return key
+
+
+def libraries_text(libraries):
+    def quote(value):
+        # JSON strings are TOML strings too, except that TOML also escapes the delete character.
+        return json.dumps(value, ensure_ascii=False).replace("\x7f", "\\u007f")
+
+    tables = []
+    for library in libraries:
+        lines = ["[[library]]", f"id = {quote(library['id'])}", f"name = {quote(library['name'])}"]
+        if library["category"]:
+            lines.append(f"category = {quote(library['category'])}")
+        lines.append(f"courses = [{', '.join(map(quote, library['courses']))}]")
+        tables.append("\n".join(lines) + "\n")
+    return "\n".join(tables)
+
+
+def write_libraries(libraries, saved):
+    """Replace libraries.toml, unless it no longer holds the bytes in saved.
+
+    The old version becomes libraries.toml.bak. If anything fails, libraries.toml stays as it was.
+    """
+    temporary = LIBRARIES_FILE.with_suffix(".toml.tmp")
+    backup = LIBRARIES_FILE.with_suffix(".toml.bak")
+    new_backup = LIBRARIES_FILE.with_suffix(".toml.bak.tmp")
+
+    def write(path, data):
+        with path.open("wb") as stream:
+            stream.write(data)
+            stream.flush()
+            os.fsync(stream.fileno())
+
+    try:
+        write(temporary, libraries_text(libraries).encode("utf-8"))
+        if load_libraries(temporary.read_bytes()) != libraries:
+            raise AppError("Nothing was saved, because the new libraries.toml didn't read back correctly.")
+        if saved is not None:
+            write(new_backup, saved)
+        # Check for a hand edit as late as possible.
+        if library_bytes() != saved:
+            raise LibraryConflict
+        if saved is not None:
+            new_backup.replace(backup)
+        temporary.replace(LIBRARIES_FILE)
+    except (OSError, UnicodeError) as error:
+        raise AppError(f"Nothing was saved, because libraries.toml couldn't be written: {error}") from error
+    finally:
+        for path in (temporary, new_backup):
+            try:
+                path.unlink(missing_ok=True)
+            except OSError as error:
+                print(f"Couldn't remove {path.name}: {error}", flush=True)
+
+
+def library_text(value, what, limit):
+    """A name or category from the page. Any run of spaces or line breaks becomes one space."""
+    text = " ".join(value.split()) if isinstance(value, str) else None
+    if text is None or len(text) > limit:
+        raise AppError(f"The {what} must be up to {limit} characters.")
+    if not text.isprintable():
+        raise AppError(f"The {what} has an invisible character. Delete it or type the {what} again.")
+    return text
+
+
+def change_libraries(data, change):
+    """Apply a change from the Libraries page, if libraries.toml is still what the page loaded."""
+    saved = library_bytes()
+    try:
+        libraries = load_libraries(saved)
+    except AppError as error:
+        return {"conflict": "Nothing was saved, because saving would erase a file that has a mistake in it. "
+                            f"{error}. Fix it by hand, then reload."}
+    try:
+        if data.get("revision") != library_revision(saved):
+            raise LibraryConflict
+        key = change(libraries)
+        write_libraries(libraries, saved)
+    except LibraryConflict:
+        return {"conflict": "libraries.toml changed since this was opened, so nothing was saved."}
+    return {"saved": key, **course_info()}
+
+
+def save_library(data):
+    """Create a library, or change the one with the given ID."""
+    indexed = courses()
+
+    def change(libraries):
+        key = data.get("id", "")
+        library = {"id": "", "name": "", "category": "", "courses": []}
+        if key:
+            library = next((row for row in libraries if row["id"] == key), None)
+            if library is None:
+                raise LibraryConflict
+        name = library_text(data.get("name"), "name", 60)
+        if not name:
+            raise AppError("Give the library a name.")
+        taken = ["unsorted"] + [row["name"].casefold() for row in libraries if row is not library]
+        if name.casefold() in taken and name != library["name"]:
+            raise AppError(f"There is already a library named {name}. Choose another name.")
+        chosen = data.get("courses")
+        # Only indexed courses, plus any already listed here that aren't indexed now.
+        if (not isinstance(chosen, list) or not all(isinstance(course, str) for course in chosen)
+                or not set(chosen) <= {*indexed, *library["courses"]}):
+            raise AppError("Choose courses that have already been indexed.")
+        order = dict.fromkeys(library["courses"] + indexed)
+        library.update(name=name, category=library_text(data.get("category"), "category", 40),
+                       courses=[course for course in order if course in chosen])
+        if not key:
+            library["id"] = new_library_id(name, libraries)
+            libraries.append(library)
+        return library["id"]
+
+    return change_libraries(data, change)
+
+
+def delete_library(data):
+    """Remove a grouping. Notes and the index aren't touched."""
+    def change(libraries):
+        library = next((row for row in libraries if row["id"] == data.get("id")), None)
+        if library is None:
+            raise LibraryConflict
+        libraries.remove(library)
+        return library["id"]
+
+    return change_libraries(data, change)
 
 
 def library_info(names, stats):
@@ -336,11 +502,12 @@ def course_info():
     rows = indexed_metadata()
     names = course_names(rows)
     stats = course_stats(rows)
-    library_problem = ""
+    saved, library_problem = None, ""
     try:
-        LIBRARIES = load_libraries()
+        saved = library_bytes()
+        LIBRARIES = load_libraries(saved)
     except AppError as error:
-        LIBRARIES, library_problem = [], str(error)
+        LIBRARIES, library_problem = [], f"{error}. Until it's fixed, every course is under Unsorted."
     starters, problems = {}, []
     for course in names:
         try:
@@ -350,6 +517,7 @@ def course_info():
             problems.append(str(error))
     return {"courses": names, "default_scope": default_scope(names),
             "libraries": library_info(names, stats), "library_problem": library_problem,
+            "library_revision": library_revision(saved), "library_comments": library_comments(saved),
             "stats": stats, "index_exists": (DB / "chroma.sqlite3").is_file(),
             "index_checked": index_checked(),
             "starters": starters, "starter_problems": problems}
@@ -1683,6 +1851,10 @@ class Handler(BaseHTTPRequestHandler):
                 result = app_status()
             elif self.path == "/api/library":
                 result = course_info()
+            elif self.path == "/api/library-save":
+                result = save_library(data)
+            elif self.path == "/api/library-delete":
+                result = delete_library(data)
             elif self.path == "/api/model":
                 target = data.get("model")
                 _, name = activate_model(target)

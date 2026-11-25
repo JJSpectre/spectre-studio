@@ -15,8 +15,8 @@
   --shadow:0 6px 24px #0006}
 [hidden]{display:none!important}*{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 "Segoe UI Variable Text","Segoe UI",system-ui,sans-serif}
-button,textarea,select{font:inherit}button{cursor:pointer}button:disabled,select:disabled{opacity:.55;cursor:default}
-button:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button,textarea,select,input{font:inherit}button{cursor:pointer}button:disabled,select:disabled{opacity:.55;cursor:default}
+button:focus-visible,select:focus-visible,textarea:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .icon{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .layout{display:grid;grid-template-columns:258px minmax(0,1fr);height:100dvh}
 .side{background:var(--side);border-right:1px solid var(--line);padding:22px 14px 14px;display:flex;flex-direction:column;gap:14px;min-height:0;overflow-y:auto}
@@ -30,6 +30,8 @@ button:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-v
 .nav[aria-current=page] .icon{color:var(--accent)}
 .tool+.tool,.nav+.nav{margin-top:6px}.nav:not([aria-current]):hover{background:var(--raised)}
 .tool:hover:not(:disabled),.quit button:hover:not(:disabled){background:var(--raised)}
+.button{display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 14px;border:1px solid var(--control);border-radius:8px;background:var(--panel);color:var(--ink);white-space:nowrap}.button .icon{width:18px;height:18px}
+.button:hover:not(:disabled){background:var(--raised);border-color:var(--accent)}
 .primary{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:600}
 .primary:hover:not(:disabled){background:var(--primary-hover)}
 .status-card{margin-top:auto;border:1px solid var(--line);border-radius:10px;background:var(--panel);padding:12px 14px;font-size:13px;color:var(--quiet);display:grid;gap:8px}
@@ -58,6 +60,7 @@ button:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-v
 .pick-box .chevron{left:auto;right:10px;color:var(--quiet)}
 select{appearance:none;width:100%;min-width:130px;max-width:184px;padding:8px 34px 8px 38px;border:1px solid var(--control);border-radius:8px;background:var(--panel);color:var(--ink);text-align:left;text-overflow:ellipsis}
 #model,#mode{max-width:230px}select:hover:not(:disabled){background:var(--raised)}option{background:var(--panel);color:var(--ink)}
+input:not([type=checkbox]){width:100%;min-width:0;padding:8px 12px;border:1px solid var(--control);border-radius:8px;background:var(--panel);color:var(--ink);caret-color:var(--accent)}input::placeholder{color:var(--quiet);opacity:1}input::-webkit-search-cancel-button{filter:invert(.8)}
 .model-state{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;background:var(--panel);padding:8px 12px;font-size:13px;white-space:nowrap}
 .dot{flex:none;display:inline-block;width:9px;height:9px;border-radius:50%;border:2px solid var(--warn)}.dot.on{border-color:var(--good);background:var(--good)}
 .scroll{overflow:auto;min-height:0}.thread{max-width:1080px;margin:0 auto;padding:22px 24px;min-height:100%}
@@ -121,6 +124,15 @@ select{appearance:none;width:100%;min-width:130px;max-width:184px;padding:8px 34
 .course-row>span{flex:1;min-width:0;overflow-wrap:anywhere}.course-row>span>span{display:block;color:var(--quiet);font-size:13px}.course-row>.icon{width:18px;height:18px;color:var(--accent)}
 .library-note{margin:0;color:var(--quiet);font-size:13px;overflow-wrap:anywhere}
 .open-library{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 16px;border:1px solid var(--primary);border-radius:8px}
+.library-actions{display:flex;gap:8px}.library-actions .button{flex:1;padding:6px 12px;font-size:14px}
+dialog{width:min(560px,calc(100vw - 32px));max-height:calc(100dvh - 32px);padding:0;border:1px solid var(--control);border-radius:12px;background:var(--panel);color:var(--ink);box-shadow:var(--shadow);scrollbar-width:thin}dialog::backdrop{background:#000a}
+dialog form{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;padding:20px 22px}dialog h2{font-size:20px;font-weight:650;line-height:1.25;margin:0;overflow-wrap:anywhere}
+dialog p{margin:0;color:var(--quiet);font-size:14px;overflow-wrap:anywhere}dialog p.error{color:var(--bad)}dialog p.comments-note{padding:9px 12px;border:1px solid var(--warn);border-radius:8px;color:var(--warn)}dialog p.comments-note:focus{outline:2px solid var(--warn)}dialog p:empty{display:none}
+dialog .pick label,dialog legend{font-size:13px;color:var(--quiet);margin:0 0 4px 2px;padding:0}dialog .pick select{max-width:none;padding-left:12px}#libraryCustom{margin-top:8px}
+dialog fieldset{min-width:0;margin:0;padding:0;border:0}
+.checks{max-height:200px;min-height:60px;margin-top:8px;padding:4px;border:1px solid var(--line);border-radius:8px;background:var(--bg);overflow:auto;scrollbar-width:thin}.checks p{padding:8px 10px}
+.check{display:flex;align-items:center;gap:12px;padding:6px 10px;border-radius:6px;cursor:pointer}.check:hover{background:var(--raised)}.check input{flex:none;width:17px;height:17px;margin:0;accent-color:var(--accent)}.check span{min-width:0;overflow-wrap:anywhere}.check span span{display:block;color:var(--quiet);font-size:13px}
+.dialog-buttons{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px}
 .choices{display:grid;gap:8px;margin-top:12px}.choice{display:flex;align-items:center;gap:12px;padding:9px 14px;border:1px solid var(--control);border-radius:8px;background:var(--raised);color:var(--ink);text-align:left;overflow-wrap:anywhere}
 .choice .icon{color:var(--accent)}.choice span span{display:block;color:var(--quiet);font-size:13px}.choice:hover:not(:disabled){border-color:var(--accent)}
 .reasoning .excerpt{max-height:340px;overflow:auto}.live{color:var(--quiet);font-style:italic}
@@ -208,12 +220,42 @@ select{appearance:none;width:100%;min-width:130px;max-width:184px;padding:8px 34
   </div>
 </section>
 <section class="main away" id="librariesPage" aria-label="Libraries">
-  <header class="top"><div class="page"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg><div><h1>Libraries</h1><strong>Your courses, grouped in libraries.toml</strong></div></div></header>
+  <header class="top"><div class="page"><svg class="icon" aria-hidden="true"><use href="#i-layers"/></svg><div><h1>Libraries</h1><strong>Your courses, grouped in libraries.toml</strong></div></div>
+    <div class="picks">
+      <div class="pick"><label for="librarySearch">Search</label><input type="search" id="librarySearch" placeholder="Library or course" maxlength="100" autocomplete="off"></div>
+      <div class="pick"><label for="libraryFilter">Category</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-folder"/></svg><select id="libraryFilter"><option value="all">All categories</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
+      <div class="pick"><label for="librarySort">Sort by</label><div class="pick-box"><svg class="icon" aria-hidden="true"><use href="#i-mode"/></svg><select id="librarySort"><option value="name">Name</option><option value="files">Most files</option><option value="passages">Most passages</option></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div></div>
+      <button type="button" class="button primary manage" id="newLibrary" disabled><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>New library</button>
+    </div>
+  </header>
   <div class="scroll"><div class="library-list" id="libraryList"><p>Reading your libraries…</p></div></div>
   <div class="bottom"><div class="foot" id="libraryMessage" role="status"></div></div>
 </section>
 </main>
 </div>
+<dialog id="libraryDialog" aria-labelledby="libraryFormTitle">
+  <form id="libraryForm" autocomplete="off">
+    <h2 id="libraryFormTitle">New library</h2>
+    <p class="comments-note" tabindex="-1" hidden>libraries.toml has comments you typed. Saving rewrites the file and removes them. The version you have now is kept as libraries.toml.bak, but only until the next save.</p>
+    <div class="pick"><label for="libraryName">Name</label><input type="text" id="libraryName" maxlength="60"></div>
+    <div class="pick"><label for="libraryCategory">Category</label><div class="pick-box"><select id="libraryCategory"></select><svg class="icon chevron" aria-hidden="true"><use href="#i-chevron"/></svg></div>
+      <input type="text" id="libraryCustom" maxlength="40" placeholder="Your category" aria-label="Custom category" hidden></div>
+    <fieldset><legend>Indexed courses (optional)</legend><input type="search" id="courseFilter" maxlength="100" placeholder="Find a course" aria-label="Find a course"><div class="checks" id="courseChecks"></div></fieldset>
+    <p id="libraryFormNote" role="status"></p>
+    <p class="error" id="libraryFormError" role="alert"></p>
+    <div class="dialog-buttons"><button type="button" class="button in-dialog" id="libraryReload" hidden>Reload libraries</button><button type="button" class="button in-dialog cancel">Cancel</button><button type="submit" class="button primary" id="librarySave">Save</button></div>
+  </form>
+</dialog>
+<dialog id="deleteDialog" aria-labelledby="deleteTitle" aria-describedby="deleteText">
+  <form id="deleteForm">
+    <h2 id="deleteTitle">Delete library?</h2>
+    <p class="comments-note" tabindex="-1" hidden>libraries.toml has comments you typed. Deleting this library rewrites the file and removes them. The version you have now is kept as libraries.toml.bak, but only until the next save.</p>
+    <p id="deleteText">Your notes and index stay. This removes only the grouping.</p>
+    <p id="deleteChat">It’s selected in Chat, so the conversation will be cleared and you’ll choose what to search.</p>
+    <p class="error" id="deleteError" role="alert"></p>
+    <div class="dialog-buttons"><button type="button" class="button in-dialog cancel">Cancel</button><button type="submit" class="button primary in-dialog">Delete library</button></div>
+  </form>
+</dialog>
 <script>
 'use strict';
 const $=id=>document.getElementById(id), token=document.querySelector('meta[name=study-token]').content;
@@ -240,13 +282,16 @@ function showModelState(state){
 }
 function statusState(status){return !status.online?'':status.pending_load?'pending':status.loaded?'loaded':'idle'}
 function controls(){
-  el.send.disabled=busy||stopped||!indexed.length||!el.question.value.trim();
+  el.send.disabled=busy||stopped||!indexed.length||!el.scope.value||!el.question.value.trim();
   el.question.disabled=busy||stopped;
-  el.library.disabled=el.scope.disabled=busy||stopped||!indexed.length;
+  el.library.disabled=busy||stopped||!indexed.length;
+  el.scope.disabled=el.library.disabled||!el.library.value;
   el.model.disabled=busy||stopped||!modelOptions.length;
   el.mode.disabled=busy||stopped;
   for(const id of ['new','notes','update','quit']) $(id).disabled=busy||stopped;
-  for(const button of document.querySelectorAll('.choice,.open-scope')) button.disabled=busy||stopped;
+  for(const button of document.querySelectorAll('.choice,.open-scope,.in-dialog')) button.disabled=busy||stopped;
+  for(const button of document.querySelectorAll('.manage')) button.disabled=busy||stopped||library!=='ready'||Boolean(libraryProblem);
+  $('librarySave').disabled=busy||stopped||draft?.stale;
 }
 function showModels(models,active){
   modelOptions=models;
@@ -273,8 +318,9 @@ function scopeCourses(){
   const scope=el.scope.value;
   return scope.startsWith('course:')?[scope.slice(7)]:scope.startsWith('library:')?chosenLibrary().courses:[];
 }
-// Fill both controls for one library. Unsorted isn't a library, so it's searched one course at a time.
-function showScope(libraryId,scope){
+// Fill both controls for one library, or ask for one if there's no libraryId. Unsorted
+// isn't a library, so it's searched one course at a time.
+function showScope(libraryId='',scope=''){
   const option=(select,value,text,disabled=false)=>{
     const item=make('option','',text);
     item.value=value;item.disabled=disabled;
@@ -286,13 +332,16 @@ function showScope(libraryId,scope){
     option(el.library,'','No libraries yet');
     option(el.scope,'','No indexed courses');
   }else{
+    if(!libraryId) option(el.library,'','Choose one…',true);
     for(const {id,name,courses} of libraries) option(el.library,id,courses.length?name:name+' (empty)',!courses.length);
     el.library.value=libraryId;
-    if(libraryId!=='unsorted') option(el.scope,'library:'+libraryId,'Entire library');
-    for(const course of chosenLibrary().courses) option(el.scope,'course:'+course,course);
-    if(scope) el.scope.value=scope;
+    if(!libraryId) option(el.scope,'','Pick a library',true);
+    else if(libraryId!=='unsorted') option(el.scope,'library:'+libraryId,'Entire library');
+    for(const course of chosenLibrary()?.courses??[]) option(el.scope,'course:'+course,course);
+    if(scope||!libraryId) el.scope.value=scope;
   }
-  $('title').textContent=indexed.length?'Searching '+chosenLibrary().name+' · '+el.scope.selectedOptions[0].textContent:'Nothing to search yet';
+  $('title').textContent=!indexed.length?'Nothing to search yet':!libraryId?'Choose what to search':
+    'Searching '+chosenLibrary().name+' · '+el.scope.selectedOptions[0].textContent;
   showStats();
   showStarters();
 }
@@ -326,10 +375,30 @@ function showStats(){
   const {files,passages}=library!=='ready'?{}:scope.startsWith('library:')?chosenLibrary():courseCounts(scope.slice(7));
   $('courseStats').textContent=library==='loading'?'Counting files and passages…':
     library==='ready'&&!indexed.length?'No indexed files yet':
+    library==='ready'&&!scope?'Nothing is searched until you choose a library':
     amount(files,'indexed file')+' · '+amount(passages,'passage');
 }
 // The Libraries page. Everything on it comes from the index or libraries.toml.
 let libraryProblem='';
+function categoryOf(group){return group.category||'Uncategorized'}
+// The libraries that fit the search and category filter, in order. Unsorted is always last.
+function shownLibraries(){
+  const filter=$('libraryFilter'), was=filter.value, sort=$('librarySort').value, sorted=libraries.filter(group=>group.id!=='unsorted');
+  const byName=(a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'}), known=n=>typeof n==='number'?n:-1;
+  filter.replaceChildren();
+  for(const name of ['',...[...new Set(sorted.map(categoryOf))].sort(byName)]){
+    const option=make('option','',name||'All categories');
+    option.value=name?'is:'+name:'all';
+    filter.append(option);
+  }
+  filter.value=was;
+  if(!filter.value) filter.value='all';
+  sorted.sort((a,b)=>(sort==='name'?0:known(b[sort])-known(a[sort]))||byName(a.name,b.name));
+  const words=$('librarySearch').value.trim().toLowerCase();
+  return [...sorted,...libraries.filter(group=>group.id==='unsorted'&&group.courses.length)].filter(group=>
+    (filter.value==='all'||group.id!=='unsorted'&&filter.value==='is:'+categoryOf(group))&&
+    [group.name,group.id==='unsorted'?'':categoryOf(group),...group.courses,...group.missing].some(text=>text.toLowerCase().includes(words)));
+}
 function showLibraries(problem=libraryProblem){
   libraryProblem=problem;
   const list=$('libraryList');
@@ -339,11 +408,13 @@ function showLibraries(problem=libraryProblem){
   if(!indexed.length) list.append(make('p','','No indexed courses yet. Add your notes to a course folder, then click Update index.'));
   const scope=el.scope.value;
   const open=(button,id,target)=>{button.type='button';button.classList.add('open-scope');button.onclick=()=>openScope(id,target)};
-  for(const group of libraries){
+  const shown=shownLibraries();
+  if(!shown.length) list.append(make('p','',libraries.length>1||indexed.length?'No libraries match your search or filter.':'No libraries yet. Click New library to make one.'));
+  for(const group of shown){
     const unsorted=group.id==='unsorted';
-    if(unsorted&&!group.courses.length) continue;
     const here=el.library.value===group.id, card=make('article','library'+(here?' current':'')), head=make('header'), title=make('div'), chips=make('div','chips');
     const badge=make('div','library-icon');
+    card.dataset.id=group.id;
     badge.append(icon(unsorted?'folder':'layers'));
     if(group.category) chips.append(make('span','chip',group.category));
     if(here) chips.append(make('span','chip on','Selected in Chat'));
@@ -380,9 +451,170 @@ function showLibraries(problem=libraryProblem){
       open(button,group.id,'library:'+group.id);
       card.append(button);
     }
+    if(!unsorted&&!group.courses.length) card.append(make('p','library-note','Nothing to search yet. “Entire library” turns on once this has an indexed course.'));
+    if(!unsorted){
+      const actions=make('div','library-actions');
+      for(const [text,action,cls] of [['Edit',editLibrary,'edit'],['Delete',askDelete,'delete']]){
+        const button=make('button','button manage '+cls,text);
+        button.type='button';
+        button.setAttribute('aria-label',text+' '+group.name);
+        button.onclick=()=>action(group);
+        actions.append(button);
+      }
+      card.append(actions);
+    }
     list.append(card);
   }
   controls();
+}
+// The form that makes or changes a library. draft is what it's working on. Its revision says
+// which version of libraries.toml it started from, so saving can't undo a hand edit.
+const categories=['Math & Statistics','Science','Computing & IT','Engineering & Trades','Business & Finance','Health Sciences','Humanities & Languages','Personal Reference'];
+let draft=null;
+for(const [value,text] of [['','Uncategorized'],...categories.map(name=>[name,name]),['custom','Custom category']]){
+  const option=make('option','',text);
+  option.value=value;
+  $('libraryCategory').append(option);
+}
+// If the file has comments, the first Save or Delete only asks. agreed is when it asked.
+let agreed=0;
+function showComments(){
+  agreed=0;
+  for(const note of document.querySelectorAll('.comments-note')) note.hidden=!comments;
+  $('librarySave').textContent='Save';
+  $('deleteForm').querySelector('[type=submit]').textContent='Delete library';
+}
+function mayRewrite(form,text){
+  if(!comments) return true;
+  // A double-click isn't an answer.
+  if(agreed) return performance.now()-agreed>800;
+  agreed=performance.now();
+  form.querySelector('[type=submit]').textContent=text;
+  form.querySelector('.comments-note').focus();
+  return false;
+}
+function formSays(note,error=''){$('libraryFormNote').textContent=note;$('libraryFormError').textContent=error}
+function showCustom(){$('libraryCustom').hidden=$('libraryCategory').value!=='custom'}
+// Courses listed in this library that aren't indexed now can stay or be removed, but not added.
+function draftCourses(){return [...indexed,...libraries.find(group=>group.id===draft.id)?.missing??[]]}
+function showChecks(){
+  const box=$('courseChecks'), words=$('courseFilter').value.trim().toLowerCase(), names=draftCourses();
+  box.replaceChildren();
+  for(const course of names.filter(name=>name.toLowerCase().includes(words))){
+    const row=make('label','check'), tick=make('input'), text=make('span'), {files,passages}=courseCounts(course);
+    tick.type='checkbox';
+    tick.checked=draft.picked.has(course);
+    tick.onchange=()=>draft.picked[tick.checked?'add':'delete'](course);
+    text.append(course,make('span','',indexed.includes(course)?amount(files,'indexed file')+' · '+amount(passages,'passage'):'Not indexed, so not searched'));
+    row.append(tick,text);
+    box.append(row);
+  }
+  if(!box.childElementCount) box.append(make('p','',names.length?'No courses match.':'No indexed courses yet. You can add them later.'));
+}
+function editLibrary(group){
+  const category=group?.category??'', listed=!category||categories.includes(category);
+  draft={id:group?.id??'',revision,stale:false,picked:new Set(group?[...group.courses,...group.missing]:[])};
+  $('libraryFormTitle').textContent=group?'Edit library':'New library';
+  $('libraryName').value=group?.name??'';
+  $('libraryCategory').value=listed?category:'custom';
+  $('libraryCustom').value=listed?'':category;
+  $('courseFilter').value='';
+  $('libraryReload').hidden=true;
+  formSays('');showCustom();showComments();showChecks();controls();
+  $('libraryDialog').showModal();
+  $('libraryName').focus();
+}
+// Show the saved libraries, then go back to the one that was changed.
+function showSaved(out,text){
+  showCourses(out);
+  const card=[...document.querySelectorAll('.library')].find(card=>card.dataset.id===out.saved);
+  notice(text+(el.scope.value||!indexed.length?'':' Choose what to search in Chat.'));
+  return card;
+}
+$('libraryForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(busy||stopped||draft.stale) return;
+  const name=$('libraryName').value.trim(), custom=$('libraryCategory').value==='custom', category=(custom?$('libraryCustom'):$('libraryCategory')).value.trim();
+  if(!name){formSays('','Give the library a name.');return $('libraryName').focus()}
+  if(custom&&!category){formSays('','Type a category, or choose Uncategorized.');return $('libraryCustom').focus()}
+  if(!mayRewrite($('libraryForm'),'Save and remove comments')) return;
+  busy=true;controls();formSays('Saving…');
+  let card;
+  try{
+    const out=await api('library-save',{id:draft.id,revision:draft.revision,name,category,courses:draftCourses().filter(course=>draft.picked.has(course))});
+    if(out.conflict){
+      draft.stale=true;
+      $('libraryReload').hidden=false;
+      formSays('',out.conflict+' What you entered is still here.');
+      return;
+    }
+    $('libraryDialog').close();
+    card=showSaved(out,'Saved “'+name+'”.');
+    if(!card) notice('Saved “'+name+'”. Your search or filter is hiding it.');
+  }catch(error){formSays('',error.message)}
+  finally{busy=false;controls();if(!$('libraryDialog').open) (card?.querySelector('.edit')??$('newLibrary')).focus();else if(draft.stale) $('libraryReload').focus()}
+});
+// Read the changed file but keep what's in the form. Saving again is the student's choice.
+$('libraryReload').onclick=async()=>{
+  if(busy||stopped) return;
+  busy=true;controls();formSays('Reloading…');
+  try{
+    const out=await api('library');
+    showCourses(out);
+    if(out.library_problem){formSays('',out.library_problem);return}
+    draft.revision=revision;
+    draft.stale=false;
+    $('libraryReload').hidden=true;
+    const now=libraries.find(group=>group.id===draft.id);
+    if(now) formSays('libraries.toml now has “'+now.name+'” · '+categoryOf(now)+' · '+([...now.courses,...now.missing].join(', ')||'no courses')+'. Save replaces that with what’s in this form.');
+    else if(draft.id){
+      draft.id='';
+      $('libraryFormTitle').textContent='New library';
+      formSays('This library isn’t in libraries.toml any more. Save makes a new one.');
+    }else formSays('Reloaded. Nothing you entered changed.');
+    showComments();showChecks();
+  }catch(error){formSays('',error.message)}
+  finally{busy=false;controls();$(draft.stale?'libraryReload':'librarySave').focus()}
+};
+let doomed=null;
+function askDelete(group){
+  doomed={id:group.id,name:group.name,revision};
+  $('deleteTitle').textContent='Delete “'+group.name+'”?';
+  $('deleteChat').hidden=el.library.value!==group.id;
+  $('deleteError').textContent='';
+  showComments();
+  if(!$('deleteDialog').open) $('deleteDialog').showModal();
+  $('deleteDialog').querySelector('.cancel').focus();
+}
+$('deleteForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(busy||stopped) return;
+  if(!mayRewrite($('deleteForm'),'Delete and remove comments')) return;
+  busy=true;controls();
+  try{
+    let out=await api('library-delete',{id:doomed.id,revision:doomed.revision});
+    if(out.conflict){
+      // Show the changed file, then ask again about what's there now.
+      const message=out.conflict;
+      out=await api('library');
+      showCourses(out);
+      const now=libraries.find(group=>group.id===doomed.id);
+      if(now){askDelete(now);$('deleteError').textContent='libraries.toml changed, so nothing was deleted. It has been reloaded. Delete this library anyway?'}
+      else{$('deleteDialog').close();notice(out.library_problem?message:'“'+doomed.name+'” was already gone from libraries.toml.',Boolean(out.library_problem))}
+      return;
+    }
+    $('deleteDialog').close();
+    showSaved(out,'Deleted “'+doomed.name+'”. Your notes and index stay.');
+  }catch(error){$('deleteError').textContent=error.message}
+  finally{busy=false;controls();if(!$('deleteDialog').open) $('newLibrary').focus();else $('deleteDialog').querySelector('.cancel').focus()}
+});
+$('libraryCategory').addEventListener('change',()=>{showCustom();if(!$('libraryCustom').hidden) $('libraryCustom').focus()});
+$('courseFilter').addEventListener('input',showChecks);
+$('courseFilter').addEventListener('keydown',e=>{if(e.key==='Enter') e.preventDefault()});
+$('newLibrary').onclick=()=>editLibrary();
+for(const dialog of document.querySelectorAll('dialog')){
+  dialog.querySelector('.cancel').onclick=()=>dialog.close();
+  dialog.addEventListener('cancel',e=>{if(busy) e.preventDefault()});
 }
 function showPage(name){
   for(const [page,nav] of [['chatPage','navChat'],['librariesPage','navLibraries']]){
@@ -419,21 +651,27 @@ async function refreshLibrary(){
 }
 // Mistakes in libraries.toml or a starters.toml file.
 function problems(out){return [out.library_problem,...out.starter_problems].filter(Boolean)}
+// Which version of libraries.toml the page shows, and whether it has comments.
+let revision='', comments=false;
 function showCourses(out){
-  const list=out.courses, before=JSON.stringify([el.scope.value,scopeCourses()]), known=indexed.length>0;
+  const list=out.courses, searched=()=>JSON.stringify([el.scope.value,[...scopeCourses()].sort()]), before=searched(), known=indexed.length>0;
   const fits=(library,scope)=>library&&(scope===('library:'+library.id)?library.id!=='unsorted'&&library.courses.length:
     scope.startsWith('course:')&&library.courses.includes(scope.slice(7)));
-  let scope=el.scope.value, chosen=chosenLibrary()?.id;
+  let scope=el.scope.value, chosen=el.library.value;
   indexed=list;
   libraries=out.libraries;
   starters=out.starters;
   library='ready';stats=out.stats;
-  // Keep the scope if it still exists. A course may have moved to another library.
-  if(!libraries.some(library=>fits(library,scope))) scope=out.default_scope;
+  revision=out.library_revision;comments=out.library_comments;
+  // Keep the scope if it still exists. If it or its library is gone, ask instead of picking another.
+  if(!known) scope=out.default_scope;
+  else if(!libraries.some(library=>library.id===chosen)) scope='';
+  // A course may have moved to another library.
   if(!fits(libraries.find(library=>library.id===chosen),scope)) chosen=libraries.find(library=>fits(library,scope))?.id;
+  if(!chosen) scope='';
   showScope(chosen,scope);
   // The chat belongs to what it searched, so clear it if that changed.
-  if(known&&before!==JSON.stringify([el.scope.value,scopeCourses()])) reset();
+  if(known&&before!==searched()) reset();
   $('indexText').textContent='Notes index · '+(list.length?list.length+(list.length===1?' course':' courses'):'no courses yet');
   showChecked(out);
   showLibraries(out.library_problem);
@@ -790,7 +1028,7 @@ function showAnswer(target,value,citations,finished=true){
 el.form.addEventListener('submit',e=>{
   e.preventDefault();
   const question=el.question.value.trim();
-  if(busy||stopped||!question||!indexed.length) return;
+  if(busy||stopped||!question||!indexed.length||!el.scope.value) return;
   el.question.value='';
   ask(question,el.mode.value);
 });
@@ -909,6 +1147,8 @@ narrow.addEventListener('change',pollGpus);
 $('hardware').addEventListener('toggle',pollGpus);
 $('navChat').onclick=()=>{showPage('chatPage');el.question.focus()};
 $('navLibraries').onclick=()=>showPage('librariesPage');
+$('librarySearch').addEventListener('input',()=>showLibraries());
+for(const id of ['libraryFilter','librarySort']) $(id).addEventListener('change',()=>showLibraries());
 $('new').onclick=()=>{showPage('chatPage');reset()};
 $('notes').onclick=async()=>{try{const out=await api('notes');notice(out.message)}catch(error){notice(error.message,true)}};
 $('update').onclick=async()=>{
