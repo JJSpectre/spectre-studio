@@ -71,6 +71,7 @@ MAX_REPEATS = 3        # repeated identical calls before the same stop
 MAX_SEARCHES = 3       # search_notes calls per answer
 MAX_SOURCES = 10       # passages the model can see and cite
 FIRST_SOURCES = 4      # passages found before the model starts
+READ_BATCH = 5000      # passages per read. Chroma fails above 32,766 in one read
 # Search. Three rankings are merged by reciprocal rank fusion: each passage scores
 # weight / (RRF_K + its rank) in each ranking.
 SEARCH_DEPTH = 50      # how far down each ranking to look
@@ -156,11 +157,23 @@ def index_collection():
     return COLLECTION
 
 
+def read_passages(collection, where=None, include=()):
+    """The same rows, in the same order, as collection.get(), read a batch at a time."""
+    rows = {key: [] for key in ("ids", *include)}
+    while True:
+        batch = collection.get(where=where, include=list(include),
+                               limit=READ_BATCH, offset=len(rows["ids"]))
+        for key, values in rows.items():
+            values.extend(batch[key])
+        if len(batch["ids"]) < READ_BATCH:
+            return rows
+
+
 def indexed_metadata():
     """The metadata of every indexed passage that has a course."""
     if not (DB / "chroma.sqlite3").is_file():
         return []
-    info = index_collection().get(include=["metadatas"])
+    info = read_passages(index_collection(), include=["metadatas"])
     return [m for m in info["metadatas"] if m and m.get("course")]
 
 
@@ -854,7 +867,7 @@ def search_scope(scope_id, files=()):
     files = tuple(sorted(set(files)))
     if files:
         found = {}
-        for metadata in index_collection().get(where=where, include=["metadatas"])["metadatas"]:
+        for metadata in read_passages(index_collection(), where, ["metadatas"])["metadatas"]:
             found.setdefault(source_path(metadata["source"]), set()).add(metadata["source"])
         if not all(path in found for path in files):
             raise AppError("That file isn't in the notes you selected. Name the file again or start a new chat.")
@@ -872,7 +885,7 @@ def search_passages(query, scope, limit, *, ask=None, skip=()):
     where = scope.where
     collection = index_collection()
     # Keywords are read from the index itself, so they always match the current notes.
-    rows = collection.get(where=where, include=["documents", "metadatas"])
+    rows = read_passages(collection, where, ["documents", "metadatas"])
     passages = {entry: (metadata, text) for entry, metadata, text
                 in zip(rows["ids"], rows["metadatas"], rows["documents"]) if text}
     entries = list(passages)
@@ -929,7 +942,7 @@ def named_files(question, scope, picks):
     """
     picks, files = set(picks), set()
     if re.search(r"\.(?:pdf|txt|md)\b", question, re.I):
-        rows = index_collection().get(where=scope.where, include=["metadatas"])
+        rows = read_passages(index_collection(), scope.where, ["metadatas"])
         by_name = {}
         for path in {source_path(metadata["source"]) for metadata in rows["metadatas"]}:
             parts = ["notes", *path.casefold().split("/")]
@@ -1800,7 +1813,7 @@ def rebuild(progress_callback=None):
         COLLECTION = open_collection()
 
     # Compare the notes with what is already indexed.
-    rows = COLLECTION.get(include=["documents", "metadatas"])
+    rows = read_passages(COLLECTION, include=["documents", "metadatas"])
     stored = {entry: (text, metadata or {}) for entry, text, metadata
               in zip(rows["ids"], rows["documents"], rows["metadatas"])}
     new, changed, relabel = [], [], []
@@ -1842,7 +1855,7 @@ def rebuild(progress_callback=None):
     current_ids = {chunk["id"] for chunk in chunks}
     # A file that couldn't be read is still in the notes, so keep what was indexed from it.
     unread_files = tuple(f"{source}#" for source, page, _, _ in skips if not page)
-    stale_ids = [entry for entry in COLLECTION.get(include=[])["ids"]
+    stale_ids = [entry for entry in read_passages(COLLECTION)["ids"]
                  if entry not in current_ids and not entry.startswith(unread_files)]
     if stale_ids:
         progress("Removing passages that are no longer in the notes.")
