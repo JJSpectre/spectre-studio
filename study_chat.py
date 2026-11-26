@@ -16,6 +16,7 @@ import tomllib
 import traceback
 import unicodedata
 import webbrowser
+from array import array
 from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -61,6 +62,9 @@ WORK = threading.Lock()
 EMBEDDER = None
 CLIENT = None
 COLLECTION = None
+# The index as last read, kept until the next Update index: ids and metadata in index
+# order, and each course's keyword data once a search needs it. See index_rows().
+INDEX = None
 NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 # Streaming: give up only if LM Studio sends nothing for this long. A model that
 # is still thinking keeps sending tokens, so long reasoning never trips this.
@@ -169,11 +173,38 @@ def read_passages(collection, where=None, include=()):
             return rows
 
 
+def index_rows():
+    """The index's ids and metadata in index order, read once and kept until the next Update index."""
+    global INDEX
+    if INDEX is None:
+        rows = read_passages(index_collection(), include=["metadatas"])
+        courses = {}
+        for position, metadata in enumerate(rows["metadatas"]):
+            if metadata and metadata.get("course"):
+                courses.setdefault(metadata["course"], []).append(position)
+        INDEX = {"ids": rows["ids"], "metadatas": rows["metadatas"], "courses": courses,
+                 "positions": {entry: position for position, entry in enumerate(rows["ids"])},
+                 # Filled in by course_keywords(), one course at a time.
+                 "vocabulary": {}, "words": {}, "holders": {}}
+    return INDEX
+
+
+def scope_positions(courses, sources=()):
+    """Where the passages of these courses are in index_rows(), in index order.
+    sources narrows them to passages with those sources."""
+    index = index_rows()
+    positions = sorted(position for course in courses for position in index["courses"].get(course, ()))
+    if sources:
+        sources = set(sources)
+        positions = [position for position in positions if index["metadatas"][position]["source"] in sources]
+    return positions
+
+
 def indexed_metadata():
     """The metadata of every indexed passage that has a course."""
     if not (DB / "chroma.sqlite3").is_file():
         return []
-    info = read_passages(index_collection(), include=["metadatas"])
+    info = index_rows()
     return [m for m in info["metadatas"] if m and m.get("course")]
 
 
@@ -810,28 +841,84 @@ def ask_part(question):
     return " ".join(asking) or question
 
 
-def keyword_ranking(query, documents):
-    """Positions of the documents that share words with the query, best first (BM25)."""
+def course_keywords(course):
+    """A course's keyword data, made on its first search and kept with index_rows():
+    each passage's words, and for each word the passages that have it and how often."""
+    index = index_rows()
+    holders = index["holders"].get(course)
+    if holders is None:
+        holders, vocabulary, words = {}, index["vocabulary"], index["words"]
+        rows = read_passages(index_collection(), {"course": course}, ["documents"])
+        for entry, text in zip(rows["ids"], rows["documents"]):
+            if not text:
+                continue
+            position = index["positions"][entry]
+            # Word numbers instead of strings keep this small in memory.
+            numbers = array("I", (vocabulary.setdefault(word, len(vocabulary))
+                                  for word in keyword_words(text)))
+            words[position] = numbers
+            found = Counter(numbers)
+            for number in numbers[:HEADING_TERMS]:
+                found[number] += HEADING_BOOST
+            for number, count in found.items():
+                passages, counts = holders.setdefault(number, (array("I"), array("I")))
+                passages.append(position)
+                counts.append(count)
+        index["holders"][course] = holders
+    return holders
+
+
+def passages_with(word, searched, courses):
+    """{position: count} for the searched passages that have the word."""
+    number = index_rows()["vocabulary"].get(word)
+    found = {}
+    for course in courses:
+        passages, counts = course_keywords(course).get(number, ((), ()))
+        for position, count in zip(passages, counts):
+            if position in searched:
+                found[position] = count
+    return found
+
+
+def pair_count(numbers, first, second):
+    return sum(1 for one, two in zip(numbers, numbers[1:]) if one == first and two == second)
+
+
+def keyword_ranking(query, positions, courses):
+    """Positions of the passages that share words with the query, best first (BM25).
+
+    positions are the passages searched, in index order, from these courses."""
+    index = index_rows()
+    vocabulary, words = index["vocabulary"], index["words"]
+    searched = set(positions)
     wanted = set(keyword_terms(keyword_words(query)))
-    words = [keyword_words(text) for text in documents]
-    average = sum(map(len, words)) / len(words) if words else 0
-    counts = []
-    for passage in words:
-        found = Counter(keyword_terms(passage))
-        for term in keyword_terms(passage[:HEADING_TERMS]):
-            found[term] += HEADING_BOOST
-        counts.append(found)
-    rarity = {}
+    average = sum(len(words[position]) for position in positions) / len(positions) if positions else 0
+    counts = {}
     for term in wanted:
-        holders = sum(term in found for found in counts)
-        rarity[term] = math.log(1 + (len(counts) - holders + 0.5) / (holders + 0.5))
-    scores = []
-    for passage, found in zip(words, counts):
-        length = 1.2 * (0.25 + 0.75 * len(passage) / average) if average else 1.2
-        scores.append(sum(rarity[term] * found[term] * 2.2 / (found[term] + length)
-                          for term in wanted if term in found))
-    order = sorted(range(len(scores)), key=scores.__getitem__, reverse=True)
-    return [position for position in order if scores[position] > 0]
+        if " " in term:
+            # A pair of neighbors: count it in the passages that have both words.
+            first, second = term.split(" ")
+            both = (passages_with(first, searched, courses).keys()
+                    & passages_with(second, searched, courses).keys())
+            one, two = vocabulary.get(first), vocabulary.get(second)
+            counts[term] = {}
+            for position in both:
+                numbers = words[position]
+                count = (pair_count(numbers, one, two)
+                         + HEADING_BOOST * pair_count(numbers[:HEADING_TERMS], one, two))
+                if count:
+                    counts[term][position] = count
+        else:
+            counts[term] = passages_with(term, searched, courses)
+    rarity = {term: math.log(1 + (len(positions) - len(found) + 0.5) / (len(found) + 0.5))
+              for term, found in counts.items()}
+    # Each passage adds its terms in the order of wanted, so the sums match term for term.
+    scores = {}
+    for term in wanted:
+        for position, count in counts[term].items():
+            length = 1.2 * (0.25 + 0.75 * len(words[position]) / average) if average else 1.2
+            scores[position] = scores.get(position, 0) + rarity[term] * count * 2.2 / (count + length)
+    return sorted(sorted(scores), key=scores.__getitem__, reverse=True)
 
 
 @dataclass(frozen=True)
@@ -842,6 +929,8 @@ class Scope:
     heading: str    # what the model is told
     files: tuple    # the files the question was narrowed to, if any
     where: dict     # the search filter
+    courses: tuple  # the courses it searches
+    sources: tuple  # the sources it was narrowed to, if any
 
 
 def search_scope(scope_id, files=()):
@@ -865,15 +954,17 @@ def search_scope(scope_id, files=()):
         raise AppError("Choose a library or course that has already been indexed.")
     where = {"course": members[0] if len(members) == 1 else {"$in": members}}
     files = tuple(sorted(set(files)))
+    sources = ()
     if files:
         found = {}
-        for metadata in read_passages(index_collection(), where, ["metadatas"])["metadatas"]:
+        metadatas = index_rows()["metadatas"]
+        for metadata in map(metadatas.__getitem__, scope_positions(members)):
             found.setdefault(source_path(metadata["source"]), set()).add(metadata["source"])
         if not all(path in found for path in files):
             raise AppError("That file isn't in the notes you selected. Name the file again or start a new chat.")
-        sources = sorted(set().union(*(found[path] for path in files)))
-        where = {"$and": [where, {"source": {"$in": sources}}]}
-    return Scope(scope_id, label, heading, files, where)
+        sources = tuple(sorted(set().union(*(found[path] for path in files))))
+        where = {"$and": [where, {"source": {"$in": list(sources)}}]}
+    return Scope(scope_id, label, heading, files, where, tuple(members), sources)
 
 
 def search_passages(query, scope, limit, *, ask=None, skip=()):
@@ -884,19 +975,22 @@ def search_passages(query, scope, limit, *, ask=None, skip=()):
     ask = ask or query
     where = scope.where
     collection = index_collection()
-    # Keywords are read from the index itself, so they always match the current notes.
-    rows = read_passages(collection, where, ["documents", "metadatas"])
-    passages = {entry: (metadata, text) for entry, metadata, text
-                in zip(rows["ids"], rows["metadatas"], rows["documents"]) if text}
-    entries = list(passages)
-    documents = [passages[entry][1] for entry in entries]
+    index = index_rows()
+    # Keywords come from the index itself, kept in memory until the next Update index.
+    # Passages without text have no keyword data, so they are left out.
+    for course in scope.courses:
+        course_keywords(course)
+    positions = [position for position in scope_positions(scope.courses, scope.sources)
+                 if position in index["words"]]
+    passages = {index["ids"][position]: index["metadatas"][position] for position in positions}
     keyword_weight = WEIGHT_KEYWORDS
     asked = set(keyword_words(ask))
     if len(asked) <= SHORT_ASK:
-        uses = Counter(word for text in documents for word in asked & set(keyword_words(text)))
-        if any(count <= RARE_TERM for count in uses.values()):
+        searched = set(positions)
+        if any(0 < len(passages_with(word, searched, scope.courses)) <= RARE_TERM for word in asked):
             keyword_weight = WEIGHT_RARE_TERM
-    ranked = [(keyword_weight, [entries[position] for position in keyword_ranking(ask, documents)])]
+    ranked = [(keyword_weight, [index["ids"][position]
+                                for position in keyword_ranking(ask, positions, scope.courses)])]
     for weight, text in ((WEIGHT_QUESTION, query), (WEIGHT_ASK, ask)):
         vector = embedding_model().encode("search_query: " + text, show_progress_bar=False)
         result = collection.query(query_embeddings=[vector.tolist()], where=where,
@@ -911,7 +1005,7 @@ def search_passages(query, scope, limit, *, ask=None, skip=()):
 
     # A typed note has no misread symbols, so it wins a near tie with an OCR passage.
     def kind(entry):
-        source = passages[entry][0]["source"].casefold()
+        source = passages[entry]["source"].casefold()
         return "typed" if source.endswith((".txt", ".md")) else "ocr" if source.endswith("ocr)") else "pdf"
 
     for start in range(1, len(order)):
@@ -921,9 +1015,12 @@ def search_passages(query, scope, limit, *, ask=None, skip=()):
             order[place - 1], order[place] = order[place], order[place - 1]
             place -= 1
 
+    # Only these passages can be returned, so only their text is read.
+    rows = collection.get(ids=order, include=["documents"]) if order else {"ids": [], "documents": []}
+    texts = dict(zip(rows["ids"], rows["documents"]))
     seen, found = set(skip), []
     for entry in order:
-        metadata, text = passages[entry]
+        metadata, text = passages[entry], texts[entry]
         if text not in seen and len(found) < limit:
             seen.add(text)
             found.append((metadata, text))
@@ -942,9 +1039,10 @@ def named_files(question, scope, picks):
     """
     picks, files = set(picks), set()
     if re.search(r"\.(?:pdf|txt|md)\b", question, re.I):
-        rows = read_passages(index_collection(), scope.where, ["metadatas"])
+        metadatas = index_rows()["metadatas"]
         by_name = {}
-        for path in {source_path(metadata["source"]) for metadata in rows["metadatas"]}:
+        for path in {source_path(metadatas[position]["source"])
+                     for position in scope_positions(scope.courses, scope.sources)}:
             parts = ["notes", *path.casefold().split("/")]
             for start in range(len(parts)):
                 by_name.setdefault("/".join(parts[start:]), set()).add(path)
@@ -1745,9 +1843,11 @@ def skipped_summary(skips):
 
 
 def rebuild(progress_callback=None):
-    global CLIENT, COLLECTION, INDEX_PROGRESS
+    global CLIENT, COLLECTION, INDEX, INDEX_PROGRESS
     from ingest import OCRError, load_chunks
 
+    # Forget the index in memory before anything changes it, so it's read again afterward.
+    INDEX = None
     INDEX_PROGRESS = {}
     share = 0
 
